@@ -9,6 +9,34 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    #btg-btn {
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 13px;
+      border-radius: 12px;
+      border: 1.5px solid var(--border);
+      background: var(--card);
+      cursor: pointer;
+      text-decoration: none;
+      font-family: 'Syne', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: 0.04em;
+      transition: all 0.15s;
+      z-index: 100;
+    }
+
+    #btg-btn:hover {
+      background: var(--bg);
+      transform: translateY(-1px);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    }
+
     :root {
       --bg: #f5f0e8;
       --card: #fffdf8;
@@ -354,6 +382,8 @@
   </style>
 </head>
 <body>
+
+  <a id="btg-btn" href="index.html">🌳 BTG</a>
 
   <header>
     <h1>Above or Below Average? 🤔</h1>
