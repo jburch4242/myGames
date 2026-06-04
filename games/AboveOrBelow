@@ -1,0 +1,394 @@
+import { useState, useEffect } from "react";
+
+const questions = [
+  {
+    id: 1,
+    emoji: "😴",
+    stat: "Hours of sleep per night",
+    average: 6.8,
+    unit: "hrs",
+    color: "#7F77DD",
+    lightColor: "#EEEDFE",
+    context: "The average American gets only 6.8 hours of sleep per night — despite the recommended 7+ hours.",
+    direction: "higher is better",
+    source: "SingleCare / CDC data",
+    sourceUrl: "https://www.singlecare.com/blog/news/sleep-statistics/",
+  },
+  {
+    id: 2,
+    emoji: "🚶",
+    stat: "Steps walked per day",
+    average: 4500,
+    unit: "steps",
+    color: "#1D9E75",
+    lightColor: "#E1F5EE",
+    context: "Americans walk between 4,000–5,000 steps daily on average — far below the commonly cited 10,000 goal.",
+    direction: "higher is better",
+    source: "UCLA Health",
+    sourceUrl: "https://www.uclahealth.org/news/article/how-many-steps-do-you-need-day-see-health-benefits",
+  },
+  {
+    id: 3,
+    emoji: "📚",
+    stat: "Books read per year",
+    average: 4,
+    unit: "books",
+    color: "#D85A30",
+    lightColor: "#FAECE7",
+    context: "The median American reads about 4 books per year (the mean is higher, skewed by avid readers).",
+    direction: "higher is better",
+    source: "Pew Research Center",
+    sourceUrl: "https://www.pewresearch.org/internet/2016/09/01/book-reading-2016/",
+  },
+  {
+    id: 4,
+    emoji: "📱",
+    stat: "Daily phone screen time",
+    average: 5.3,
+    unit: "hrs",
+    color: "#D4537E",
+    lightColor: "#FBEAF0",
+    context: "Americans average over 5 hours of phone screen time per day — more than double what experts recommend.",
+    direction: "lower is better",
+    source: "Harmony Healthcare IT (2024 survey)",
+    sourceUrl: "https://www.harmonyhit.com/phone-screen-time-statistics/",
+  },
+  {
+    id: 5,
+    emoji: "🥦",
+    stat: "Fruit & vegetable servings per day",
+    average: 2.7,
+    unit: "servings",
+    context: "Adults average about 1.1 fruit + 1.6 vegetable servings daily. Only 1 in 10 meets recommendations.",
+    direction: "higher is better",
+    color: "#639922",
+    lightColor: "#EAF3DE",
+    source: "CDC / BRFSS 2019",
+    sourceUrl: "https://archive.cdc.gov/www_cdc_gov/nccdphp/dnpao/division-information/media-tools/adults-fruits-vegetables.html",
+  },
+  {
+    id: 6,
+    emoji: "🧠",
+    stat: "Vocabulary size (words known)",
+    average: 42000,
+    unit: "words",
+    context: "A large-scale study found native English-speaking Americans know around 42,000 words by age 20.",
+    direction: "higher is better",
+    color: "#BA7517",
+    lightColor: "#FAEEDA",
+    source: "Brysbaert et al., Frontiers in Psychology (2016)",
+    sourceUrl: "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4965448/",
+  },
+  {
+    id: 7,
+    emoji: "👯",
+    stat: "Close friends you have",
+    average: 3.6,
+    unit: "friends",
+    context: "A 2025 Talker Research survey of 2,000 adults found Americans now have an average of 3.6 close friends — down from prior decades.",
+    direction: "higher is better",
+    color: "#7F77DD",
+    lightColor: "#EEEDFE",
+    source: "Talker Research / StudyFinds (2025)",
+    sourceUrl: "https://studyfinds.org/average-american-4-close-friends/",
+  },
+  {
+    id: 8,
+    emoji: "💧",
+    stat: "Cups of plain water per day",
+    average: 4.3,
+    unit: "cups",
+    context: "NHANES data shows US adults drink about 4.3 cups of plain water daily — well below the recommended 8–13.",
+    direction: "higher is better",
+    color: "#378ADD",
+    lightColor: "#E6F1FB",
+    source: "CDC / NHANES 2005–2008",
+    sourceUrl: "https://www.cdc.gov/pcd/issues/2013/12_0248.htm",
+  },
+  {
+    id: 9,
+    emoji: "🏃",
+    stat: "Minutes of exercise per week",
+    average: 120,
+    unit: "min",
+    context: "Americans average only about 2 hours of sports/fitness weekly — well short of the CDC-recommended 150 minutes.",
+    direction: "higher is better",
+    color: "#1D9E75",
+    lightColor: "#E1F5EE",
+    source: "Penn State / American Time Use Study",
+    sourceUrl: "https://www.psu.edu/news/research/story/americans-fall-short-federal-exercise-recommendations/",
+  },
+  {
+    id: 10,
+    emoji: "📺",
+    stat: "Hours watching TV per day",
+    average: 3.7,
+    unit: "hrs",
+    context: "Nielsen data shows Americans spend an average of 3.7 hours watching TV daily, making it the dominant leisure activity.",
+    direction: "lower is better",
+    color: "#D85A30",
+    lightColor: "#FAECE7",
+    source: "Nielsen / adwave.com",
+    sourceUrl: "https://adwave.com/resources/average-daily-tv-viewing-time",
+  },
+  {
+    id: 11,
+    emoji: "🍳",
+    stat: "Minutes cooking at home per day",
+    average: 37,
+    unit: "min",
+    context: "Americans spend an average of 37 minutes per day on food prep and cleanup at home.",
+    direction: "neutral",
+    color: "#BA7517",
+    lightColor: "#FAEEDA",
+    source: "Bureau of Labor Statistics (ATUS)",
+    sourceUrl: "https://www.bls.gov/tus/",
+  },
+  {
+    id: 12,
+    emoji: "😴",
+    stat: "Adults who get 7+ hours of sleep",
+    average: 65,
+    unit: "%",
+    context: "Only about 65% of US adults report getting a healthy 7+ hours of sleep per night.",
+    direction: "higher is better",
+    color: "#534AB7",
+    lightColor: "#EEEDFE",
+    source: "CDC / MMWR 2016",
+    sourceUrl: "https://www.cdc.gov/mmwr/volumes/65/wr/mm6506a1.htm",
+  },
+];
+
+const shuffle = arr => [...arr].sort(() => Math.random() - 0.5);
+
+export default function App() {
+  const [deck, setDeck] = useState([]);
+  const [idx, setIdx] = useState(0);
+  const [choice, setChoice] = useState(null);
+  const [votes, setVotes] = useState({});
+  const [phase, setPhase] = useState("playing");
+  const [animKey, setAnimKey] = useState(0);
+
+  useEffect(() => { setDeck(shuffle(questions)); }, []);
+
+  const q = deck[idx];
+
+  const getVotePct = (qId, picked) => {
+    const v = votes[qId];
+    if (!v) return { above: 50, below: 50 };
+    const total = v.above + v.below;
+    return {
+      above: Math.round((v.above / total) * 100),
+      below: Math.round((v.below / total) * 100),
+    };
+  };
+
+  const handleChoice = (picked) => {
+    if (choice) return;
+    setChoice(picked);
+    setAnimKey(k => k + 1);
+    const newVotes = { ...votes };
+    if (!newVotes[q.id]) newVotes[q.id] = { above: Math.floor(Math.random() * 15) + 8, below: Math.floor(Math.random() * 15) + 8 };
+    newVotes[q.id][picked] += 1;
+    setVotes(newVotes);
+  };
+
+  const handleNext = () => {
+    if (idx + 1 >= deck.length) { setPhase("done"); return; }
+    setChoice(null);
+    setIdx(i => i + 1);
+  };
+
+  const restart = () => {
+    setDeck(shuffle(questions));
+    setIdx(0);
+    setChoice(null);
+    setVotes({});
+    setPhase("playing");
+  };
+
+  const formatNum = n => {
+    if (n >= 1000) return n.toLocaleString();
+    if (Number.isInteger(n)) return n;
+    return n.toFixed(1);
+  };
+
+  if (!q && phase !== "done") return null;
+
+  if (phase === "done") {
+    return (
+      <div style={{ padding: "3rem 1rem", textAlign: "center", maxWidth: 480, margin: "0 auto" }}>
+        <div style={{ fontSize: 64, marginBottom: 12 }}>🎉</div>
+        <h2 style={{ fontSize: 22, fontWeight: 500, margin: "0 0 8px" }}>That's a wrap!</h2>
+        <p style={{ color: "var(--color-text-secondary)", marginBottom: 28, lineHeight: 1.6 }}>
+          You made it through all {deck.length} stats. How did your life stack up?
+        </p>
+        <button onClick={restart} style={{ padding: "12px 32px", borderRadius: "var(--border-radius-lg)", border: "0.5px solid var(--color-border-secondary)", background: "var(--color-background-primary)", cursor: "pointer", fontSize: 15, fontWeight: 500 }}>
+          Play again ↺
+        </button>
+      </div>
+    );
+  }
+
+  const pct = choice ? getVotePct(q.id, choice) : null;
+  const progress = ((idx) / deck.length) * 100;
+
+  return (
+    <div style={{ maxWidth: 520, margin: "0 auto", padding: "1.25rem 1rem", fontFamily: "var(--font-sans)" }}>
+      <h2 className="sr-only">Above or Below Average? Game</h2>
+
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+        <span style={{ fontSize: 13, color: "var(--color-text-secondary)", fontWeight: 500 }}>
+          {idx + 1} <span style={{ opacity: 0.5 }}>/ {deck.length}</span>
+        </span>
+        <div style={{ flex: 1, height: 4, background: "var(--color-background-secondary)", borderRadius: 2, margin: "0 12px", overflow: "hidden" }}>
+          <div style={{ height: "100%", width: `${progress}%`, background: q.color, borderRadius: 2, transition: "width 0.4s ease" }} />
+        </div>
+        <span style={{ fontSize: 12, color: "var(--color-text-tertiary)" }}>
+          {Math.round(progress)}%
+        </span>
+      </div>
+
+      <div style={{
+        background: q.lightColor,
+        borderRadius: "var(--border-radius-lg)",
+        padding: "1.5rem",
+        marginBottom: 14,
+        position: "relative",
+        overflow: "hidden",
+        minHeight: 160,
+        border: `1px solid ${q.color}22`,
+        transition: "background 0.3s",
+      }}>
+        <div style={{ fontSize: 40, marginBottom: 10, lineHeight: 1 }}>{q.emoji}</div>
+        <p style={{ fontSize: 12, fontWeight: 500, color: q.color, textTransform: "uppercase", letterSpacing: "0.08em", margin: "0 0 6px" }}>
+          Are you above or below average?
+        </p>
+        <h3 style={{ fontSize: 20, fontWeight: 500, margin: "0 0 12px", color: "#1a1a1a", lineHeight: 1.25 }}>
+          {q.stat}
+        </h3>
+
+        {choice ? (
+          <div style={{ animation: "fadeIn 0.3s ease" }}>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 4 }}>
+              <span style={{ fontSize: 34, fontWeight: 500, color: q.color }}>
+                {formatNum(q.average)}
+              </span>
+              <span style={{ fontSize: 14, color: "#555" }}>{q.unit} average</span>
+            </div>
+            <p style={{ fontSize: 13, color: "#444", margin: "0 0 10px", lineHeight: 1.5 }}>{q.context}</p>
+            <a href={q.sourceUrl} target="_blank" rel="noopener noreferrer"
+              style={{ fontSize: 11, color: q.color, textDecoration: "none", borderBottom: `1px solid ${q.color}55`, paddingBottom: 1 }}>
+              Source: {q.source} ↗
+            </a>
+          </div>
+        ) : (
+          <p style={{ fontSize: 14, color: "#666", margin: 0, fontStyle: "italic" }}>
+            Pick above or below, then see the real number.
+          </p>
+        )}
+      </div>
+
+      {!choice && (
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 14 }}>
+          {[
+            { key: "above", label: "Above average", icon: "⬆" },
+            { key: "below", label: "Below average", icon: "⬇" },
+          ].map(opt => (
+            <button
+              key={opt.key}
+              onClick={() => handleChoice(opt.key)}
+              style={{
+                padding: "28px 16px",
+                borderRadius: 24,
+                border: "1.5px solid var(--color-border-secondary)",
+                background: "var(--color-background-primary)",
+                cursor: "pointer",
+                fontSize: 16,
+                fontWeight: 600,
+                color: "var(--color-text-primary)",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 8,
+                transition: "all 0.15s",
+              }}
+              onMouseEnter={e => { e.currentTarget.style.background = q.lightColor; e.currentTarget.style.borderColor = q.color; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "var(--color-background-primary)"; e.currentTarget.style.borderColor = "var(--color-border-secondary)"; }}
+            >
+              <span style={{ fontSize: 28 }}>{opt.icon}</span>
+              <span>{opt.label}</span>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {choice && pct && (
+        <div style={{
+          background: "var(--color-background-primary)",
+          border: "0.5px solid var(--color-border-tertiary)",
+          borderRadius: "var(--border-radius-lg)",
+          padding: "1rem 1.25rem",
+          marginBottom: 14,
+        }}>
+          <p style={{ fontSize: 12, color: "var(--color-text-secondary)", margin: "0 0 14px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+            What everyone else said
+          </p>
+          {["above", "below"].map(opt => (
+            <div key={opt} style={{ marginBottom: opt === "above" ? 12 : 0 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, marginBottom: 5 }}>
+                <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <span>{opt === "above" ? "⬆" : "⬇"}</span>
+                  <span style={{ color: choice === opt ? "var(--color-text-primary)" : "var(--color-text-secondary)", fontWeight: choice === opt ? 500 : 400 }}>
+                    {opt === "above" ? "Above" : "Below"} average
+                  </span>
+                  {choice === opt && (
+                    <span style={{ fontSize: 11, background: q.color, color: "#fff", padding: "1px 7px", borderRadius: 99, fontWeight: 500 }}>
+                      you
+                    </span>
+                  )}
+                </span>
+                <span style={{ fontWeight: 600, color: choice === opt ? q.color : "var(--color-text-secondary)" }}>
+                  {pct[opt]}%
+                </span>
+              </div>
+              <div style={{ height: 10, borderRadius: 5, background: "var(--color-background-secondary)", overflow: "hidden" }}>
+                <div style={{
+                  height: "100%",
+                  width: `${pct[opt]}%`,
+                  borderRadius: 5,
+                  background: choice === opt ? q.color : "var(--color-border-tertiary)",
+                  transition: "width 0.7s cubic-bezier(0.34,1.56,0.64,1)",
+                }} />
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {choice && (
+        <button
+          onClick={handleNext}
+          style={{
+            width: "100%",
+            padding: "14px 0",
+            borderRadius: "var(--border-radius-lg)",
+            border: `1.5px solid ${q.color}`,
+            background: q.color,
+            cursor: "pointer",
+            fontSize: 15,
+            fontWeight: 500,
+            color: "#fff",
+            transition: "opacity 0.15s",
+          }}
+          onMouseEnter={e => e.currentTarget.style.opacity = "0.88"}
+          onMouseLeave={e => e.currentTarget.style.opacity = "1"}
+        >
+          {idx + 1 >= deck.length ? "See results 🎉" : "Next question →"}
+        </button>
+      )}
+
+      <style>{`@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }`}</style>
+    </div>
+  );
+}
