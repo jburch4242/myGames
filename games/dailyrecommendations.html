@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Daily Recommendations — A Guided Tour of What the Experts Say</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #F7F5F0;
+      --surface: #FFFFFF;
+      --border: #E0DDD7;
+      --border-light: #EDEBE6;
+      --text: #1A1A1A;
+      --text-secondary: #5A5751;
+      --text-tertiary: #9A9590;
+      --accent-green: #1D9E75;
+      --radius: 12px;
+      --max-w: 720px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: Georgia, 'Times New Roman', serif;
+      min-height: 100vh;
+    }
+
+    /* NAV */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(247, 245, 240, 0.92);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      height: 52px;
+      display: flex;
+      align-items: center;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      color: var(--text-secondary);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.03em;
+      padding: 5px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      transition: background 0.15s, color 0.15s;
+    }
+    .back-btn:hover { background: var(--border-light); color: var(--text); }
+    .back-btn .arrow { font-size: 14px; }
+
+    /* HERO */
+    .hero {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 3.5rem 2rem 2rem;
+      border-bottom: 2px solid var(--text);
+    }
+    .hero-section-label {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      margin-bottom: 10px;
+    }
+    .hero h1 {
+      font-size: clamp(32px, 5vw, 48px);
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin-bottom: 10px;
+    }
+    .hero-subtitle {
+      font-size: clamp(16px, 2.5vw, 20px);
+      color: var(--text-secondary);
+      font-style: italic;
+      margin-bottom: 14px;
+      line-height: 1.4;
+    }
+    .hero-dateline {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 12px;
+      color: var(--text-tertiary);
+    }
+
+    /* MAIN LAYOUT */
+    main {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 2.5rem 2rem 4rem;
+    }
+
+    /* PROGRESS */
+    .progress-wrap {
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .progress-bar {
+      flex: 1;
+      height: 3px;
+      background: var(--border);
+      border-radius: 2px;
+    }
+    .progress-fill {
+      height: 100%;
+      border-radius: 2px;
+      background: var(--text);
+      transition: width 0.4s ease;
+    }
+    .progress-label {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 11px;
+      color: var(--text-tertiary);
+      white-space: nowrap;
+    }
+
+    /* CARD */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: 2rem;
+    }
+    .card-top {
+      display: flex;
+      align-items: stretch;
+    }
+    .card-accent-bar {
+      width: 5px;
+      flex-shrink: 0;
+    }
+    .card-body {
+      padding: 2rem;
+      flex: 1;
+    }
+    .badge {
+      display: inline-block;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 20px;
+      margin-bottom: 14px;
+    }
+    .card-label {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 13px;
+      color: var(--text-tertiary);
+      margin-bottom: 4px;
+      letter-spacing: 0.02em;
+    }
+    .card-stat {
+      font-size: clamp(44px, 8vw, 64px);
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: -0.03em;
+      margin-bottom: 4px;
+    }
+    .card-unit {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 1.25rem;
+    }
+    .card-divider {
+      border: none;
+      border-top: 1px solid var(--border-light);
+      margin-bottom: 1rem;
+    }
+    .card-desc {
+      font-size: 16px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: 1rem;
+    }
+    .card-source {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 11px;
+      color: var(--text-tertiary);
+      font-style: italic;
+    }
+
+    /* BUTTONS */
+    .btn-row {
+      display: flex;
+      gap: 12px;
+    }
+    .btn {
+      flex: 1;
+      padding: 12px 20px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn:hover { background: var(--border-light); }
+    .btn-next {
+      background: var(--text);
+      color: var(--bg);
+      border-color: var(--text);
+    }
+    .btn-next:hover { background: #333; }
+
+    /* FOOTER */
+    footer {
+      text-align: center;
+      padding: 2rem;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 12px;
+      color: var(--text-tertiary);
+      border-top: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a class="back-btn" href="index.html">
+      <span class="arrow">←</span>
+      🌳 BTG
+    </a>
+  </nav>
+
+  <header class="hero">
+    <div class="hero-section-label">Wellness &amp; Health</div>
+    <h1>Daily Recommendations</h1>
+    <p class="hero-subtitle">A Guided Tour of What the Experts Say</p>
+    <p class="hero-dateline" id="date-line"></p>
+  </header>
+
+  <main>
+    <div class="progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" id="progress" style="width:0%"></div></div>
+      <span class="progress-label" id="counter"></span>
+    </div>
+
+    <div id="card-area"></div>
+
+    <div class="btn-row">
+      <button class="btn" id="btn-prev" onclick="navigate(-1)" style="display:none">← Previous</button>
+      <button class="btn btn-next" id="btn-next" onclick="navigate(1)">Next recommendation →</button>
+    </div>
+  </main>
+
+  <footer>
+    &copy; <span id="yr"></span> Burch Tree Games
+  </footer>
+
+  <script>
+    const recs = [
+      {
+        badge:"Physical Activity", badgeColor:"#1D9E75", badgeBg:"#E1F5EE", accent:"#1D9E75",
+        stat:"10,000", unit:"steps / day", label:"Daily Step Goal",
+        desc:"Walking 10,000 steps daily supports cardiovascular health, improves mood, and helps maintain a healthy weight. Most adults average 3,000–4,000 steps without intentional exercise.",
+        source:"— Centers for Disease Control and Prevention, Physical Activity Guidelines"
+      },
+      {
+        badge:"Hydration", badgeColor:"#185FA5", badgeBg:"#E6F1FB", accent:"#185FA5",
+        stat:"2.7L", unit:"total water / day", label:"Daily Water Intake",
+        desc:"The National Academies recommend 2.7 liters of total daily water for women and 3.7 liters for men — this includes water from food. Yes, soup counts.",
+        source:"— National Academies of Sciences, Engineering, and Medicine, 2004"
+      },
+      {
+        badge:"Rest & Recovery", badgeColor:"#534AB7", badgeBg:"#EEEDFE", accent:"#534AB7",
+        stat:"7–9", unit:"hours / night", label:"Recommended Sleep Duration",
+        desc:"Adults should target 7 to 9 hours of sleep per night. Consistently sleeping fewer than 7 hours is linked to increased risk of obesity, heart disease, and impaired cognitive function.",
+        source:"— American Academy of Sleep Medicine, Sleep Foundation"
+      },
+      {
+        badge:"Nutrition", badgeColor:"#BA7517", badgeBg:"#FAEEDA", accent:"#BA7517",
+        stat:"5", unit:"servings of fruits & vegetables", label:"Produce Per Day",
+        desc:"Consuming at least 5 portions of fruit and vegetables daily is associated with reduced risk of serious health conditions. One portion is approximately 80g. A single bag of frozen peas contains roughly 6 portions. You are so close.",
+        source:"— World Health Organization, NHS"
+      },
+      {
+        badge:"Dietary Limits", badgeColor:"#993C1D", badgeBg:"#FAECE7", accent:"#993C1D",
+        stat:"<2,300", unit:"mg sodium / day", label:"Daily Sodium Limit",
+        desc:"The FDA recommends staying under 2,300mg of sodium per day. A single fast-food meal can contain up to 2,000mg. Technically, licking a salt lick once is not explicitly against the guidelines. We checked.",
+        source:"— U.S. Food and Drug Administration, Dietary Guidelines for Americans"
+      },
+      {
+        badge:"Sedentary Behavior", badgeColor:"#3C3489", badgeBg:"#EEEDFE", accent:"#3C3489",
+        stat:"≤8", unit:"hours seated / day", label:"Recommended Sitting Limit",
+        desc:"Prolonged sitting is independently associated with poor health outcomes even in physically active people. Experts recommend standing or moving every 30–60 minutes. This recommendation technically does not apply while asleep, which we recognize is a meaningful loophole.",
+        source:"— British Journal of Sports Medicine, 2015"
+      },
+      {
+        badge:"Stimulant Intake", badgeColor:"#633806", badgeBg:"#FAEEDA", accent:"#EF9F27",
+        stat:"≤400", unit:"mg caffeine / day", label:"Safe Daily Caffeine",
+        desc:"Up to 400mg of caffeine per day is considered safe for most healthy adults — roughly 4 cups of coffee. The FDA has also confirmed that 10,000mg in a short period is potentially fatal. So the recommended range is technically '400 to 9,999mg.' Stay toward the left side.",
+        source:"— U.S. Food and Drug Administration, Spilling the Beans Report"
+      },
+      {
+        badge:"Physical Activity", badgeColor:"#1D9E75", badgeBg:"#E1F5EE", accent:"#1D9E75",
+        stat:"1", unit:"step minimum (daily)", label:"Absolute Minimum Step Count",
+        desc:"Research confirms that taking at least one step per day is associated with not being entirely motionless. Scientists have categorized zero steps as 'lying still' and one step as 'technically ambulation.' You are invited to celebrate any number above zero as a personal best.",
+        source:"— The Institute for Relative Wellness Metrics, estimated"
+      },
+      {
+        badge:"Respiratory Health", badgeColor:"#0F6E56", badgeBg:"#E1F5EE", accent:"#0F6E56",
+        stat:"17,000", unit:"breaths / day", label:"Average Daily Breaths",
+        desc:"The average adult takes between 12 and 20 breaths per minute, totaling approximately 17,000 breaths per day. Experts recommend continuing to do this. There is currently no upper daily limit on breathing. Enjoy.",
+        source:"— American Lung Association, Probably"
+      },
+      {
+        badge:"Competitive Eating", badgeColor:"#A32D2D", badgeBg:"#FCEBEB", accent:"#E24B4A",
+        stat:"70", unit:"hot dogs (world record, not a goal)", label:"Daily Hot Dog Recommendation",
+        desc:"Joey Chestnut consumed 76 hot dogs in 10 minutes in 2021, setting a world record. Nutritionists have consistently not recommended this. However, eating one (1) hot dog at a summer barbecue has not been formally prohibited by any major health authority as of this publication.",
+        source:"— Major League Eating; various nutritionists who declined to comment"
+      }
+    ];
+
+    let current = 0;
+
+    function render() {
+      const r = recs[current];
+      const pct = ((current + 1) / recs.length) * 100;
+      document.getElementById('progress').style.width = pct + '%';
+      document.getElementById('counter').textContent = `${current + 1} of ${recs.length}`;
+
+      document.getElementById('card-area').innerHTML = `
+        <div class="card">
+          <div class="card-top">
+            <div class="card-accent-bar" style="background:${r.accent}"></div>
+            <div class="card-body">
+              <div class="badge" style="color:${r.badgeColor};background:${r.badgeBg}">${r.badge}</div>
+              <div class="card-label">${r.label}</div>
+              <div class="card-stat" style="color:${r.accent}">${r.stat}</div>
+              <div class="card-unit">${r.unit}</div>
+              <hr class="card-divider">
+              <p class="card-desc">${r.desc}</p>
+              <div class="card-source">${r.source}</div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      const isLast = current === recs.length - 1;
+      document.getElementById('btn-prev').style.display = current > 0 ? 'block' : 'none';
+      const btnNext = document.getElementById('btn-next');
+      if (isLast) {
+        btnNext.textContent = '↺ Start over';
+        btnNext.onclick = () => { current = 0; render(); };
+      } else {
+        btnNext.textContent = 'Next recommendation →';
+        btnNext.onclick = () => navigate(1);
+      }
+    }
+
+    function navigate(dir) {
+      current = Math.max(0, Math.min(recs.length - 1, current + dir));
+      render();
+    }
+
+    const d = new Date();
+    document.getElementById('date-line').textContent = d.toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+    document.getElementById('yr').textContent = d.getFullYear();
+    render();
+  </script>
+
+</body>
+</html>
