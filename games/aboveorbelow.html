@@ -1,394 +1,647 @@
-import { useState, useEffect } from "react";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Above or Below Average?</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet" />
 
-const questions = [
-  {
-    id: 1,
-    emoji: "😴",
-    stat: "Hours of sleep per night",
-    average: 6.8,
-    unit: "hrs",
-    color: "#7F77DD",
-    lightColor: "#EEEDFE",
-    context: "The average American gets only 6.8 hours of sleep per night — despite the recommended 7+ hours.",
-    direction: "higher is better",
-    source: "SingleCare / CDC data",
-    sourceUrl: "https://www.singlecare.com/blog/news/sleep-statistics/",
-  },
-  {
-    id: 2,
-    emoji: "🚶",
-    stat: "Steps walked per day",
-    average: 4500,
-    unit: "steps",
-    color: "#1D9E75",
-    lightColor: "#E1F5EE",
-    context: "Americans walk between 4,000–5,000 steps daily on average — far below the commonly cited 10,000 goal.",
-    direction: "higher is better",
-    source: "UCLA Health",
-    sourceUrl: "https://www.uclahealth.org/news/article/how-many-steps-do-you-need-day-see-health-benefits",
-  },
-  {
-    id: 3,
-    emoji: "📚",
-    stat: "Books read per year",
-    average: 4,
-    unit: "books",
-    color: "#D85A30",
-    lightColor: "#FAECE7",
-    context: "The median American reads about 4 books per year (the mean is higher, skewed by avid readers).",
-    direction: "higher is better",
-    source: "Pew Research Center",
-    sourceUrl: "https://www.pewresearch.org/internet/2016/09/01/book-reading-2016/",
-  },
-  {
-    id: 4,
-    emoji: "📱",
-    stat: "Daily phone screen time",
-    average: 5.3,
-    unit: "hrs",
-    color: "#D4537E",
-    lightColor: "#FBEAF0",
-    context: "Americans average over 5 hours of phone screen time per day — more than double what experts recommend.",
-    direction: "lower is better",
-    source: "Harmony Healthcare IT (2024 survey)",
-    sourceUrl: "https://www.harmonyhit.com/phone-screen-time-statistics/",
-  },
-  {
-    id: 5,
-    emoji: "🥦",
-    stat: "Fruit & vegetable servings per day",
-    average: 2.7,
-    unit: "servings",
-    context: "Adults average about 1.1 fruit + 1.6 vegetable servings daily. Only 1 in 10 meets recommendations.",
-    direction: "higher is better",
-    color: "#639922",
-    lightColor: "#EAF3DE",
-    source: "CDC / BRFSS 2019",
-    sourceUrl: "https://archive.cdc.gov/www_cdc_gov/nccdphp/dnpao/division-information/media-tools/adults-fruits-vegetables.html",
-  },
-  {
-    id: 6,
-    emoji: "🧠",
-    stat: "Vocabulary size (words known)",
-    average: 42000,
-    unit: "words",
-    context: "A large-scale study found native English-speaking Americans know around 42,000 words by age 20.",
-    direction: "higher is better",
-    color: "#BA7517",
-    lightColor: "#FAEEDA",
-    source: "Brysbaert et al., Frontiers in Psychology (2016)",
-    sourceUrl: "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4965448/",
-  },
-  {
-    id: 7,
-    emoji: "👯",
-    stat: "Close friends you have",
-    average: 3.6,
-    unit: "friends",
-    context: "A 2025 Talker Research survey of 2,000 adults found Americans now have an average of 3.6 close friends — down from prior decades.",
-    direction: "higher is better",
-    color: "#7F77DD",
-    lightColor: "#EEEDFE",
-    source: "Talker Research / StudyFinds (2025)",
-    sourceUrl: "https://studyfinds.org/average-american-4-close-friends/",
-  },
-  {
-    id: 8,
-    emoji: "💧",
-    stat: "Cups of plain water per day",
-    average: 4.3,
-    unit: "cups",
-    context: "NHANES data shows US adults drink about 4.3 cups of plain water daily — well below the recommended 8–13.",
-    direction: "higher is better",
-    color: "#378ADD",
-    lightColor: "#E6F1FB",
-    source: "CDC / NHANES 2005–2008",
-    sourceUrl: "https://www.cdc.gov/pcd/issues/2013/12_0248.htm",
-  },
-  {
-    id: 9,
-    emoji: "🏃",
-    stat: "Minutes of exercise per week",
-    average: 120,
-    unit: "min",
-    context: "Americans average only about 2 hours of sports/fitness weekly — well short of the CDC-recommended 150 minutes.",
-    direction: "higher is better",
-    color: "#1D9E75",
-    lightColor: "#E1F5EE",
-    source: "Penn State / American Time Use Study",
-    sourceUrl: "https://www.psu.edu/news/research/story/americans-fall-short-federal-exercise-recommendations/",
-  },
-  {
-    id: 10,
-    emoji: "📺",
-    stat: "Hours watching TV per day",
-    average: 3.7,
-    unit: "hrs",
-    context: "Nielsen data shows Americans spend an average of 3.7 hours watching TV daily, making it the dominant leisure activity.",
-    direction: "lower is better",
-    color: "#D85A30",
-    lightColor: "#FAECE7",
-    source: "Nielsen / adwave.com",
-    sourceUrl: "https://adwave.com/resources/average-daily-tv-viewing-time",
-  },
-  {
-    id: 11,
-    emoji: "🍳",
-    stat: "Minutes cooking at home per day",
-    average: 37,
-    unit: "min",
-    context: "Americans spend an average of 37 minutes per day on food prep and cleanup at home.",
-    direction: "neutral",
-    color: "#BA7517",
-    lightColor: "#FAEEDA",
-    source: "Bureau of Labor Statistics (ATUS)",
-    sourceUrl: "https://www.bls.gov/tus/",
-  },
-  {
-    id: 12,
-    emoji: "😴",
-    stat: "Adults who get 7+ hours of sleep",
-    average: 65,
-    unit: "%",
-    context: "Only about 65% of US adults report getting a healthy 7+ hours of sleep per night.",
-    direction: "higher is better",
-    color: "#534AB7",
-    lightColor: "#EEEDFE",
-    source: "CDC / MMWR 2016",
-    sourceUrl: "https://www.cdc.gov/mmwr/volumes/65/wr/mm6506a1.htm",
-  },
-];
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-const shuffle = arr => [...arr].sort(() => Math.random() - 0.5);
+    :root {
+      --bg: #f5f0e8;
+      --card: #fffdf8;
+      --ink: #1a1410;
+      --muted: #7a7060;
+      --border: #ddd5c0;
+    }
 
-export default function App() {
-  const [deck, setDeck] = useState([]);
-  const [idx, setIdx] = useState(0);
-  const [choice, setChoice] = useState(null);
-  const [votes, setVotes] = useState({});
-  const [phase, setPhase] = useState("playing");
-  const [animKey, setAnimKey] = useState(0);
+    body {
+      background: var(--bg);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 2rem 1rem 4rem;
+      color: var(--ink);
+    }
 
-  useEffect(() => { setDeck(shuffle(questions)); }, []);
+    header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
 
-  const q = deck[idx];
+    header h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(1.8rem, 5vw, 2.6rem);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
 
-  const getVotePct = (qId, picked) => {
-    const v = votes[qId];
-    if (!v) return { above: 50, below: 50 };
-    const total = v.above + v.below;
-    return {
-      above: Math.round((v.above / total) * 100),
-      below: Math.round((v.below / total) * 100),
-    };
-  };
+    header p {
+      margin-top: 0.5rem;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
 
-  const handleChoice = (picked) => {
-    if (choice) return;
-    setChoice(picked);
-    setAnimKey(k => k + 1);
-    const newVotes = { ...votes };
-    if (!newVotes[q.id]) newVotes[q.id] = { above: Math.floor(Math.random() * 15) + 8, below: Math.floor(Math.random() * 15) + 8 };
-    newVotes[q.id][picked] += 1;
-    setVotes(newVotes);
-  };
+    #game {
+      width: 100%;
+      max-width: 520px;
+    }
 
-  const handleNext = () => {
-    if (idx + 1 >= deck.length) { setPhase("done"); return; }
-    setChoice(null);
-    setIdx(i => i + 1);
-  };
+    /* Progress */
+    #progress-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 1.25rem;
+    }
 
-  const restart = () => {
-    setDeck(shuffle(questions));
-    setIdx(0);
-    setChoice(null);
-    setVotes({});
-    setPhase("playing");
-  };
+    #progress-bar-bg {
+      flex: 1;
+      height: 6px;
+      background: var(--border);
+      border-radius: 99px;
+      overflow: hidden;
+    }
 
-  const formatNum = n => {
-    if (n >= 1000) return n.toLocaleString();
-    if (Number.isInteger(n)) return n;
-    return n.toFixed(1);
-  };
+    #progress-bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      transition: width 0.4s ease, background 0.4s ease;
+    }
 
-  if (!q && phase !== "done") return null;
+    #progress-label {
+      font-size: 0.8rem;
+      color: var(--muted);
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
 
-  if (phase === "done") {
-    return (
-      <div style={{ padding: "3rem 1rem", textAlign: "center", maxWidth: 480, margin: "0 auto" }}>
-        <div style={{ fontSize: 64, marginBottom: 12 }}>🎉</div>
-        <h2 style={{ fontSize: 22, fontWeight: 500, margin: "0 0 8px" }}>That's a wrap!</h2>
-        <p style={{ color: "var(--color-text-secondary)", marginBottom: 28, lineHeight: 1.6 }}>
-          You made it through all {deck.length} stats. How did your life stack up?
-        </p>
-        <button onClick={restart} style={{ padding: "12px 32px", borderRadius: "var(--border-radius-lg)", border: "0.5px solid var(--color-border-secondary)", background: "var(--color-background-primary)", cursor: "pointer", fontSize: 15, fontWeight: 500 }}>
-          Play again ↺
-        </button>
-      </div>
-    );
-  }
+    /* Card */
+    #card {
+      border-radius: 20px;
+      padding: 1.75rem;
+      margin-bottom: 1rem;
+      transition: background 0.35s ease;
+      position: relative;
+      overflow: hidden;
+      border: 1.5px solid transparent;
+    }
 
-  const pct = choice ? getVotePct(q.id, choice) : null;
-  const progress = ((idx) / deck.length) * 100;
+    #card-emoji {
+      font-size: 2.5rem;
+      line-height: 1;
+      margin-bottom: 0.6rem;
+      display: block;
+    }
 
-  return (
-    <div style={{ maxWidth: 520, margin: "0 auto", padding: "1.25rem 1rem", fontFamily: "var(--font-sans)" }}>
-      <h2 className="sr-only">Above or Below Average? Game</h2>
+    #card-eyebrow {
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 0.4rem;
+      opacity: 0.7;
+    }
 
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-        <span style={{ fontSize: 13, color: "var(--color-text-secondary)", fontWeight: 500 }}>
-          {idx + 1} <span style={{ opacity: 0.5 }}>/ {deck.length}</span>
-        </span>
-        <div style={{ flex: 1, height: 4, background: "var(--color-background-secondary)", borderRadius: 2, margin: "0 12px", overflow: "hidden" }}>
-          <div style={{ height: "100%", width: `${progress}%`, background: q.color, borderRadius: 2, transition: "width 0.4s ease" }} />
-        </div>
-        <span style={{ fontSize: 12, color: "var(--color-text-tertiary)" }}>
-          {Math.round(progress)}%
-        </span>
-      </div>
+    #card-title {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(1.25rem, 3.5vw, 1.55rem);
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 0.9rem;
+    }
 
-      <div style={{
-        background: q.lightColor,
-        borderRadius: "var(--border-radius-lg)",
-        padding: "1.5rem",
-        marginBottom: 14,
-        position: "relative",
-        overflow: "hidden",
-        minHeight: 160,
-        border: `1px solid ${q.color}22`,
-        transition: "background 0.3s",
-      }}>
-        <div style={{ fontSize: 40, marginBottom: 10, lineHeight: 1 }}>{q.emoji}</div>
-        <p style={{ fontSize: 12, fontWeight: 500, color: q.color, textTransform: "uppercase", letterSpacing: "0.08em", margin: "0 0 6px" }}>
-          Are you above or below average?
-        </p>
-        <h3 style={{ fontSize: 20, fontWeight: 500, margin: "0 0 12px", color: "#1a1a1a", lineHeight: 1.25 }}>
-          {q.stat}
-        </h3>
+    #card-hint {
+      font-size: 0.9rem;
+      color: var(--muted);
+      font-style: italic;
+    }
 
-        {choice ? (
-          <div style={{ animation: "fadeIn 0.3s ease" }}>
-            <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 4 }}>
-              <span style={{ fontSize: 34, fontWeight: 500, color: q.color }}>
-                {formatNum(q.average)}
-              </span>
-              <span style={{ fontSize: 14, color: "#555" }}>{q.unit} average</span>
-            </div>
-            <p style={{ fontSize: 13, color: "#444", margin: "0 0 10px", lineHeight: 1.5 }}>{q.context}</p>
-            <a href={q.sourceUrl} target="_blank" rel="noopener noreferrer"
-              style={{ fontSize: 11, color: q.color, textDecoration: "none", borderBottom: `1px solid ${q.color}55`, paddingBottom: 1 }}>
-              Source: {q.source} ↗
-            </a>
-          </div>
-        ) : (
-          <p style={{ fontSize: 14, color: "#666", margin: 0, fontStyle: "italic" }}>
-            Pick above or below, then see the real number.
-          </p>
-        )}
-      </div>
+    #card-reveal {
+      display: none;
+    }
 
-      {!choice && (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 14 }}>
-          {[
-            { key: "above", label: "Above average", icon: "⬆" },
-            { key: "below", label: "Below average", icon: "⬇" },
-          ].map(opt => (
-            <button
-              key={opt.key}
-              onClick={() => handleChoice(opt.key)}
-              style={{
-                padding: "28px 16px",
-                borderRadius: 24,
-                border: "1.5px solid var(--color-border-secondary)",
-                background: "var(--color-background-primary)",
-                cursor: "pointer",
-                fontSize: 16,
-                fontWeight: 600,
-                color: "var(--color-text-primary)",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: 8,
-                transition: "all 0.15s",
-              }}
-              onMouseEnter={e => { e.currentTarget.style.background = q.lightColor; e.currentTarget.style.borderColor = q.color; }}
-              onMouseLeave={e => { e.currentTarget.style.background = "var(--color-background-primary)"; e.currentTarget.style.borderColor = "var(--color-border-secondary)"; }}
-            >
-              <span style={{ fontSize: 28 }}>{opt.icon}</span>
-              <span>{opt.label}</span>
-            </button>
-          ))}
-        </div>
-      )}
+    #card-reveal.show {
+      display: block;
+      animation: popIn 0.3s ease;
+    }
 
-      {choice && pct && (
-        <div style={{
-          background: "var(--color-background-primary)",
-          border: "0.5px solid var(--color-border-tertiary)",
-          borderRadius: "var(--border-radius-lg)",
-          padding: "1rem 1.25rem",
-          marginBottom: 14,
-        }}>
-          <p style={{ fontSize: 12, color: "var(--color-text-secondary)", margin: "0 0 14px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em" }}>
-            What everyone else said
-          </p>
-          {["above", "below"].map(opt => (
-            <div key={opt} style={{ marginBottom: opt === "above" ? 12 : 0 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, marginBottom: 5 }}>
-                <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                  <span>{opt === "above" ? "⬆" : "⬇"}</span>
-                  <span style={{ color: choice === opt ? "var(--color-text-primary)" : "var(--color-text-secondary)", fontWeight: choice === opt ? 500 : 400 }}>
-                    {opt === "above" ? "Above" : "Below"} average
-                  </span>
-                  {choice === opt && (
-                    <span style={{ fontSize: 11, background: q.color, color: "#fff", padding: "1px 7px", borderRadius: 99, fontWeight: 500 }}>
-                      you
-                    </span>
-                  )}
-                </span>
-                <span style={{ fontWeight: 600, color: choice === opt ? q.color : "var(--color-text-secondary)" }}>
-                  {pct[opt]}%
-                </span>
-              </div>
-              <div style={{ height: 10, borderRadius: 5, background: "var(--color-background-secondary)", overflow: "hidden" }}>
-                <div style={{
-                  height: "100%",
-                  width: `${pct[opt]}%`,
-                  borderRadius: 5,
-                  background: choice === opt ? q.color : "var(--color-border-tertiary)",
-                  transition: "width 0.7s cubic-bezier(0.34,1.56,0.64,1)",
-                }} />
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+    #card-number {
+      font-family: 'Syne', sans-serif;
+      font-size: 3rem;
+      font-weight: 800;
+      line-height: 1;
+      margin-bottom: 0.2rem;
+    }
 
-      {choice && (
-        <button
-          onClick={handleNext}
-          style={{
-            width: "100%",
-            padding: "14px 0",
-            borderRadius: "var(--border-radius-lg)",
-            border: `1.5px solid ${q.color}`,
-            background: q.color,
-            cursor: "pointer",
-            fontSize: 15,
-            fontWeight: 500,
-            color: "#fff",
-            transition: "opacity 0.15s",
-          }}
-          onMouseEnter={e => e.currentTarget.style.opacity = "0.88"}
-          onMouseLeave={e => e.currentTarget.style.opacity = "1"}
-        >
-          {idx + 1 >= deck.length ? "See results 🎉" : "Next question →"}
-        </button>
-      )}
+    #card-unit {
+      font-size: 1rem;
+      opacity: 0.7;
+      margin-bottom: 0.75rem;
+    }
 
-      <style>{`@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }`}</style>
+    #card-context {
+      font-size: 0.9rem;
+      line-height: 1.6;
+      margin-bottom: 0.75rem;
+      color: #333;
+    }
+
+    #card-source {
+      font-size: 0.75rem;
+      opacity: 0.65;
+      text-decoration: none;
+      border-bottom: 1px dotted currentColor;
+      padding-bottom: 1px;
+    }
+
+    /* Buttons */
+    #buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 1rem;
+    }
+
+    .choice-btn {
+      padding: 1.6rem 1rem;
+      border-radius: 20px;
+      border: 2px solid var(--border);
+      background: var(--card);
+      cursor: pointer;
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--ink);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .choice-btn .btn-icon {
+      font-size: 1.75rem;
+      line-height: 1;
+    }
+
+    .choice-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    }
+
+    .choice-btn:active {
+      transform: translateY(0px);
+    }
+
+    .choice-btn.selected {
+      color: #fff;
+      border-color: transparent;
+    }
+
+    .choice-btn.faded {
+      opacity: 0.4;
+    }
+
+    /* Votes panel */
+    #votes-panel {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 18px;
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+      display: none;
+    }
+
+    #votes-panel.show {
+      display: block;
+      animation: popIn 0.3s ease;
+    }
+
+    #votes-panel h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+
+    .vote-row {
+      margin-bottom: 0.85rem;
+    }
+
+    .vote-row:last-child { margin-bottom: 0; }
+
+    .vote-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 5px;
+      font-size: 0.85rem;
+    }
+
+    .vote-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 500;
+    }
+
+    .you-badge {
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 99px;
+      color: #fff;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .vote-pct {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .vote-bar-bg {
+      height: 10px;
+      background: #ede8e0;
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .vote-bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      transition: width 0.7s cubic-bezier(0.34, 1.4, 0.64, 1);
+    }
+
+    /* Next button */
+    #next-btn {
+      display: none;
+      width: 100%;
+      padding: 1rem;
+      border-radius: 16px;
+      border: none;
+      cursor: pointer;
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff;
+      transition: opacity 0.15s, transform 0.15s;
+      letter-spacing: 0.01em;
+    }
+
+    #next-btn.show { display: block; animation: popIn 0.25s ease; }
+    #next-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+    #next-btn:active { transform: translateY(0); }
+
+    /* Done screen */
+    #done-screen {
+      display: none;
+      text-align: center;
+      padding: 2rem 0;
+    }
+
+    #done-screen.show { display: block; animation: popIn 0.4s ease; }
+
+    #done-screen .done-emoji { font-size: 4rem; margin-bottom: 1rem; display: block; }
+
+    #done-screen h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+    }
+
+    #done-screen p {
+      color: var(--muted);
+      margin-bottom: 1.75rem;
+      line-height: 1.6;
+    }
+
+    #restart-btn {
+      padding: 0.9rem 2.5rem;
+      border-radius: 16px;
+      border: none;
+      cursor: pointer;
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      background: var(--ink);
+      color: #fff;
+      transition: opacity 0.15s;
+    }
+
+    #restart-btn:hover { opacity: 0.8; }
+
+    /* Loading / error */
+    #loading { text-align: center; padding: 3rem 0; color: var(--muted); font-style: italic; }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: translateY(8px) scale(0.98); }
+      to   { opacity: 1; transform: translateY(0)  scale(1); }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Above or Below Average? 🤔</h1>
+    <p>How do you stack up against everyone else?</p>
+  </header>
+
+  <div id="game">
+    <div id="loading">Loading questions…</div>
+
+    <div id="progress-wrap" style="display:none">
+      <div id="progress-bar-bg"><div id="progress-bar-fill"></div></div>
+      <span id="progress-label"></span>
     </div>
-  );
-}
+
+    <div id="card" style="display:none">
+      <span id="card-emoji"></span>
+      <p id="card-eyebrow">Above or below average?</p>
+      <h2 id="card-title"></h2>
+      <p id="card-hint"></p>
+      <div id="card-reveal">
+        <div id="card-number"></div>
+        <div id="card-unit"></div>
+        <p id="card-context"></p>
+        <a id="card-source" href="#" target="_blank" rel="noopener noreferrer"></a>
+      </div>
+    </div>
+
+    <div id="buttons">
+      <button class="choice-btn" id="btn-above" onclick="choose('above')">
+        <span class="btn-icon">⬆️</span>
+        Above average
+      </button>
+      <button class="choice-btn" id="btn-below" onclick="choose('below')">
+        <span class="btn-icon">⬇️</span>
+        Below average
+      </button>
+    </div>
+
+    <div id="votes-panel">
+      <h3>What everyone picked</h3>
+      <div class="vote-row">
+        <div class="vote-meta">
+          <span class="vote-label" id="label-above">⬆ Above average</span>
+          <span class="vote-pct" id="pct-above"></span>
+        </div>
+        <div class="vote-bar-bg"><div class="vote-bar-fill" id="bar-above" style="width:0%"></div></div>
+      </div>
+      <div class="vote-row">
+        <div class="vote-meta">
+          <span class="vote-label" id="label-below">⬇ Below average</span>
+          <span class="vote-pct" id="pct-below"></span>
+        </div>
+        <div class="vote-bar-bg"><div class="vote-bar-fill" id="bar-below" style="width:0%"></div></div>
+      </div>
+    </div>
+
+    <button id="next-btn" onclick="next()">Next question →</button>
+
+    <div id="done-screen">
+      <span class="done-emoji">🎉</span>
+      <h2>You made it through!</h2>
+      <p>Thanks for playing. Share it with a friend and see how they compare.</p>
+      <button id="restart-btn" onclick="restart()">Play again ↺</button>
+    </div>
+  </div>
+
+  <script>
+    // =============================================
+    // SUPABASE CONFIG — fill these in after setup
+    // =============================================
+    const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+    const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+    // =============================================
+
+    const questions = [
+      { id: 1,  emoji: '😴', stat: 'Hours of sleep per night',         average: 6.8,   unit: 'hrs',     color: '#7B68EE', light: '#f0effe', context: 'The average American gets 6.8 hours of sleep a night — below the recommended 7+.',                                                     source: 'SingleCare / CDC',                  sourceUrl: 'https://www.singlecare.com/blog/news/sleep-statistics/' },
+      { id: 2,  emoji: '🚶', stat: 'Steps walked per day',             average: 4500,  unit: 'steps',   color: '#2ECC9A', light: '#eafaf4', context: 'Americans walk 4,000–5,000 steps a day on average. The popular 10,000 goal? A marketing invention.',                                 source: 'UCLA Health',                       sourceUrl: 'https://www.uclahealth.org/news/article/how-many-steps-do-you-need-day-see-health-benefits' },
+      { id: 3,  emoji: '📚', stat: 'Books read per year',              average: 4,     unit: 'books',   color: '#E8613A', light: '#fdf0ec', context: 'The median American reads 4 books a year. The mean is higher, dragged up by people who read constantly.',                            source: 'Pew Research Center',               sourceUrl: 'https://www.pewresearch.org/internet/2016/09/01/book-reading-2016/' },
+      { id: 4,  emoji: '📱', stat: 'Daily phone screen time',          average: 5.3,   unit: 'hrs',     color: '#E8547A', light: '#fdedf2', context: 'Americans average over 5 hours on their phones daily. Experts say 2 hours is the healthy max.',                                     source: 'Harmony Healthcare IT, 2024',       sourceUrl: 'https://www.harmonyhit.com/phone-screen-time-statistics/' },
+      { id: 5,  emoji: '🥦', stat: 'Fruit & veg servings per day',     average: 2.7,   unit: 'servings',color: '#74B816', light: '#f3fae6', context: 'Adults average 1.1 fruit + 1.6 vegetable servings daily. Only 1 in 10 meets the official recommendation.',                         source: 'CDC / BRFSS 2019',                  sourceUrl: 'https://archive.cdc.gov/www_cdc_gov/nccdphp/dnpao/division-information/media-tools/adults-fruits-vegetables.html' },
+      { id: 6,  emoji: '🧠', stat: 'English words you know',           average: 42000, unit: 'words',   color: '#F59F00', light: '#fff8e6', context: 'A study of 1 million people found native English speakers know around 42,000 words by age 20.',                                   source: 'Brysbaert et al., Frontiers in Psychology', sourceUrl: 'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4965448/' },
+      { id: 7,  emoji: '👯', stat: 'Close friends you have',           average: 3.6,   unit: 'friends', color: '#CC5DE8', light: '#faeffe', context: 'A 2025 survey of 2,000 adults found Americans now average just 3.6 close friends — and that number keeps shrinking.',               source: 'Talker Research / StudyFinds, 2025',sourceUrl: 'https://studyfinds.org/average-american-4-close-friends/' },
+      { id: 8,  emoji: '💧', stat: 'Cups of plain water per day',      average: 4.3,   unit: 'cups',    color: '#4DABF7', light: '#eaf5ff', context: 'NHANES data shows US adults drink about 4.3 cups of plain water daily — well below the recommended 8–13.',                          source: 'CDC / NHANES',                      sourceUrl: 'https://www.cdc.gov/pcd/issues/2013/12_0248.htm' },
+      { id: 9,  emoji: '🏃', stat: 'Minutes of exercise per week',     average: 120,   unit: 'min',     color: '#2ECC9A', light: '#eafaf4', context: 'Americans average around 2 hours of exercise weekly. The CDC recommends at least 2.5 hours of moderate activity.',                   source: 'Penn State / American Time Use Study',sourceUrl: 'https://www.psu.edu/news/research/story/americans-fall-short-federal-exercise-recommendations/' },
+      { id: 10, emoji: '📺', stat: 'Hours watching TV per day',        average: 3.7,   unit: 'hrs',     color: '#E8613A', light: '#fdf0ec', context: 'Nielsen data shows Americans watch 3.7 hours of TV daily — more time than most people spend eating, exercising, and socializing combined.', source: 'Nielsen / adwave.com',           sourceUrl: 'https://adwave.com/resources/average-daily-tv-viewing-time' },
+      { id: 11, emoji: '🍳', stat: 'Minutes cooking at home per day',  average: 37,    unit: 'min',     color: '#F59F00', light: '#fff8e6', context: 'Americans spend 37 minutes a day on food prep and cleanup — not much time for anything fancy.',                                      source: 'Bureau of Labor Statistics (ATUS)', sourceUrl: 'https://www.bls.gov/tus/' },
+      { id: 12, emoji: '😴', stat: 'Adults getting 7+ hrs of sleep',   average: 65,    unit: '%',       color: '#7B68EE', light: '#f0effe', context: 'About 65% of US adults report sleeping a healthy 7+ hours per night. The rest are running on fumes.',                               source: 'CDC / MMWR 2016',                   sourceUrl: 'https://www.cdc.gov/mmwr/volumes/65/wr/mm6506a1.htm' },
+    ];
+
+    let deck = [];
+    let idx = 0;
+    let currentChoice = null;
+
+    function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
+
+    function fmt(n) {
+      if (n >= 1000) return n.toLocaleString();
+      return Number.isInteger(n) ? n : n.toFixed(1);
+    }
+
+    async function supabase(method, path, body) {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+        method,
+        headers: {
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json',
+          'Prefer': method === 'POST' ? 'return=representation' : '',
+        },
+        body: body ? JSON.stringify(body) : undefined,
+      });
+      if (!res.ok) throw new Error(await res.text());
+      return res.json().catch(() => null);
+    }
+
+    async function getVotes(questionId) {
+      const data = await supabase('GET', `votes?question_id=eq.${questionId}&select=above,below`);
+      if (!data || data.length === 0) return { above: 0, below: 0 };
+      return data[0];
+    }
+
+    async function submitVote(questionId, choice) {
+      // Upsert: increment the chosen column
+      const current = await getVotes(questionId);
+      const updated = { ...current, question_id: questionId };
+      updated[choice] = (updated[choice] || 0) + 1;
+      await supabase('POST', 'votes?on_conflict=question_id', updated);
+      return updated;
+    }
+
+    async function init() {
+      deck = shuffle(questions);
+      idx = 0;
+      currentChoice = null;
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('progress-wrap').style.display = 'flex';
+      document.getElementById('card').style.display = 'block';
+      document.getElementById('buttons').style.display = 'grid';
+      document.getElementById('done-screen').classList.remove('show');
+      renderQuestion();
+    }
+
+    function renderQuestion() {
+      const q = deck[idx];
+
+      // Progress
+      const pct = (idx / deck.length) * 100;
+      document.getElementById('progress-bar-fill').style.width = pct + '%';
+      document.getElementById('progress-bar-fill').style.background = q.color;
+      document.getElementById('progress-label').textContent = `${idx + 1} / ${deck.length}`;
+
+      // Card
+      const card = document.getElementById('card');
+      card.style.background = q.light;
+      card.style.borderColor = q.color + '33';
+      card.style.color = q.color;
+
+      document.getElementById('card-emoji').textContent = q.emoji;
+      document.getElementById('card-eyebrow').style.color = q.color;
+      document.getElementById('card-title').style.color = '#1a1410';
+      document.getElementById('card-title').textContent = q.stat;
+      document.getElementById('card-hint').textContent = 'Take a guess — then see where everyone lands.';
+      document.getElementById('card-hint').style.display = 'block';
+
+      const reveal = document.getElementById('card-reveal');
+      reveal.classList.remove('show');
+      document.getElementById('card-number').textContent = fmt(q.average);
+      document.getElementById('card-number').style.color = q.color;
+      document.getElementById('card-unit').textContent = q.unit + ' (average)';
+      document.getElementById('card-context').textContent = q.context;
+      const src = document.getElementById('card-source');
+      src.textContent = '↗ ' + q.source;
+      src.href = q.sourceUrl;
+      src.style.color = q.color;
+
+      // Buttons
+      const btnAbove = document.getElementById('btn-above');
+      const btnBelow = document.getElementById('btn-below');
+      btnAbove.className = 'choice-btn';
+      btnBelow.className = 'choice-btn';
+      btnAbove.style.cssText = '';
+      btnBelow.style.cssText = '';
+      document.getElementById('buttons').style.display = 'grid';
+
+      // Hover colors
+      btnAbove.onmouseenter = () => { if (!currentChoice) { btnAbove.style.background = q.light; btnAbove.style.borderColor = q.color; } };
+      btnAbove.onmouseleave = () => { if (!currentChoice) { btnAbove.style.background = ''; btnAbove.style.borderColor = ''; } };
+      btnBelow.onmouseenter = () => { if (!currentChoice) { btnBelow.style.background = q.light; btnBelow.style.borderColor = q.color; } };
+      btnBelow.onmouseleave = () => { if (!currentChoice) { btnBelow.style.background = ''; btnBelow.style.borderColor = ''; } };
+
+      // Votes panel
+      const vp = document.getElementById('votes-panel');
+      vp.classList.remove('show');
+
+      // Next btn
+      document.getElementById('next-btn').classList.remove('show');
+      document.getElementById('next-btn').style.background = q.color;
+
+      currentChoice = null;
+    }
+
+    async function choose(pick) {
+      if (currentChoice) return;
+      currentChoice = pick;
+
+      const q = deck[idx];
+
+      // Style buttons
+      const btnAbove = document.getElementById('btn-above');
+      const btnBelow = document.getElementById('btn-below');
+      const picked = pick === 'above' ? btnAbove : btnBelow;
+      const other  = pick === 'above' ? btnBelow  : btnAbove;
+
+      picked.style.background = q.color;
+      picked.style.borderColor = q.color;
+      picked.style.color = '#fff';
+      other.classList.add('faded');
+
+      // Reveal answer
+      document.getElementById('card-hint').style.display = 'none';
+      document.getElementById('card-reveal').classList.add('show');
+
+      // Submit vote & show results
+      let votes;
+      try {
+        votes = await submitVote(q.id, pick);
+      } catch (e) {
+        // If Supabase isn't set up yet, fall back to fake numbers
+        votes = { above: Math.floor(Math.random() * 60) + 20, below: Math.floor(Math.random() * 60) + 20 };
+        votes[pick] += 1;
+      }
+
+      const total = votes.above + votes.below;
+      const abovePct = Math.round((votes.above / total) * 100);
+      const belowPct = 100 - abovePct;
+
+      // You badge
+      const labelAbove = document.getElementById('label-above');
+      const labelBelow = document.getElementById('label-below');
+      labelAbove.innerHTML = `⬆ Above average${pick === 'above' ? ` <span class="you-badge" style="background:${q.color}">you</span>` : ''}`;
+      labelBelow.innerHTML = `⬇ Below average${pick === 'below' ? ` <span class="you-badge" style="background:${q.color}">you</span>` : ''}`;
+
+      document.getElementById('pct-above').textContent = abovePct + '%';
+      document.getElementById('pct-below').textContent = belowPct + '%';
+      document.getElementById('pct-above').style.color = pick === 'above' ? q.color : '#7a7060';
+      document.getElementById('pct-below').style.color = pick === 'below' ? q.color : '#7a7060';
+
+      setTimeout(() => {
+        document.getElementById('bar-above').style.width = abovePct + '%';
+        document.getElementById('bar-above').style.background = pick === 'above' ? q.color : '#ccc5b8';
+        document.getElementById('bar-below').style.width = belowPct + '%';
+        document.getElementById('bar-below').style.background = pick === 'below' ? q.color : '#ccc5b8';
+      }, 80);
+
+      document.getElementById('votes-panel').classList.add('show');
+      document.getElementById('next-btn').classList.add('show');
+      document.getElementById('next-btn').textContent = idx + 1 >= deck.length ? 'See results 🎉' : 'Next question →';
+    }
+
+    function next() {
+      idx++;
+      if (idx >= deck.length) {
+        document.getElementById('card').style.display = 'none';
+        document.getElementById('buttons').style.display = 'none';
+        document.getElementById('votes-panel').classList.remove('show');
+        document.getElementById('next-btn').classList.remove('show');
+        document.getElementById('progress-wrap').style.display = 'none';
+        document.getElementById('done-screen').classList.add('show');
+        return;
+      }
+      currentChoice = null;
+      document.getElementById('votes-panel').classList.remove('show');
+      document.getElementById('next-btn').classList.remove('show');
+      renderQuestion();
+    }
+
+    function restart() {
+      document.getElementById('card').style.display = 'block';
+      document.getElementById('buttons').style.display = 'grid';
+      document.getElementById('progress-wrap').style.display = 'flex';
+      document.getElementById('done-screen').classList.remove('show');
+      deck = shuffle(questions);
+      idx = 0;
+      currentChoice = null;
+      renderQuestion();
+    }
+
+    init();
+  </script>
+</body>
+</html>
