@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Art of Finals</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Special+Elite&family=Patrick+Hand&display=swap');
+  :root {
+    --parchment: #f4e4bc; --dark-ink: #2c1810; --red-ink: #8b1a1a;
+    --gold: #c9a227; --notebook: #e8f0fe; --ruled: #b8c8e8;
+    --green: #2d6a2d; --bar-bg: #3a2010;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #1a0f08; font-family: 'Patrick Hand', cursive; color: var(--dark-ink); min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 24px 16px; }
+  #game { width: 680px; max-width: 100%; min-height: 96vh; display: flex; flex-direction: column; }
+  #header { background: var(--dark-ink); border: 3px solid var(--gold); border-bottom: none; padding: 10px 18px 8px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px; }
+  #header h1 { font-family: 'Cinzel', serif; color: var(--gold); font-size: 1.3em; letter-spacing: 2px; text-shadow: 0 0 10px rgba(201,162,39,0.5); }
+  #header .subtitle { color: #a08060; font-size: 0.8em; font-family: 'Special Elite', cursive; }
+  #home-btn { background: none; border: 1px solid #5a3a20; color: #a08060; font-family: 'Special Elite', cursive; font-size: 0.75em; padding: 4px 10px; border-radius: 3px; cursor: pointer; letter-spacing: 1px; transition: all 0.2s; text-decoration: none; display: inline-block; }
+  #home-btn:hover { border-color: var(--gold); color: var(--gold); }
+  #stats-bar { background: var(--bar-bg); border: 3px solid var(--gold); border-bottom: none; border-top: none; padding: 8px 14px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: space-between; }
+  .stat { display: flex; flex-direction: column; align-items: center; min-width: 70px; flex: 1; }
+  .stat-label { font-size: 0.7em; color: #d4b896; font-family: 'Special Elite', cursive; letter-spacing: 1px; }
+  .stat-bar-outer { width: 100%; height: 10px; background: #1a0f08; border-radius: 5px; border: 1px solid #5a3a20; margin: 2px 0; }
+  .stat-bar-inner { height: 100%; border-radius: 5px; transition: width 0.5s ease; }
+  .stat-val { font-size: 0.75em; color: var(--gold); font-weight: bold; }
+  #main-panel { background: var(--parchment); border: 3px solid var(--gold); flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  .scroll-top { background: linear-gradient(to bottom, #c8a060, var(--parchment)); height: 18px; border-bottom: 2px solid #b8902a; display: flex; align-items: center; justify-content: center; }
+  .scroll-top span { font-size: 0.7em; color: #8a6020; letter-spacing: 4px; font-family: 'Special Elite', cursive; }
+  #content-area { flex: 1; padding: 18px 22px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; }
+  .semester-banner { background: var(--dark-ink); color: var(--gold); font-family: 'Cinzel', serif; text-align: center; padding: 6px 12px; font-size: 1em; letter-spacing: 3px; border: 2px solid var(--gold); margin: -4px -4px 4px; }
+  .scenario-num { font-family: 'Special Elite', cursive; color: var(--red-ink); font-size: 0.85em; letter-spacing: 1px; }
+  .scenario-title { font-family: 'Cinzel', serif; font-size: 1.15em; color: var(--dark-ink); margin: 2px 0 6px; line-height: 1.3; }
+  .sunzi-quote { background: rgba(44,24,16,0.07); border-left: 4px solid var(--gold); padding: 8px 12px; font-family: 'Special Elite', cursive; font-size: 0.85em; color: #5a3010; font-style: italic; margin: 4px 0; }
+  .sunzi-quote .attr { color: var(--red-ink); font-style: normal; font-size: 0.85em; }
+  .scenario-text { font-size: 1em; line-height: 1.6; color: #2c1810; }
+  .concept-tag { display: inline-block; background: var(--red-ink); color: #f4e4bc; font-size: 0.7em; padding: 2px 8px; border-radius: 10px; font-family: 'Special Elite', cursive; letter-spacing: 1px; margin-bottom: 4px; }
+  #choices { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+  .choice-btn { background: var(--dark-ink); color: var(--parchment); border: 2px solid var(--gold); padding: 10px 14px; font-family: 'Patrick Hand', cursive; font-size: 0.95em; cursor: pointer; text-align: left; border-radius: 4px; transition: all 0.2s; line-height: 1.4; }
+  .choice-btn:hover:not(:disabled) { background: #4a2810; border-color: #e8c040; transform: translateX(3px); }
+  .choice-btn:disabled { cursor: default; }
+  .choice-letter { color: var(--gold); font-weight: bold; margin-right: 6px; font-family: 'Cinzel', serif; }
+  #outcome-panel { background: rgba(44,24,16,0.06); border: 2px solid var(--gold); border-radius: 4px; padding: 12px 14px; font-size: 0.95em; line-height: 1.6; display: none; }
+  #outcome-panel.show { display: block; }
+  .outcome-good { color: var(--green); font-weight: bold; }
+  .outcome-bad { color: var(--red-ink); font-weight: bold; }
+  .stat-change { font-family: 'Special Elite', cursive; font-size: 0.85em; margin-top: 6px; color: #5a3010; }
+  .stat-change .plus { color: var(--green); } .stat-change .minus { color: var(--red-ink); }
+  .big-btn { background: var(--gold); color: var(--dark-ink); border: none; padding: 12px; font-family: 'Cinzel', serif; font-size: 1em; cursor: pointer; border-radius: 4px; width: 100%; margin-top: 8px; letter-spacing: 1px; transition: all 0.2s; }
+  .big-btn:hover { background: #e8c040; transform: scale(1.02); }
+  .start-btn { background: var(--dark-ink); color: var(--gold); border: 3px solid var(--gold); padding: 12px 36px; font-family: 'Cinzel', serif; font-size: 1.1em; cursor: pointer; border-radius: 4px; letter-spacing: 2px; transition: all 0.2s; margin-top: 8px; }
+  .start-btn:hover { background: #4a2810; transform: scale(1.04); }
+  .tutorial-card { background: var(--notebook); border: 2px solid var(--ruled); border-radius: 4px; padding: 12px 14px; }
+  .tutorial-concept { font-size: 1em; font-weight: bold; color: var(--dark-ink); margin-bottom: 2px; }
+  .tutorial-body { font-size: 0.9em; color: #3a2010; line-height: 1.5; }
+  .choice-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
+  .choice-card { background: var(--dark-ink); border: 2px solid var(--gold); border-radius: 6px; padding: 12px; cursor: pointer; transition: all 0.2s; color: var(--parchment); }
+  .choice-card:hover { background: #4a2810; border-color: #e8c040; transform: translateY(-2px); }
+  .choice-card.selected { border-color: #e8c040; background: #4a2810; box-shadow: 0 0 12px rgba(201,162,39,0.4); }
+  .cc-icon { font-size: 1.8em; margin-bottom: 4px; }
+  .cc-name { font-family: 'Cinzel', serif; font-size: 0.95em; color: var(--gold); margin-bottom: 4px; }
+  .cc-desc { font-size: 0.8em; line-height: 1.4; color: #d4b896; }
+  .cc-effect { font-size: 0.75em; font-family: 'Special Elite', cursive; color: #a0c080; margin-top: 6px; }
+  .chronicle-para { background: var(--notebook); border-left: 4px solid var(--gold); padding: 12px 16px; border-radius: 0 4px 4px 0; font-size: 0.92em; line-height: 1.75; color: #2a1a08; position: relative; font-family: 'Patrick Hand', cursive; }
+  .chronicle-para::before { content: attr(data-label); position: absolute; top: -11px; left: 10px; background: var(--gold); color: var(--dark-ink); font-family: 'Special Elite', cursive; font-size: 0.7em; padding: 1px 8px; border-radius: 3px; }
+  .journal-section { font-family: 'Cinzel', serif; color: var(--red-ink); font-size: 1em; margin: 8px 0 4px; border-bottom: 1px solid var(--gold); padding-bottom: 4px; }
+  .summary-grid { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+  .summary-card { background: rgba(44,24,16,0.07); border: 2px solid var(--gold); border-radius: 4px; padding: 10px 16px; text-align: center; min-width: 90px; }
+  .summary-card .s-label { font-family: 'Special Elite', cursive; font-size: 0.72em; color: #5a3010; }
+  .summary-card .s-val { font-family: 'Cinzel', serif; font-size: 1.3em; color: var(--dark-ink); font-weight: bold; }
+  .end-title { font-family: 'Cinzel', serif; font-size: 1.8em; color: var(--red-ink); text-align: center; }
+  .end-title.win { color: var(--green); }
+  .end-wisdom { font-family: 'Special Elite', cursive; font-size: 0.9em; color: #5a3010; font-style: italic; border-top: 1px solid var(--gold); border-bottom: 1px solid var(--gold); padding: 8px; text-align: center; }
+  .identity-bar { background: rgba(44,24,16,0.08); border: 1px solid var(--gold); border-radius: 4px; padding: 6px 12px; font-family: 'Special Elite', cursive; font-size: 0.78em; color: #5a3010; display: flex; gap: 16px; flex-wrap: wrap; }
+  .identity-bar span { color: var(--dark-ink); }
+  .bonus-tag { display: inline-block; background: #2d6a2d; color: #e0f0e0; font-size: 0.72em; padding: 1px 7px; border-radius: 8px; margin-left: 6px; font-family: 'Special Elite', cursive; }
+  .penalty-tag { display: inline-block; background: var(--red-ink); color: #f4e4bc; font-size: 0.72em; padding: 1px 7px; border-radius: 8px; margin-left: 6px; font-family: 'Special Elite', cursive; }
+  #content-area::-webkit-scrollbar { width: 6px; }
+  #content-area::-webkit-scrollbar-track { background: var(--parchment); }
+  #content-area::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 3px; }
+</style>
+</head>
+<body>
+<div id="game">
+  <div id="header">
+    <a id="home-btn" href="index.html">🌳 Burch Tree</a>
+    <div style="text-align:center;flex:1;">
+      <h1>☯ THE ART OF FINALS</h1>
+      <div class="subtitle">Sun Tzu's Wisdom for Surviving Freshman Year</div>
+    </div>
+    <div id="semester-label" style="color:#a08060;font-family:'Special Elite',cursive;font-size:0.85em;white-space:nowrap;"></div>
+  </div>
+  <div id="stats-bar" style="display:none;">
+    <div class="stat"><div class="stat-label">📚 GPA</div><div id="gpa-num" style="font-size:1.2em;color:var(--gold);font-family:'Cinzel',serif;font-weight:bold;">4.0</div></div>
+    <div class="stat"><div class="stat-label">⚡ ENERGY</div><div class="stat-bar-outer"><div class="stat-bar-inner" id="bar-energy" style="background:#e8c040;width:100%;"></div></div><div class="stat-val" id="val-energy">100</div></div>
+    <div class="stat"><div class="stat-label">🎉 SOCIAL</div><div class="stat-bar-outer"><div class="stat-bar-inner" id="bar-social" style="background:#e05060;width:80%;"></div></div><div class="stat-val" id="val-social">80</div></div>
+    <div class="stat"><div class="stat-label">💰 MONEY</div><div class="stat-bar-outer"><div class="stat-bar-inner" id="bar-money" style="background:#50c060;width:70%;"></div></div><div class="stat-val" id="val-money">70</div></div>
+  </div>
+  <div id="main-panel">
+    <div class="scroll-top"><span>✦ ✦ ✦</span></div>
+    <div id="content-area"></div>
+  </div>
+</div>
+<script>
+const S = {
+  phase:'title', tutorialStep:0, semester:0, scenarioIndex:0,
+  gpa:4.0, energy:100, social:80, money:70,
+  major:null, mealPlan:null, friendGroup:null, springCommit:null,
+  journal:[], selectedCard:null, _currentScenario:null,
+  // track memorable moments for chronicle
+  thermostatChoice:null, allNighterChoice:null, groupProjectChoice:null, finalChoice:null,
+};
+
+const CONCEPTS = [
+  { num:'I', name:'Know Your Enemy', sun:'If you know the enemy and know yourself, you need not fear the result of a hundred battles.', body:'Translation: Before you pick a class, STALK that professor on RateMyProfessor like it\'s your full-time job. Does he give pop quizzes? Does she curve? This is INTELLIGENCE. This is SURVIVAL.' },
+  { num:'II', name:'Choose Your Battles', sun:'He who knows when he can fight, and when he cannot, will be victorious.', body:'Translation: Not every argument in the group chat is worth your energy. Roommate left dishes in the sink AGAIN? Let it go. RA enforcing quiet hours? Not the hill you want to die on, soldier.' },
+  { num:'III', name:'The Art of Deception', sun:'All warfare is based on deception.', body:'Translation: Walk into every class looking like you absolutely did the reading. Nod. Make eye contact. Carry the book. You haven\'t opened it since page 12 but the PROFESSOR doesn\'t know that. Confidence IS the strategy.' },
+  { num:'IV', name:'Control the Terrain', sun:'The general who wins the battle makes many calculations before the battle is fought.', body:'Translation: Arrive early and SECURE the optimal seat. Not front row (too visible), not back row (too far from exit). Third row, aisle seat. Near the door for quick escapes. This is terrain mastery.' },
+  { num:'V', name:'Energy & Timing', sun:'There are not more than five musical notes, yet the combinations of these five give rise to more melodies than can ever be heard.', body:'Translation: You have limited energy. An all-nighter sounds heroic but your brain will be a wet sock by 8am. Sleep is a WEAPON. Deploy it strategically.' },
+  { num:'VI', name:'Spies & Intelligence', sun:'Hence it is that with none in the whole army are more intimate relations to be maintained than with spies.', body:'Translation: Befriend upperclassmen. They know which professors give the same midterm every year, which dining hall has the best mac on Tuesdays, and which electives are secretly impossible.' },
+  { num:'VII', name:'Adaptability', sun:'Water shapes its course according to the nature of the ground over which it flows.', body:'Translation: Your major WILL change. This is not failure — this is ADAPTABILITY. Sun Tzu himself would have switched majors if Intro to Tactics had a 40% drop rate. Pivot. Evolve. Survive.' },
+  { num:'VIII', name:'Supply Lines', sun:'An army without its baggage-train is lost.', body:'Translation: Your baggage-train is your meal plan, your ramen stash, your Venmo balance, and your mom\'s care packages. Let supplies run out and watch everything collapse.' },
+  { num:'IX', name:'Unity of Command', sun:'The quality of decision is like the well-timed swoop of a falcon.', body:'Translation: Group projects. SOMEONE has to be the falcon. That someone is you. If you don\'t step up, Marcus who "had a lot going on" will submit a half-finished Google Doc at 11:58pm.' },
+  { num:'X', name:'Victory Without Fighting', sun:'The supreme art of war is to subdue the enemy without fighting.', body:'Translation: Getting a deadline extension without begging is the highest academic art. A polite, vague email citing "circumstances"? That\'s diplomacy. That\'s victory.' },
+];
+
+const MAJORS = [
+  { id:'business', icon:'💼', name:'Business', desc:'Finance, marketing, the art of the deal.', effect:'GPA easier to maintain. Money events more favorable.', mods:{ gpaScale:0.15, moneyBonus:5 } },
+  { id:'engineering', icon:'⚙️', name:'Engineering', desc:'You chose pain. Voluntary, structured pain.', effect:'GPA harder to maintain, but Energy penalties reduced.', mods:{ gpaScale:-0.15, energyDiscount:0.25 } },
+  { id:'liberalarts', icon:'🎭', name:'Liberal Arts', desc:'Writing, thinking, explaining your degree to relatives.', effect:'Social events give bigger bonuses. GPA middling.', mods:{ socialBonus:8 } },
+  { id:'undecided', icon:'🤷', name:'Undecided', desc:'A bold strategy of infinite possibility.', effect:'Balanced stats, but a mandatory Major Crisis hits in Spring.', mods:{ crisis:true } },
+];
+const MEAL_PLANS = [
+  { id:'unlimited', icon:'🍽️', name:'Unlimited', desc:'Swipe in, swipe out, eat anything, anytime.', effect:'High upfront cost. Food events never drain Energy. +10 starting Energy.', mods:{ moneyCost:-15, energyBonus:10, foodShield:true } },
+  { id:'block150', icon:'🥗', name:'Block 150', desc:'Reasonable. Responsible. Boring.', effect:'No bonuses or penalties. The diplomatic neutral choice.', mods:{} },
+  { id:'ramen', icon:'🍜', name:'Ramen Budget', desc:'Who needs a meal plan? You have $40 and optimism.', effect:'Saves money upfront. Food events hit Energy harder.', mods:{ moneySave:15, foodPenalty:true } },
+];
+const FRIEND_GROUPS = [
+  { id:'studiers', icon:'📖', name:'The Studiers', desc:'They color-code their notes. You are intimidated and inspired.', effect:'GPA bonus rest of Fall. Social harder to raise.', mods:{ gpaBonus:0.2, socialScale:0.6 } },
+  { id:'partiers', icon:'🎉', name:'The Partiers', desc:'They know every event on campus. You will never sleep again.', effect:'Social always high. Energy drains faster.', mods:{ socialBonus:15, energyScale:1.3 } },
+  { id:'gamers', icon:'🎮', name:'The Gamers', desc:'Nocturnal, loyal, and extremely online.', effect:'Energy stays stable. Money drains slowly.', mods:{ energyShield:true, moneySlow:true } },
+  { id:'loners', icon:'🎧', name:'Going Solo', desc:'You don\'t need a group. You have a playlist.', effect:'No stat modifiers. No favors to call in Spring.', mods:{ noFavors:true } },
+];
+const SPRING_COMMITS = [
+  { id:'club', icon:'🏛️', name:'Join a Club', desc:'Model UN, ultimate frisbee, underwater basket-weaving.', effect:'Social bonus all Spring. Small GPA boost from structure.', mods:{ socialBonus:10, gpaBonus:0.1 } },
+  { id:'job', icon:'💵', name:'Get a Job', desc:'Campus coffee shop, library desk, or the dining hall (full circle).', effect:'Money recovers steadily each scenario. Energy costs higher.', mods:{ moneyRegen:8, energyScale:1.2 } },
+  { id:'sports', icon:'🏃', name:'Walk-on Sports', desc:'You showed up to tryouts with no experience and sheer audacity.', effect:'Heavy Energy drain, but unlocks bold choices in scenarios.', mods:{ energyCost:15, boldUnlock:true } },
+];
+
+// ── SCENARIOS ─────────────────────────────────────────────────────────────────
+const FALL_SCENARIOS = [
+  {
+    title:'The First Day Seat Selection', concept:'Control the Terrain',
+    quote:'The general who wins the battle makes many calculations before the battle is fought.',
+    text:'It\'s your first day of Intro to Psychology. The lecture hall fills fast. You have 30 seconds to pick your destiny seat.',
+    choices:[
+      { text:'Front row center — show everyone you mean BUSINESS.', outcome:'Professor immediately calls on you every single class. You can never zone out again.', stats:{ gpa:+0.1, energy:-15, social:-5, money:0 } },
+      { text:'Third row, aisle seat. Optimal terrain secured.', outcome:'PERFECT execution. Good visibility, near the exit, outside the professor\'s blast radius. Sun Tzu nods.', stats:{ gpa:+0.2, energy:+5, social:+5, money:0 } },
+      { text:'Back row with the people who already look asleep.', outcome:'You can\'t hear anything but you make three friends who will only invite you to parties during finals week.', stats:{ gpa:-0.2, energy:0, social:+15, money:0 } },
+      { text:'Middle of the row, totally blocked in.', outcome:'You are trapped. The professor spots you every time you check your phone.', stats:{ gpa:-0.1, energy:-10, social:0, money:0 } },
+    ]
+  },
+  {
+    title:'RateMyProfessor Recon Mission', concept:'Know Your Enemy',
+    quote:'If you know the enemy and know yourself, you need not fear the result of a hundred battles.',
+    text:'You\'re registering for next semester. HIST 201 with Dr. Bramwell has an open spot — but zero reviews online. Do you risk it?',
+    choices:[
+      { text:'Ask three upperclassmen first. Never go in blind.', outcome:'Intel gathered: Dr. Bramwell gives the SAME midterm every year. You just won the war before it started.', stats:{ gpa:+0.3, energy:+5, social:+5, money:0 } },
+      { text:'Just take it. You\'re bold. You\'re brave. You\'re unprepared.', outcome:'Dr. Bramwell requires a 20-page paper, daily attendance, and two oral exams. You didn\'t see this coming.', stats:{ gpa:-0.3, energy:-20, social:-5, money:0 } },
+      { text:'Google the syllabus from two years ago.', outcome:'Partial intelligence. You know the workload but not the grading style. A reasonable move.', stats:{ gpa:+0.1, energy:0, social:0, money:0 } },
+      { text:'Skip it. Take a different class entirely.', outcome:'You take HIST 150 — known to be easy. Smart if cowardly. Your GPA quietly thanks you.', stats:{ gpa:+0.2, energy:+10, social:0, money:0 } },
+    ]
+  },
+  // friend group injected here
+  {
+    title:'The Group Chat Argument', concept:'Choose Your Battles',
+    quote:'He who knows when he can fight, and when he cannot, will be victorious.',
+    text:'At 11pm the dorm group chat explodes. Someone cranked the thermostat to 80°F. Tyler is being VERY defensive about it.',
+    trackKey:'thermostatChoice',
+    choices:[
+      { text:'Stay completely silent. You were never here.', outcome:'Wise. The argument burns out in 40 minutes and everyone forgets by morning.', stats:{ gpa:0, energy:+10, social:0, money:0 }, trackVal:'vanished like a ghost' },
+      { text:'Mediate calmly. "Hey, can we just set it to 72?"', outcome:'Unexpected victory. Everyone respects you. Tyler is quieter now.', stats:{ gpa:0, energy:-5, social:+15, money:0 }, trackVal:'brokered a fragile thermostat peace' },
+      { text:'GO OFF on Tyler. He KNOWS what he did.', outcome:'You win the argument and lose the floor\'s goodwill simultaneously. Tyler does not speak to you for a week.', stats:{ gpa:-0.1, energy:-15, social:-20, money:0 }, trackVal:'declared full thermostat war on Tyler' },
+      { text:'Send a long voice memo detailing your stance.', outcome:'No one listens to the whole thing. You are now "that person."', stats:{ gpa:0, energy:-10, social:-10, money:0 }, trackVal:'sent a 4-minute voice memo about thermostat philosophy that no one finished' },
+    ]
+  },
+  {
+    title:'The All-Nighter Decision', concept:'Energy & Timing',
+    quote:'There are not more than five musical notes, yet the combinations of these five give rise to more melodies than can ever be heard.',
+    text:'Your Econ midterm is tomorrow at 9am. It\'s midnight. You\'ve studied maybe... a little. Do you pull the all-nighter?',
+    trackKey:'allNighterChoice',
+    choices:[
+      { text:'All-nighter. MAXIMUM EFFORT. Caffeine is a resource.', outcome:'By 7am your brain is a damp napkin. You finish the exam but second-guess every answer.', stats:{ gpa:-0.2, energy:-30, social:0, money:-5 }, trackVal:'consumed an unknowable quantity of caffeine and emerged hollow-eyed' },
+      { text:'Study until 2am, sleep 6 hours. Deploy rest as a weapon.', outcome:'OPTIMAL. You wake up sharp. Your recall is clean. Sun Tzu would high-five you if he had hands.', stats:{ gpa:+0.3, energy:-5, social:0, money:0 }, trackVal:'deployed sleep as a strategic weapon and woke refreshed and dangerous' },
+      { text:'Give up entirely. Sleep at 10, watch Netflix.', outcome:'You\'re rested but know nothing. At least you finished The Bear.', stats:{ gpa:-0.4, energy:+20, social:+5, money:0 }, trackVal:'abandoned all preparation and watched The Bear in its entirety' },
+      { text:'Text the group chat looking for someone\'s study guide.', outcome:'Emily sends it at 2am. You cram with medium results.', stats:{ gpa:+0.1, energy:-20, social:+5, money:0 }, trackVal:'obtained Emily\'s study guide at 2am through desperate social maneuvering' },
+    ]
+  },
+  {
+    title:'The Dining Hall Supply Crisis', concept:'Supply Lines',
+    quote:'An army without its baggage-train is lost.',
+    text:'DYNAMIC_FOOD', isFoodEvent:true, isDynamic:true, dynamicKey:'food',
+  },
+];
+
+const SPRING_SCENARIOS = [
+  {
+    title:'The Major Crisis', concept:'Adaptability',
+    quote:'Water shapes its course according to the nature of the ground over which it flows.',
+    text:'DYNAMIC_MAJOR', isMajorCrisis:true, isDynamic:true, dynamicKey:'major',
+    choices:[
+      { text:'Pivot immediately. Declare a new major with confidence.', outcome:'ADAPTABILITY. You flow around the obstacle. New path secured.', stats:{ gpa:+0.2, energy:+10, social:0, money:0 } },
+      { text:'Retake the class and grind harder. Never retreat.', outcome:'Admirable. You pass with a C. The war continues.', stats:{ gpa:+0.1, energy:-25, social:-10, money:-5 } },
+      { text:'Declare Undecided and take interesting electives.', outcome:'You discover a passion for Sociology by accident. Sometimes the river finds its own path.', stats:{ gpa:+0.2, energy:+5, social:+10, money:0 } },
+      { text:'Spiral for two weeks and miss the advising deadline.', outcome:'The opposite of adaptability. The terrain changes. You do not.', stats:{ gpa:-0.3, energy:-20, social:-10, money:0 } },
+    ]
+  },
+  {
+    title:'The Group Project Vacuum', concept:'Unity of Command',
+    quote:'The quality of decision is like the well-timed swoop of a falcon.',
+    text:'Your Marketing group project is due in two weeks. Nobody has started. Marcus "has a lot going on." The chat has one message — yours.',
+    trackKey:'groupProjectChoice',
+    choices:[
+      { text:'Call an emergency Zoom. Divide tasks. Swoop decisively.', outcome:'You are the falcon. The project gets done. Your teammates take equal credit. Worth it.', stats:{ gpa:+0.3, energy:-10, social:+5, money:0 }, trackVal:'swooped as the falcon, organized the Zoom, and dragged Marcus to partial productivity' },
+      { text:'Do the whole thing yourself. Suffer now, succeed later.', outcome:'A+ on the project. You resent every person in that group for a calendar year.', stats:{ gpa:+0.4, energy:-30, social:-15, money:0 }, trackVal:'completed the entire project solo and developed a Marcus-specific resentment that lingered into sophomore year' },
+      { text:'Email the professor about team dynamics preemptively.', outcome:'Nuclear option. Effective. Nobody in this class will ever partner with you again.', stats:{ gpa:+0.2, energy:0, social:-20, money:0 }, trackVal:'deployed the nuclear option and emailed the professor, achieving victory and social exile simultaneously' },
+      { text:'Trust the process. It\'ll come together.', outcome:'It does not come together. Marcus submits a half-finished Canva deck at 11:58pm. C-.', stats:{ gpa:-0.3, energy:0, social:+5, money:0 }, trackVal:'trusted the process, which failed spectacularly when Marcus submitted a Canva deck at 11:58pm' },
+    ]
+  },
+  {
+    title:'The Fake-Confidence Gambit', concept:'The Art of Deception',
+    quote:'All warfare is based on deception.',
+    text:'You\'re called on in seminar. You did not do the reading. 20 students and a professor stare at you. Four seconds of silence.',
+    choices:[
+      { text:'Speak confidently about THEMES. Never admit specifics.', outcome:'"The text interrogates identity and power" works for literally any book. Professor nods.', stats:{ gpa:+0.1, energy:+5, social:+10, money:0 } },
+      { text:'Admit you didn\'t do it. Honesty is a policy.', outcome:'Respected for honesty. Also a quiet note in the professor\'s mental grade book.', stats:{ gpa:0, energy:+5, social:0, money:0 } },
+      { text:'Ask a clarifying question to redirect attention.', outcome:'"Can you say more about that term?" buys you 4 minutes of other people talking. Elegant.', stats:{ gpa:+0.1, energy:0, social:+5, money:0 } },
+      { text:'Panic-ramble for 45 seconds about something vaguely related.', outcome:'You said "capitalism" four times and nothing else of substance. The class has moved on. You have not.', stats:{ gpa:-0.1, energy:-10, social:-5, money:0 } },
+    ]
+  },
+  {
+    title:'The Deadline Extension Diplomacy', concept:'Victory Without Fighting',
+    quote:'The supreme art of war is to subdue the enemy without fighting.',
+    text:'Your research paper is due Friday. It\'s Wednesday night. You have one paragraph. You need an extension. How do you handle this?',
+    choices:[
+      { text:'Email the professor professionally, vaguely citing "circumstances."', outcome:'VICTORY. "Circumstances affecting my progress — would 48 hours be possible?" They say yes.', stats:{ gpa:+0.2, energy:+10, social:0, money:0 } },
+      { text:'Beg emotionally with full personal details about your week.', outcome:'Too much information. Extension granted. Professor now knows your entire life story.', stats:{ gpa:+0.1, energy:-5, social:-5, money:0 } },
+      { text:'Submit what you have. One paragraph, wide margins, large font.', outcome:'Wide margins only go so far. The professor is not fooled. D assigned.', stats:{ gpa:-0.4, energy:+5, social:0, money:0 } },
+      { text:'Have a classmate ask so it seems like a general request.', outcome:'"My friend wants to know..." — the professor gives you both an extension. Unconventional victory.', stats:{ gpa:+0.2, energy:+5, social:-5, money:0 } },
+    ]
+  },
+  {
+    title:'The Final Boss: Finals Week', concept:'Know Your Enemy',
+    quote:'If you know the enemy and know yourself, you need not fear the result of a hundred battles.',
+    text:'Finals week. Three exams in four days. You have applied the wisdom all year. Now it culminates. Choose your final strategy.',
+    trackKey:'finalChoice',
+    choices:[
+      { text:'Study old exams. Intel-driven preparation.', outcome:'LEGENDARY. Two of three exams have repeated questions. You answer with the confidence of someone who has fought this battle before.', stats:{ gpa:+0.4, energy:-15, social:0, money:-5 }, trackVal:'uncovered the ancient secret of recycled exam questions and answered them like a prophet' },
+      { text:'Study groups for every subject.', outcome:'Effective but chaotic. You learn a lot and get distracted twice. Solid results.', stats:{ gpa:+0.2, energy:-10, social:+15, money:0 }, trackVal:'ran study groups for all three finals, learning much and debating pizza toppings for 40 minutes' },
+      { text:'Triage the battlefield. Prioritize borderline grades.', outcome:'BRILLIANT. You raise two borderline grades and coast through your strong class.', stats:{ gpa:+0.3, energy:-10, social:0, money:0 }, trackVal:'executed a masterful finals triage, prioritizing borderline grades with surgical precision' },
+      { text:'Wing it. You\'ve survived this far somehow.', outcome:'The chaos strategy reaches its natural conclusion. You pass. Barely.', stats:{ gpa:-0.1, energy:+10, social:+10, money:0 }, trackVal:'approached finals with the same feral chaos energy that defined the entire year' },
+    ]
+  },
+];
+
+// ── DYNAMIC SCENARIOS ─────────────────────────────────────────────────────────
+function getDynamicScenario(sc) {
+  if (!sc.isDynamic) return sc;
+  const out = Object.assign({}, sc);
+  if (sc.dynamicKey === 'food') {
+    const mp = S.mealPlan;
+    if (mp === 'unlimited') {
+      out.title = 'The Unlimited Plan Temptation';
+      out.text = 'Week 10. You\'re on the Unlimited plan — technically invincible. But your friends keep saying "just downgrade and pocket the difference." The dining hall gleams. Your wallet is listening.';
+      out.choices = [
+        { text:'Exploit your plan to the fullest. Eat for sport.', outcome:'You become a dining hall legend. Four meals a day. The staff know your name. Your energy is immaculate.', stats:{ gpa:0, energy:+20, social:+10, money:0 } },
+        { text:'Share your swipes generously. Build goodwill.', outcome:'You become the most popular person on the floor. Jake owes you forever.', stats:{ gpa:0, energy:+10, social:+25, money:0 } },
+        { text:'Downgrade mid-semester to save money.', outcome:'You save money but lose the psychological security blanket of infinite food.', stats:{ gpa:0, energy:-5, social:0, money:+15 } },
+        { text:'Start hoarding dining hall snacks for your dorm. Supply depot.', outcome:'Your room becomes a pantry. Efficiency is high. Roommate has questions.', stats:{ gpa:+0.1, energy:+10, social:-5, money:+10 } },
+      ];
+    } else if (mp === 'block150') {
+      out.title = 'The Block 150 Midpoint Crisis';
+      out.text = 'Week 10. You\'ve done the math. You have 22 swipes left. Thirty-eight meals remain before semester\'s end. The numbers do not add up.';
+      out.choices = [
+        { text:'Ration aggressively. One real meal a day, ramen fills the gaps.', outcome:'You survive but you\'re miserable and slightly malnourished.', stats:{ gpa:0, energy:-20, social:-5, money:+10 } },
+        { text:'Buy a small dining plan top-up. Invest in the supply line.', outcome:'Expensive but sensible. You eat normally through finals. Peace of mind restored.', stats:{ gpa:+0.1, energy:+15, social:+5, money:-15 } },
+        { text:'Befriend someone with unlimited swipes. Social engineering.', outcome:'BRILLIANT. Jake has a Block 300 plan and no concept of scarcity. Free meals twice a week.', stats:{ gpa:0, energy:+15, social:+20, money:+5 } },
+        { text:'Ignore the problem entirely. Vibes-based meal planning.', outcome:'Three days of granola bars from your desk drawer.', stats:{ gpa:-0.1, energy:-25, social:-5, money:-5 } },
+      ];
+    } else {
+      out.title = 'The Ramen Budget Reckoning';
+      out.text = 'Week 10. You chose the Ramen Budget plan, fully aware of the consequences. Those consequences have arrived. Your dorm smells like sodium.';
+      out.choices = [
+        { text:'Commit to the bit. Full ramen ascendancy. Embrace the sodium.', outcome:'You spend nothing and feel everything. Energy craters. Your bank account weeps tears of joy.', stats:{ gpa:0, energy:-30, social:-10, money:+20 } },
+        { text:'Emergency dining hall upgrade. Enough is enough.', outcome:'You spend what you saved and more. But you eat a real vegetable for the first time in weeks.', stats:{ gpa:+0.1, energy:+20, social:+5, money:-25 } },
+        { text:'Attend every club meeting with free food.', outcome:'Genius foraging. You join four clubs you have no interest in. You eat well.', stats:{ gpa:-0.1, energy:+15, social:+15, money:+10 } },
+        { text:'Call home. Describe the situation. Wait for a care package.', outcome:'Your mom sends a box within 48 hours. It contains granola bars, which you now hate, and $40.', stats:{ gpa:0, energy:+10, social:0, money:+15 } },
+      ];
+    }
+  }
+  if (sc.dynamicKey === 'major') {
+    const maj = S.major;
+    const baseChoices = out.choices.map(c => Object.assign({}, c));
+    if (maj === 'business') {
+      out.title = 'The Business Major Identity Crisis';
+      out.text = 'You got a C- in Intro to Microeconomics. Your Business major wobbles. Your dad, who paid for this, has texted "how\'s econ going?" You have not replied.';
+      baseChoices[0].text = 'Pivot to Marketing. Still Business, different battlefield.';
+      baseChoices[0].outcome = 'Clean lateral move. You tell your dad it\'s "a specialization." He accepts this.';
+      baseChoices[1].text = 'Retake Microeconomics. Demand curves will not defeat you.';
+      baseChoices[1].outcome = 'You pass with a C. Supply and demand eventually submitted. Barely.';
+    } else if (maj === 'engineering') {
+      out.title = 'The Engineering Crucible';
+      out.text = 'You failed Calculus II. Not badly — catastrophically. Your professor wrote "see me" in red ink large enough to be seen from orbit. Engineering suddenly feels very far away.';
+      baseChoices[0].text = 'Switch to Computer Science. Technical, but the calculus is different.';
+      baseChoices[0].outcome = 'A lateral move that preserves your dignity and your GPA trajectory. The coding is hard. The integrals are gone.';
+      baseChoices[1].text = 'Retake Calc II. You will understand derivatives or perish.';
+      baseChoices[1].outcome = 'You pass with a B-. The derivatives did not perish. Neither did you. Barely.';
+    } else if (maj === 'liberalarts') {
+      out.title = 'The Liberal Arts Reckoning';
+      out.text = 'Your 12-page essay on postcolonial theory came back with a D+. Comment: "Interesting but unfocused." Your parents\' implied comment: "We told you so."';
+      baseChoices[0].text = 'Switch to Communications. Adjacent. Defensible at Thanksgiving.';
+      baseChoices[0].outcome = 'Smart pivot. Your relatives partially relax. Your GPA cautiously improves.';
+      baseChoices[1].text = 'Rewrite the essay. Prove the professor wrong.';
+      baseChoices[1].outcome = 'You resubmit. They give you a C+. You call this a moral victory.';
+    } else {
+      out.title = 'The Undecided Reckoning (As Prophesied)';
+      out.text = 'You declared Undecided. The ancient masters warned you. And now, as foretold in the tutorial, the Major Crisis has arrived. Your advisor says you must choose something. The clock ticks.';
+      baseChoices[0].text = 'Finally commit to a major. Any major. Right now.';
+      baseChoices[0].outcome = 'You point at the course catalog and say the first word you see. It is Psychology. Close enough. Forward.';
+    }
+    out.choices = baseChoices;
+  }
+  return out;
+}
+
+// ── CHRONICLE BUILDER ─────────────────────────────────────────────────────────
+function buildChronicle() {
+  const maj = MAJORS.find(m => m.id === S.major);
+  const mp  = MEAL_PLANS.find(m => m.id === S.mealPlan);
+  const fg  = FRIEND_GROUPS.find(f => f.id === S.friendGroup);
+  const sc  = SPRING_COMMITS.find(c => c.id === S.springCommit);
+
+  const majName  = maj ? maj.name : 'an undeclared discipline';
+  const mpName   = mp  ? mp.name  : 'an unnamed dining arrangement';
+  const fgName   = fg  ? fg.name  : 'a shadowy social faction';
+  const scName   = sc  ? sc.name.toLowerCase() : 'a mysterious commitment';
+
+  const thermostat    = S.thermostatChoice  || 'navigated the thermostat dispute with questionable judgment';
+  const allNighter    = S.allNighterChoice  || 'approached the Econ midterm through methods unrecorded';
+  const groupProject  = S.groupProjectChoice|| 'handled the Marketing group project in a manner too chaotic to fully document';
+  const finalStrat    = S.finalChoice       || 'approached finals with the energy of someone who had tried their best';
+
+  const tier = S.gpa >= 3.5 ? 'triumph' : S.gpa >= 2.7 ? 'middling' : 'disaster';
+
+  // Three storyline templates
+  const STORIES = {
+    triumph: [
+      `Thus begins the legend of a ${majName} scholar of unimpeachable strategic genius, who descended upon the campus armed with a ${mpName} dining arrangement and an iron will. In those hallowed early weeks, our hero ${thermostat}, a decision the dormitory elders still debate to this day. Armed with provisions and a friend group known as ${fgName}, the warrior ${allNighter} — a maneuver so tactically elegant that Sun Tzu himself, peering down from whatever ancient cloud he haunts, was said to have nodded approvingly and updated his scroll.`,
+      `The spring semester arrived like a second act in a hero's epic, and with it came the trials of ${majName} scholarship in full force. Our hero had committed to ${scName}, a decision that would test both constitution and calendar. The infamous group project — that crucible of human endurance — saw our champion ${groupProject}. Though Marcus remained a wildcard of catastrophic potential, the semester bent to the scholar's will, and the deadline extension was secured through diplomacy so elegant it bordered on the supernatural.`,
+      `And so the year concluded in a blaze of academic glory, a GPA of ${gpaStr(S.gpa)} shining like a beacon over the smoldering ruins of lesser students' ambitions. In the final reckoning, our hero ${finalStrat}, securing victory with the calm certainty of one who had read the terrain, chosen their battles, and never once — not once — trusted Marcus with anything important. "Know thine enemy," wrote Sun Tzu. "And also know that Marcus will absolutely not finish his slides in time." — The Ancient Scholars of the College, Year One.`,
+    ],
+    middling: [
+      `Hearken now to the tale of a ${majName} student of adequate but inconsistent genius, who arrived on campus clutching a ${mpName} dining arrangement and an optimism that would be gradually, methodically dismantled over nine months. The dormitory welcomed our hero with open arms and an immediate thermostat dispute, during which they ${thermostat} — a choice that defined the floor's social ecosystem for weeks. Having aligned with ${fgName}, the warrior prepared for the Econ midterm, whereupon they ${allNighter}. The ancient masters made no comment, but their silence was louder than words.`,
+      `Spring arrived. Our hero, now weathered and slightly malnourished in spirit if not in body, committed to ${scName} — a bold declaration that introduced new complications into an already complicated academic existence. The Marketing group project became the semester's great crucible, and here our scholar ${groupProject}. Marcus remained a force of nature, untameable and largely ungraded. The research paper deadline passed with a mix of diplomacy and mild deception that Sun Tzu would call "acceptable, I suppose."`,
+      `The year ended as it had lived: imperfectly, earnestly, and with a GPA of ${gpaStr(S.gpa)} that told the story of someone who tried, mostly, when it counted, somewhat. The final examination period saw our hero ${finalStrat}. "He who knows when he can fight and when he cannot will be victorious," wrote Sun Tzu. "He who is not entirely sure will achieve a 2.9 and call it a learning experience." — The Moderately Impressed Historians of the College, Year One.`,
+    ],
+    disaster: [
+      `Let the record show that a ${majName} student did in fact survive freshman year, a fact that surprised the dining hall staff, the academic advisor, and at least two professors. Armed with a ${mpName} dining plan chosen with the strategic foresight of someone who had not yet read Chapter VIII, our hero began the fall semester by attempting to ${thermostat}. The dormitory was not the same afterward. The creature known as ${fgName} adopted this wandering academic, and together they faced the Econ midterm, during which the warrior ${allNighter}. It did not go as hoped.`,
+      `Spring semester arrived to find our hero technically enrolled, which the administration acknowledged as the bare minimum definition of progress. The commitment to ${scName} introduced chaos where there was already chaos, creating a kind of academic chaos supercollider. When the group project descended, the scholar ${groupProject} — a maneuver that future historians will note was "bold" in the same way that sailing into a reef is bold. Marcus submitted his slides at 11:58pm. They were not good slides.`,
+      `And yet — AND YET — the year ended with a GPA of ${gpaStr(S.gpa)}, which is a number that exists above the minimum threshold required to return in September. Our hero ${finalStrat}, emerging from finals week blinking into the light like someone who had been underground for a very long time and was not entirely sure what season it was. "The supreme art of war is to subdue the enemy without fighting," wrote Sun Tzu. "The supreme art of college is to subdue the GPA calculator at 11pm on the last day of finals." — The Baffled Historians of the College, Year One.`,
+    ],
+  };
+
+  const story = STORIES[tier];
+  return story.map((para, i) =>
+    `<div class="chronicle-para" data-label="${['Fall Semester','Spring Semester','Verdict of the Ages'][i]}">${para}</div>`
+  ).join('');
+}
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+function gpaStr(v) { return v.toFixed(2); }
+function ca() { return document.getElementById('content-area'); }
+function clear() { ca().innerHTML = ''; }
+
+function applyMods(stats, sc) {
+  const d = Object.assign({}, stats);
+  const maj = MAJORS.find(m => m.id === S.major);
+  if (maj) {
+    if (maj.mods.gpaScale && d.gpa) d.gpa += d.gpa > 0 ? maj.mods.gpaScale : -Math.abs(maj.mods.gpaScale);
+    if (maj.mods.moneyBonus && d.money) d.money += maj.mods.moneyBonus;
+    if (maj.mods.energyDiscount && d.energy < 0) d.energy = Math.floor(d.energy * (1 - maj.mods.energyDiscount));
+    if (maj.mods.socialBonus && d.social > 0) d.social += maj.mods.socialBonus;
+  }
+  const mp = MEAL_PLANS.find(m => m.id === S.mealPlan);
+  if (mp && sc && sc.isFoodEvent) {
+    if (mp.mods.foodShield && d.energy < 0) d.energy = 0;
+    if (mp.mods.foodPenalty && d.energy < 0) d.energy = Math.floor(d.energy * 1.4);
+  }
+  const fg = FRIEND_GROUPS.find(f => f.id === S.friendGroup);
+  if (fg) {
+    if (fg.mods.socialScale && d.social) d.social = Math.round(d.social * fg.mods.socialScale);
+    if (fg.mods.socialBonus && d.social > 0) d.social += fg.mods.socialBonus;
+    if (fg.mods.energyScale && d.energy < 0) d.energy = Math.round(d.energy * fg.mods.energyScale);
+    if (fg.mods.moneySlow && d.money > 0) d.money = Math.max(0, d.money - 3);
+    if (fg.mods.energyShield && d.energy < 0) d.energy = Math.max(d.energy, -10);
+    if (fg.mods.gpaBonus && d.gpa > 0) d.gpa += fg.mods.gpaBonus;
+  }
+  if (S.semester === 1) {
+    const scc = SPRING_COMMITS.find(c => c.id === S.springCommit);
+    if (scc) {
+      if (scc.mods.socialBonus && d.social > 0) d.social += scc.mods.socialBonus;
+      if (scc.mods.gpaBonus && d.gpa > 0) d.gpa += scc.mods.gpaBonus;
+      if (scc.mods.moneyRegen) d.money = (d.money || 0) + scc.mods.moneyRegen;
+      if (scc.mods.energyScale && d.energy < 0) d.energy = Math.round(d.energy * scc.mods.energyScale);
+    }
+  }
+  return d;
+}
+
+function updateStats() {
+  document.getElementById('stats-bar').style.display = 'flex';
+  document.getElementById('gpa-num').textContent = gpaStr(S.gpa);
+  ['energy','social','money'].forEach(k => {
+    document.getElementById('bar-'+k).style.width = clamp(S[k],0,100)+'%';
+    document.getElementById('val-'+k).textContent = S[k];
+  });
+  document.getElementById('semester-label').textContent = S.semester===0 ? 'Fall Semester' : 'Spring Semester';
+}
+
+function identityBar() {
+  const maj = MAJORS.find(m => m.id === S.major);
+  const mp  = MEAL_PLANS.find(m => m.id === S.mealPlan);
+  const fg  = FRIEND_GROUPS.find(f => f.id === S.friendGroup);
+  const scc = SPRING_COMMITS.find(c => c.id === S.springCommit);
+  const parts = [];
+  if (maj) parts.push(`${maj.icon} <span>${maj.name}</span>`);
+  if (mp)  parts.push(`${mp.icon} <span>${mp.name}</span>`);
+  if (fg)  parts.push(`${fg.icon} <span>${fg.name}</span>`);
+  if (scc) parts.push(`${scc.icon} <span>${scc.name}</span>`);
+  return parts.length ? `<div class="identity-bar">${parts.join(' &nbsp;·&nbsp; ')}</div>` : '';
+}
+
+// ── SCREENS ───────────────────────────────────────────────────────────────────
+function showTitle() {
+  Object.assign(S, { phase:'title', tutorialStep:0, semester:0, scenarioIndex:0, gpa:4.0, energy:100, social:80, money:70, major:null, mealPlan:null, friendGroup:null, springCommit:null, journal:[], selectedCard:null, _currentScenario:null, thermostatChoice:null, allNighterChoice:null, groupProjectChoice:null, finalChoice:null });
+  document.getElementById('stats-bar').style.display = 'none';
+  document.getElementById('semester-label').textContent = '';
+  clear();
+  ca().innerHTML = `
+    <div style="display:flex;flex-direction:column;align-items:center;gap:16px;padding:24px;text-align:center;">
+      <div style="font-size:2em;">☯️</div>
+      <div style="font-family:'Cinzel',serif;font-size:2em;color:var(--dark-ink);line-height:1.2;">THE ART OF<br><span style="color:var(--red-ink);">FINALS</span></div>
+      <div style="width:80%;height:2px;background:linear-gradient(to right,transparent,var(--gold),transparent);"></div>
+      <div style="font-family:'Special Elite',cursive;color:#5a3010;font-size:0.95em;line-height:1.6;max-width:420px;">"The supreme art of war is to subdue your GPA without ever leaving your dorm room."<br><em style="font-size:0.85em;color:#8a5030;">— Sun Tzu (probably)</em></div>
+      <div style="font-size:0.9em;color:#3a2010;max-width:420px;line-height:1.6;">Navigate freshman year using ancient wisdom — reinterpreted for dining hall drama, group project disasters, and the eternal 8am struggle.</div>
+      <button class="start-btn" onclick="showTutorial()">⚔️ BEGIN YOUR CAMPAIGN</button>
+    </div>`;
+}
+
+function showTutorial() { S.phase='tutorial'; S.tutorialStep=0; renderTutorial(); }
+
+function renderTutorial() {
+  clear();
+  if (S.tutorialStep >= CONCEPTS.length) { showMajorSelect(); return; }
+  const con = CONCEPTS[S.tutorialStep];
+  ca().innerHTML = `
+    <div class="scenario-num">ANCIENT WISDOM · ${S.tutorialStep+1} of ${CONCEPTS.length}</div>
+    <div class="scenario-title">Principle ${con.num}: "${con.name}"</div>
+    <div class="sunzi-quote">"${con.sun}" <span class="attr">— Sun Tzu</span></div>
+    <div class="tutorial-card"><div class="tutorial-concept">☯ Modern Translation:</div><div class="tutorial-body">${con.body}</div></div>
+    <div style="font-size:0.8em;color:#8a5030;font-family:'Special Elite',cursive;">${S.tutorialStep+1} / ${CONCEPTS.length} concepts</div>
+    <button class="big-btn" onclick="S.tutorialStep++;renderTutorial()">${S.tutorialStep < CONCEPTS.length-1 ? 'NEXT PRINCIPLE →' : 'CHOOSE YOUR PATH →'}</button>`;
+}
+
+function showCardSelect(title, subtitle, items, confirmFn) {
+  clear();
+  ca().innerHTML = `
+    <div class="semester-banner">${title}</div>
+    <div style="font-size:0.95em;line-height:1.6;color:#3a2010;margin-bottom:4px;">${subtitle}</div>
+    <div class="choice-cards">${items.map(item=>`
+      <div class="choice-card" id="cc-${item.id}" onclick="selectCard('${item.id}')">
+        <div class="cc-icon">${item.icon}</div>
+        <div class="cc-name">${item.name}</div>
+        <div class="cc-desc">${item.desc}</div>
+        <div class="cc-effect">${item.effect}</div>
+      </div>`).join('')}
+    </div>
+    <button class="big-btn" id="confirm-btn" style="display:none;" onclick="${confirmFn}">CONFIRM →</button>`;
+}
+
+function selectCard(id) {
+  document.querySelectorAll('.choice-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('cc-'+id).classList.add('selected');
+  S.selectedCard = id;
+  document.getElementById('confirm-btn').style.display = 'block';
+}
+
+function showMajorSelect() { showCardSelect('CHOOSE YOUR MAJOR','Your major shapes your entire academic campaign. Choose wisely — or at least entertainingly.',MAJORS,'confirmMajor()'); }
+function confirmMajor() {
+  S.major = S.selectedCard; S.selectedCard = null;
+  showMealSelect();
+}
+function showMealSelect() { showCardSelect('CHOOSE YOUR MEAL PLAN','Your dining strategy determines whether you eat like a general or a garrison under siege.',MEAL_PLANS,'confirmMeal()'); }
+function confirmMeal() {
+  S.mealPlan = S.selectedCard; S.selectedCard = null;
+  const mp = MEAL_PLANS.find(m => m.id === S.mealPlan);
+  if (mp.mods.moneyCost) S.money = clamp(S.money + mp.mods.moneyCost, 0, 100);
+  if (mp.mods.energyBonus) S.energy = clamp(S.energy + mp.mods.energyBonus, 0, 100);
+  if (mp.mods.moneySave) S.money = clamp(S.money + mp.mods.moneySave, 0, 100);
+  showPreFallSummary();
+}
+
+function showPreFallSummary() {
+  clear();
+  const maj = MAJORS.find(m => m.id === S.major);
+  const mp  = MEAL_PLANS.find(m => m.id === S.mealPlan);
+  ca().innerHTML = `
+    <div class="semester-banner">☀️ FALL SEMESTER BRIEFING</div>
+    ${identityBar()}
+    <div style="font-size:0.95em;line-height:1.7;color:#3a2010;">You are a <strong>${maj.name}</strong> major on the <strong>${mp.name}</strong> dining plan. Five battles await. Choose your seat, gather your intelligence, and above all — do not go off on Tyler.</div>
+    <div class="summary-grid" style="margin-top:8px;">
+      <div class="summary-card"><div class="s-label">📚 GPA</div><div class="s-val">${gpaStr(S.gpa)}</div></div>
+      <div class="summary-card"><div class="s-label">⚡ ENERGY</div><div class="s-val">${S.energy}</div></div>
+      <div class="summary-card"><div class="s-label">🎉 SOCIAL</div><div class="s-val">${S.social}</div></div>
+      <div class="summary-card"><div class="s-label">💰 MONEY</div><div class="s-val">${S.money}</div></div>
+    </div>
+    <button class="big-btn" onclick="startFall()">⚔️ BEGIN FALL SEMESTER</button>`;
+}
+
+function startFall() { S.phase='game'; S.semester=0; S.scenarioIndex=0; updateStats(); showScenario(); }
+
+function showFriendGroupSelect() {
+  showCardSelect('CHOOSE YOUR FRIEND GROUP','Week 3. You\'ve met people. Now you must choose your people. This shapes the rest of fall.',FRIEND_GROUPS,'confirmFriendGroup()');
+}
+function confirmFriendGroup() {
+  S.friendGroup = S.selectedCard; S.selectedCard = null;
+  const fg = FRIEND_GROUPS.find(f => f.id === S.friendGroup);
+  if (fg.mods.socialBonus) S.social = clamp(S.social + fg.mods.socialBonus, 0, 100);
+  updateStats();
+  S.scenarioIndex = 2;
+  showScenario();
+}
+
+function showSpringCommitSelect() {
+  showCardSelect('SPRING COMMITMENT','Spring semester. Time to commit to something beyond surviving. This shapes your final campaign.',SPRING_COMMITS,'confirmSpringCommit()');
+}
+function confirmSpringCommit() {
+  S.springCommit = S.selectedCard; S.selectedCard = null;
+  S.energy = clamp(S.energy + 15, 0, 100);
+  updateStats();
+  S.semester = 1; S.scenarioIndex = 0;
+  showSpringBriefing();
+}
+
+function showSpringBriefing() {
+  clear();
+  const sc = SPRING_COMMITS.find(c => c.id === S.springCommit);
+  ca().innerHTML = `
+    <div class="semester-banner">🌸 SPRING SEMESTER BRIEFING</div>
+    ${identityBar()}
+    <div style="font-size:0.95em;line-height:1.7;color:#3a2010;">You survived the fall. Now ${sc.name.toLowerCase()} awaits alongside five new battles. The year ends here — fight well.</div>
+    <div class="summary-grid" style="margin-top:8px;">
+      <div class="summary-card"><div class="s-label">📚 GPA</div><div class="s-val">${gpaStr(S.gpa)}</div></div>
+      <div class="summary-card"><div class="s-label">⚡ ENERGY</div><div class="s-val">${S.energy}</div></div>
+      <div class="summary-card"><div class="s-label">🎉 SOCIAL</div><div class="s-val">${S.social}</div></div>
+      <div class="summary-card"><div class="s-label">💰 MONEY</div><div class="s-val">${S.money}</div></div>
+    </div>
+    <button class="big-btn" onclick="updateStats();showScenario()">⚔️ BEGIN SPRING SEMESTER</button>`;
+}
+
+// ── SCENARIO ENGINE ───────────────────────────────────────────────────────────
+function showScenario() {
+  const scens = S.semester === 0 ? FALL_SCENARIOS : SPRING_SCENARIOS;
+  if (S.semester === 0 && S.scenarioIndex === 2 && !S.friendGroup) { showFriendGroupSelect(); return; }
+  if (S.scenarioIndex >= scens.length) { showSemesterEnd(); return; }
+  const sc = getDynamicScenario(scens[S.scenarioIndex]);
+  S._currentScenario = sc;
+  const semLabel = S.semester === 0 ? '☀️ FALL SEMESTER' : '🌸 SPRING SEMESTER';
+  const letters = ['A','B','C','D'];
+  clear();
+  ca().innerHTML = `
+    ${identityBar()}
+    <div class="scenario-num">${semLabel} · SCENARIO ${S.scenarioIndex+1} of ${scens.length}</div>
+    <div class="concept-tag">☯ ${sc.concept}</div>
+    <div class="scenario-title">${sc.title}</div>
+    <div class="sunzi-quote">"${sc.quote}" <span class="attr">— Sun Tzu</span></div>
+    <div class="scenario-text">${sc.text}</div>
+    <div id="choices">${sc.choices.map((ch,i)=>`<button class="choice-btn" onclick="resolveChoice(${i})" id="ch${i}"><span class="choice-letter">${letters[i]}.</span>${ch.text}</button>`).join('')}</div>
+    <div id="outcome-panel"></div>
+    <button class="big-btn" id="next-btn" style="display:none;" onclick="advance()">CONTINUE →</button>`;
+}
+
+function resolveChoice(idx) {
+  const sc = S._currentScenario;
+  const ch = sc.choices[idx];
+  document.querySelectorAll('.choice-btn').forEach((b,i) => { b.disabled=true; b.style.opacity= i===idx?'1':'0.45'; });
+  document.getElementById('ch'+idx).style.borderColor = '#e8c040';
+
+  // Track memorable moments
+  if (sc.trackKey && ch.trackVal) S[sc.trackKey] = ch.trackVal;
+
+  let d = applyMods(ch.stats, sc);
+  S.gpa    = clamp(S.gpa    + (d.gpa||0),    0, 4.0);
+  S.energy = clamp(S.energy + (d.energy||0),  0, 100);
+  S.social = clamp(S.social + (d.social||0),  0, 100);
+  S.money  = clamp(S.money  + (d.money||0),   0, 100);
+  updateStats();
+
+  const tone = (d.gpa||0) >= 0 && (d.energy||0) >= -10 ? 'outcome-good' : 'outcome-bad';
+  const changes = [];
+  if (d.gpa)    changes.push(`GPA <span class="${d.gpa>0?'plus':'minus'}">${d.gpa>0?'+':''}${d.gpa.toFixed(1)}</span>`);
+  if (d.energy) changes.push(`Energy <span class="${d.energy>0?'plus':'minus'}">${d.energy>0?'+':''}${d.energy}</span>`);
+  if (d.social) changes.push(`Social <span class="${d.social>0?'plus':'minus'}">${d.social>0?'+':''}${d.social}</span>`);
+  if (d.money)  changes.push(`Money <span class="${d.money>0?'plus':'minus'}">${d.money>0?'+':''}${d.money}</span>`);
+
+  let modNote = '';
+  const mp = MEAL_PLANS.find(m => m.id === S.mealPlan);
+  if (mp && sc.isFoodEvent) {
+    if (mp.mods.foodShield) modNote += `<span class="bonus-tag">${mp.icon} Meal Shield</span>`;
+    if (mp.mods.foodPenalty) modNote += `<span class="penalty-tag">${mp.icon} Ramen Penalty</span>`;
+  }
+
+  const op = document.getElementById('outcome-panel');
+  op.innerHTML = `<span class="${tone}">${ch.outcome}</span>${modNote?'<div style="margin-top:4px;">'+modNote+'</div>':''}<div class="stat-change">${changes.join(' &nbsp;·&nbsp; ')}</div>`;
+  op.classList.add('show');
+  document.getElementById('next-btn').style.display = 'block';
+  op.scrollIntoView({ behavior:'smooth', block:'nearest' });
+
+  if (S.gpa < 2.0 || S.energy <= 0 || S.social <= 0 || S.money <= 0) setTimeout(showGameOver, 1400);
+}
+
+function advance() {
+  S.scenarioIndex++;
+  if (S.gpa < 2.0 || S.energy <= 0 || S.social <= 0 || S.money <= 0) { showGameOver(); return; }
+  showScenario();
+}
+
+function showSemesterEnd() {
+  clear();
+  if (S.semester === 0) {
+    ca().innerHTML = `
+      <div class="semester-banner">☀️ FALL SEMESTER COMPLETE</div>
+      ${identityBar()}
+      <div style="font-size:0.95em;line-height:1.7;color:#3a2010;margin-bottom:10px;">You have survived the fall. Before spring begins, you must make one more commitment.</div>
+      <div class="summary-grid">
+        <div class="summary-card"><div class="s-label">📚 GPA</div><div class="s-val">${gpaStr(S.gpa)}</div></div>
+        <div class="summary-card"><div class="s-label">⚡ ENERGY</div><div class="s-val">${S.energy}</div></div>
+        <div class="summary-card"><div class="s-label">🎉 SOCIAL</div><div class="s-val">${S.social}</div></div>
+        <div class="summary-card"><div class="s-label">💰 MONEY</div><div class="s-val">${S.money}</div></div>
+      </div>
+      <button class="big-btn" style="margin-top:10px;" onclick="showSpringCommitSelect()">CHOOSE SPRING COMMITMENT →</button>`;
+  } else { showWin(); }
+}
+
+// ── END SCREENS ───────────────────────────────────────────────────────────────
+function showWin() {
+  clear();
+  document.getElementById('stats-bar').style.display = 'none';
+  let rank, wisdom;
+  if (S.gpa >= 3.7)      { rank='Grand General';       wisdom='You have transcended academia. Sun Tzu himself would audit your elective.'; }
+  else if (S.gpa >= 3.0) { rank='Seasoned Strategist'; wisdom='You fought wisely, adapted well, and emerged with dignity intact.'; }
+  else if (S.gpa >= 2.5) { rank='Capable Soldier';     wisdom='You survived. Not always gracefully — but the battlefield does not grade on grace.'; }
+  else                   { rank='Scarred Veteran';      wisdom='You are still standing. That alone is a victory Sun Tzu did not predict.'; }
+
+  const maj = MAJORS.find(m => m.id === S.major);
+  const mp  = MEAL_PLANS.find(m => m.id === S.mealPlan);
+  const fg  = FRIEND_GROUPS.find(f => f.id === S.friendGroup);
+  const sc  = SPRING_COMMITS.find(c => c.id === S.springCommit);
+
+  ca().innerHTML = `
+    <div style="text-align:center;padding:8px 0 4px;">
+      <div style="font-size:2em;">🎓</div>
+      <div class="end-title win">FRESHMAN YEAR COMPLETE</div>
+      <div style="font-family:'Cinzel',serif;color:var(--gold);font-size:1.05em;margin:4px 0;">Rank Achieved: ${rank}</div>
+    </div>
+    <div class="summary-grid">
+      <div class="summary-card"><div class="s-label">📚 FINAL GPA</div><div class="s-val">${gpaStr(S.gpa)}</div></div>
+      <div class="summary-card"><div class="s-label">⚡ ENERGY</div><div class="s-val">${S.energy}</div></div>
+      <div class="summary-card"><div class="s-label">🎉 SOCIAL</div><div class="s-val">${S.social}</div></div>
+      <div class="summary-card"><div class="s-label">💰 MONEY</div><div class="s-val">${S.money}</div></div>
+    </div>
+    <div class="end-wisdom">"${wisdom}"<br><em style="font-size:0.85em;color:#8a5030;">— The Ancient Masters (probably)</em></div>
+    <div style="background:rgba(44,24,16,0.05);border:2px solid var(--gold);border-radius:4px;padding:12px 14px;">
+      <div style="font-family:'Cinzel',serif;font-size:1em;color:var(--red-ink);margin-bottom:4px;">⚔️ Identity Summary</div>
+      <div style="font-size:0.9em;line-height:1.7;color:#3a2010;">
+        ${maj?`Major: <strong>${maj.icon} ${maj.name}</strong><br>`:''}
+        ${mp?`Dining: <strong>${mp.icon} ${mp.name}</strong><br>`:''}
+        ${fg?`Crew: <strong>${fg.icon} ${fg.name}</strong><br>`:''}
+        ${sc?`Spring: <strong>${sc.icon} ${sc.name}</strong>`:''}
+      </div>
+    </div>
+    <div class="journal-section">📓 The Chronicle of Freshman Year</div>
+    <div style="font-family:'Special Elite',cursive;font-size:0.82em;color:#5a3010;margin-bottom:10px;font-style:italic;">As transcribed by the Ancient Historians of the College</div>
+    <div style="display:flex;flex-direction:column;gap:14px;">${buildChronicle()}</div>
+    <button class="big-btn" style="margin-top:8px;" onclick="showTitle()">↩ PLAY AGAIN</button>`;
+}
+
+function showGameOver() {
+  clear();
+  document.getElementById('stats-bar').style.display = 'none';
+  let reason = 'Your GPA collapsed below 2.0.';
+  if (S.energy <= 0) reason = 'Your energy hit zero. You fell asleep permanently — in the middle of a final.';
+  else if (S.social <= 0) reason = 'Your social life flatlined entirely. You became a campus legend for the wrong reasons.';
+  else if (S.money <= 0) reason = 'Your funds evaporated. The dining hall became a distant memory.';
+  ca().innerHTML = `
+    <div style="display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;padding:16px;">
+      <div style="font-size:2em;">💀</div>
+      <div class="end-title">CAMPAIGN FAILED</div>
+      <div style="font-size:0.95em;line-height:1.6;max-width:460px;">${reason}<br><br>Sun Tzu warned you. He said it in at least three tutorial cards. The ancient wisdom was available. You simply chose a different path.</div>
+      <div class="end-wisdom">"Victorious warriors win first and then go to war. Defeated warriors go to war first and then seek to win."<br><em style="font-size:0.85em;color:#8a5030;">— Sun Tzu</em></div>
+      <button class="start-btn" onclick="showTitle()">↩ TRY AGAIN</button>
+    </div>`;
+}
+
+showTitle();
+</script>
+</body>
+</html>
