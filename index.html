@@ -1,0 +1,143 @@
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@400;500&display=swap');
+
+.btg-wrap { font-family: 'DM Sans', sans-serif; padding: 2.5rem 1.5rem 3rem; }
+
+.btg-header { text-align: center; margin-bottom: 2.75rem; }
+
+.btg-leaf-row { display: flex; justify-content: center; gap: 6px; margin-bottom: 1.25rem; }
+.btg-leaf { width: 9px; height: 14px; border-radius: 50% 50% 50% 0; background: #7BAF7B; opacity: 0.7; transform: rotate(-30deg); }
+.btg-leaf:nth-child(2) { transform: rotate(10deg); background: #A3C47A; opacity: 0.85; }
+.btg-leaf:nth-child(3) { transform: rotate(-50deg); background: #5D8F5D; opacity: 0.6; }
+.btg-leaf:nth-child(4) { transform: rotate(35deg); background: #8FC48F; opacity: 0.9; }
+.btg-leaf:nth-child(5) { transform: rotate(-15deg); background: #6BA06B; opacity: 0.75; }
+
+.btg-title {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(2rem, 5vw, 2.75rem);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  margin-bottom: 0.5rem;
+}
+
+.btg-sub {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+  font-style: italic;
+  letter-spacing: 0.01em;
+}
+
+.btg-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 14px;
+  max-width: 820px;
+  margin: 0 auto;
+}
+
+.btg-card {
+  background: var(--color-background-primary);
+  border: 0.5px solid var(--color-border-tertiary);
+  border-radius: var(--border-radius-lg);
+  padding: 1.25rem 1rem 1.1rem;
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: border-color 0.18s, transform 0.18s;
+  cursor: pointer;
+}
+
+.btg-card:hover {
+  border-color: var(--color-border-secondary);
+  transform: translateY(-3px);
+}
+
+.btg-icon-wrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  margin-bottom: 2px;
+}
+
+.btg-icon-wrap.sage   { background: #EAF3DE; }
+.btg-icon-wrap.clay   { background: #FAECE7; }
+.btg-icon-wrap.sand   { background: #FAEEDA; }
+.btg-icon-wrap.stone  { background: #F1EFE8; }
+
+.btg-card-title {
+  font-family: 'Fraunces', serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  line-height: 1.25;
+}
+
+.btg-card-desc {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+.btg-footer {
+  text-align: center;
+  margin-top: 2.5rem;
+  font-size: 0.75rem;
+  color: var(--color-text-tertiary);
+}
+</style>
+
+<div class="btg-wrap">
+  <h2 class="sr-only">Burch Tree Games — a collection of experimental educational games</h2>
+
+  <header class="btg-header">
+    <div class="btg-leaf-row" aria-hidden="true">
+      <div class="btg-leaf"></div>
+      <div class="btg-leaf"></div>
+      <div class="btg-leaf"></div>
+      <div class="btg-leaf"></div>
+      <div class="btg-leaf"></div>
+    </div>
+    <h1 class="btg-title">Burch Tree Games</h1>
+    <p class="btg-sub">Making Games That Matter</p>
+  </header>
+
+  <div class="btg-grid">
+
+    <a class="btg-card" href="games/aboveorbelow.html">
+      <div class="btg-icon-wrap sage" aria-hidden="true">📈</div>
+      <div class="btg-card-title">Are You Above or Below Average?</div>
+      <div class="btg-card-desc">Or do you just think you are?</div>
+    </a>
+
+    <a class="btg-card" href="games/artoffinals.html">
+      <div class="btg-icon-wrap clay" aria-hidden="true">⚔️</div>
+      <div class="btg-card-title">The Art of Finals</div>
+      <div class="btg-card-desc">Navigate freshman year using ancient wisdom</div>
+    </a>
+
+    <a class="btg-card" href="games/dailyrecommendations.html">
+      <div class="btg-icon-wrap sand" aria-hidden="true">📋</div>
+      <div class="btg-card-title">Daily Recommendations</div>
+      <div class="btg-card-desc">Listen to the experts</div>
+    </a>
+
+    <a class="btg-card" href="games/chess.html">
+      <div class="btg-icon-wrap stone" aria-hidden="true">♟️</div>
+      <div class="btg-card-title">My Friends are (Chess) Bots!</div>
+      <div class="btg-card-desc">Play against AI characters with their own style</div>
+    </a>
+
+  </div>
+
+  <p class="btg-footer">🌿 Burch Tree Games</p>
+</div>
