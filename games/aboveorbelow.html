@@ -4,488 +4,583 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Above or Below Average?</title>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet" />
-
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    #btg-btn {
-      position: fixed;
-      top: 1rem;
-      left: 1rem;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 7px 13px;
-      border-radius: 12px;
-      border: 1.5px solid var(--border);
-      background: var(--card);
-      cursor: pointer;
-      text-decoration: none;
-      font-family: 'Syne', sans-serif;
-      font-size: 0.8rem;
-      font-weight: 700;
-      color: var(--ink);
-      letter-spacing: 0.04em;
-      transition: all 0.15s;
-      z-index: 100;
-    }
-
-    #btg-btn:hover {
-      background: var(--bg);
-      transform: translateY(-1px);
-      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
-    }
-
     :root {
-      --bg: #f5f0e8;
-      --card: #fffdf8;
-      --ink: #1a1410;
-      --muted: #7a7060;
-      --border: #ddd5c0;
+      --bg: #0e0e11;
+      --surface: #18181f;
+      --surface2: #22222c;
+      --border: rgba(255,255,255,0.07);
+      --text: #f0f0f5;
+      --muted: #6b6b80;
+      --accent: #6c63ff;
+      --radius: 20px;
+    }
+
+    html, body {
+      height: 100%;
     }
 
     body {
       background: var(--bg);
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: flex-start;
-      padding: 2rem 1rem 4rem;
-      color: var(--ink);
+      padding: 0 1rem 5rem;
+      -webkit-font-smoothing: antialiased;
     }
 
+    /* ── BTG back button ── */
+    #btg-btn {
+      position: fixed;
+      top: 1.1rem;
+      left: 1.1rem;
+      z-index: 99;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 7px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    #btg-btn:hover { color: var(--text); border-color: rgba(255,255,255,0.18); }
+
+    /* ── Header ── */
     header {
+      width: 100%;
+      max-width: 560px;
+      padding: 5rem 0 2rem;
       text-align: center;
-      margin-bottom: 2.5rem;
     }
-
     header h1 {
-      font-family: 'Syne', sans-serif;
-      font-size: clamp(1.8rem, 5vw, 2.6rem);
-      font-weight: 800;
+      font-size: clamp(1.6rem, 5vw, 2.2rem);
+      font-weight: 900;
+      letter-spacing: -0.03em;
       line-height: 1.1;
-      letter-spacing: -0.02em;
     }
-
     header p {
       margin-top: 0.5rem;
       color: var(--muted);
-      font-size: 0.95rem;
+      font-size: 0.9rem;
     }
 
-    #game {
-      width: 100%;
-      max-width: 520px;
-    }
+    /* ── Game wrapper ── */
+    #game { width: 100%; max-width: 560px; }
 
-    /* Progress */
+    /* ── Progress ── */
     #progress-wrap {
       display: flex;
       align-items: center;
       gap: 10px;
-      margin-bottom: 1.25rem;
+      margin-bottom: 1.5rem;
     }
-
-    #progress-bar-bg {
+    #progress-track {
       flex: 1;
-      height: 6px;
-      background: var(--border);
+      height: 4px;
+      background: var(--surface2);
       border-radius: 99px;
       overflow: hidden;
     }
-
-    #progress-bar-fill {
+    #progress-fill {
       height: 100%;
       border-radius: 99px;
-      transition: width 0.4s ease, background 0.4s ease;
+      transition: width 0.5s cubic-bezier(.4,0,.2,1), background 0.4s;
     }
-
     #progress-label {
-      font-size: 0.8rem;
+      font-size: 0.75rem;
+      font-weight: 600;
       color: var(--muted);
-      white-space: nowrap;
+      min-width: 36px;
+      text-align: right;
       font-variant-numeric: tabular-nums;
     }
 
-    /* Card */
+    /* ── Card ── */
     #card {
-      border-radius: 20px;
-      padding: 1.75rem;
-      margin-bottom: 1rem;
-      transition: background 0.35s ease;
       position: relative;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      padding: 2rem;
+      margin-bottom: 0.75rem;
       overflow: hidden;
-      border: 1.5px solid transparent;
+      transition: border-color 0.4s;
+      min-height: 210px;
+    }
+
+    /* Glow blob in corner */
+    #card::before {
+      content: '';
+      position: absolute;
+      top: -60px;
+      right: -60px;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: var(--q-color, #6c63ff);
+      opacity: 0.12;
+      filter: blur(50px);
+      pointer-events: none;
+      transition: background 0.4s;
+    }
+
+    #card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
     }
 
     #card-emoji {
-      font-size: 2.5rem;
+      font-size: 2.2rem;
       line-height: 1;
-      margin-bottom: 0.6rem;
-      display: block;
+      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));
     }
 
-    #card-eyebrow {
-      font-size: 0.7rem;
-      font-weight: 500;
+    #card-tag {
+      font-size: 0.65rem;
+      font-weight: 700;
       letter-spacing: 0.1em;
       text-transform: uppercase;
-      margin-bottom: 0.4rem;
-      opacity: 0.7;
+      padding: 4px 10px;
+      border-radius: 99px;
+      border: 1px solid;
+      opacity: 0.85;
+      white-space: nowrap;
     }
 
     #card-title {
-      font-family: 'Syne', sans-serif;
-      font-size: clamp(1.25rem, 3.5vw, 1.55rem);
-      font-weight: 700;
+      font-size: clamp(1.2rem, 3.5vw, 1.5rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
       line-height: 1.2;
-      margin-bottom: 0.9rem;
+      margin-bottom: 0.6rem;
     }
 
     #card-hint {
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       color: var(--muted);
-      font-style: italic;
     }
 
+    /* Reveal */
     #card-reveal {
       display: none;
+      margin-top: 1.1rem;
+      padding-top: 1.1rem;
+      border-top: 1px solid var(--border);
     }
+    #card-reveal.show { display: block; animation: fadeUp 0.25s ease both; }
 
-    #card-reveal.show {
-      display: block;
-      animation: popIn 0.3s ease;
+    #reveal-number-row {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 0.5rem;
     }
-
-    #card-number {
-      font-family: 'Syne', sans-serif;
-      font-size: 3rem;
-      font-weight: 800;
+    #reveal-number {
+      font-size: 2.8rem;
+      font-weight: 900;
+      letter-spacing: -0.04em;
       line-height: 1;
-      margin-bottom: 0.2rem;
     }
-
-    #card-unit {
+    #reveal-unit {
       font-size: 1rem;
-      opacity: 0.7;
-      margin-bottom: 0.75rem;
+      color: var(--muted);
+      font-weight: 500;
     }
-
-    #card-context {
-      font-size: 0.9rem;
+    #reveal-context {
+      font-size: 0.85rem;
+      color: #a0a0b8;
       line-height: 1.6;
-      margin-bottom: 0.75rem;
-      color: #333;
+      margin-bottom: 0.6rem;
     }
-
-    #card-source {
-      font-size: 0.75rem;
-      opacity: 0.65;
+    #reveal-source {
+      font-size: 0.7rem;
+      color: var(--muted);
       text-decoration: none;
-      border-bottom: 1px dotted currentColor;
-      padding-bottom: 1px;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      transition: color 0.15s;
+    }
+    #reveal-source:hover { color: var(--text); }
+
+    /* ── Rarity badge ── */
+    #rarity-wrap {
+      display: none;
+      margin-bottom: 0.75rem;
+    }
+    #rarity-wrap.show { display: block; animation: popIn 0.3s cubic-bezier(.34,1.56,.64,1) both; }
+
+    #rarity-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: 14px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      width: 100%;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    #rarity-badge .rarity-icon { font-size: 1.1rem; }
+    #rarity-badge .rarity-text { flex: 1; }
+    #rarity-badge .rarity-pct {
+      font-size: 1.1rem;
+      font-weight: 900;
+      letter-spacing: -0.02em;
     }
 
-    /* Buttons */
+    /* ── Buttons ── */
     #buttons {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
-      margin-bottom: 1rem;
+      margin-bottom: 0.75rem;
     }
 
     .choice-btn {
-      padding: 1.6rem 1rem;
-      border-radius: 20px;
-      border: 2px solid var(--border);
-      background: var(--card);
+      position: relative;
+      padding: 1.5rem 1rem 1.4rem;
+      border-radius: var(--radius);
+      border: 1.5px solid var(--border);
+      background: var(--surface);
       cursor: pointer;
-      font-family: 'Syne', sans-serif;
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--ink);
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 8px;
-      transition: all 0.15s;
+      gap: 10px;
+      transition: border-color 0.15s, transform 0.12s, background 0.15s;
       -webkit-tap-highlight-color: transparent;
+      overflow: hidden;
     }
+    .choice-btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: currentColor;
+      opacity: 0;
+      transition: opacity 0.15s;
+      pointer-events: none;
+    }
+    .choice-btn:hover::after { opacity: 0.04; }
+    .choice-btn:active { transform: scale(0.97); }
 
-    .choice-btn .btn-icon {
-      font-size: 1.75rem;
+    .btn-icon {
+      font-size: 1.6rem;
       line-height: 1;
+      transition: transform 0.2s cubic-bezier(.34,1.56,.64,1);
     }
+    .choice-btn:hover .btn-icon { transform: scale(1.15); }
 
-    .choice-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-    }
-
-    .choice-btn:active {
-      transform: translateY(0px);
+    .btn-label {
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: var(--text);
     }
 
     .choice-btn.selected {
-      color: #fff;
-      border-color: transparent;
+      border-width: 2px;
     }
+    .choice-btn.selected .btn-icon { transform: scale(1.2); }
+    .choice-btn.faded { opacity: 0.28; pointer-events: none; }
 
-    .choice-btn.faded {
-      opacity: 0.4;
-    }
-
-    /* Votes panel */
+    /* ── Votes panel ── */
     #votes-panel {
-      background: var(--card);
-      border: 1.5px solid var(--border);
-      border-radius: 18px;
-      padding: 1.25rem;
-      margin-bottom: 1rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 0.75rem;
       display: none;
     }
+    #votes-panel.show { display: block; animation: fadeUp 0.2s ease both; }
 
-    #votes-panel.show {
-      display: block;
-      animation: popIn 0.3s ease;
-    }
-
-    #votes-panel h3 {
-      font-family: 'Syne', sans-serif;
-      font-size: 0.8rem;
+    #votes-header {
+      font-size: 0.7rem;
       font-weight: 700;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
       color: var(--muted);
       margin-bottom: 1rem;
     }
 
-    .vote-row {
-      margin-bottom: 0.85rem;
-    }
-
+    .vote-row { margin-bottom: 0.85rem; }
     .vote-row:last-child { margin-bottom: 0; }
 
     .vote-meta {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 5px;
-      font-size: 0.85rem;
+      margin-bottom: 6px;
     }
-
     .vote-label {
       display: flex;
       align-items: center;
-      gap: 6px;
-      font-weight: 500;
+      gap: 7px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--muted);
     }
-
-    .you-badge {
-      font-size: 0.65rem;
-      font-weight: 700;
+    .vote-label.mine { color: var(--text); }
+    .you-pill {
+      font-size: 0.6rem;
+      font-weight: 800;
       padding: 2px 7px;
       border-radius: 99px;
-      color: #fff;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.06em;
       text-transform: uppercase;
+      color: #fff;
     }
-
-    .vote-pct {
-      font-family: 'Syne', sans-serif;
-      font-weight: 700;
-      font-size: 0.95rem;
+    .vote-pct-num {
+      font-size: 0.82rem;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      color: var(--muted);
     }
+    .vote-pct-num.mine { color: var(--text); }
 
-    .vote-bar-bg {
-      height: 10px;
-      background: #ede8e0;
+    .vote-track {
+      height: 8px;
+      background: var(--surface2);
       border-radius: 99px;
       overflow: hidden;
     }
-
-    .vote-bar-fill {
+    .vote-fill {
       height: 100%;
       border-radius: 99px;
-      transition: width 0.7s cubic-bezier(0.34, 1.4, 0.64, 1);
+      transition: width 0.6s cubic-bezier(.4,0,.2,1);
     }
 
-    /* Next button */
+    /* ── Next button ── */
     #next-btn {
       display: none;
       width: 100%;
       padding: 1rem;
-      border-radius: 16px;
+      border-radius: var(--radius);
       border: none;
       cursor: pointer;
-      font-family: 'Syne', sans-serif;
-      font-size: 1rem;
-      font-weight: 700;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 800;
       color: #fff;
-      transition: opacity 0.15s, transform 0.15s;
-      letter-spacing: 0.01em;
+      letter-spacing: -0.01em;
+      transition: transform 0.12s, opacity 0.15s;
+      position: relative;
+      overflow: hidden;
     }
+    #next-btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,0.08);
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+    #next-btn:hover::after { opacity: 1; }
+    #next-btn:active { transform: scale(0.98); }
+    #next-btn.show { display: block; animation: popIn 0.3s cubic-bezier(.34,1.56,.64,1) both; }
 
-    #next-btn.show { display: block; animation: popIn 0.25s ease; }
-    #next-btn:hover { opacity: 0.88; transform: translateY(-1px); }
-    #next-btn:active { transform: translateY(0); }
-
-    /* Done screen */
+    /* ── Done screen ── */
     #done-screen {
       display: none;
       text-align: center;
-      padding: 2rem 0;
+      padding: 3rem 0 1rem;
     }
-
-    #done-screen.show { display: block; animation: popIn 0.4s ease; }
-
-    #done-screen .done-emoji { font-size: 4rem; margin-bottom: 1rem; display: block; }
-
+    #done-screen.show { display: block; animation: fadeUp 0.4s ease both; }
+    #done-emoji { font-size: 4rem; margin-bottom: 1rem; display: block; }
     #done-screen h2 {
-      font-family: 'Syne', sans-serif;
-      font-size: 1.8rem;
-      font-weight: 800;
+      font-size: 1.75rem;
+      font-weight: 900;
+      letter-spacing: -0.03em;
       margin-bottom: 0.5rem;
     }
-
     #done-screen p {
       color: var(--muted);
-      margin-bottom: 1.75rem;
+      font-size: 0.9rem;
+      margin-bottom: 2rem;
       line-height: 1.6;
     }
-
     #restart-btn {
       padding: 0.9rem 2.5rem;
-      border-radius: 16px;
+      border-radius: 14px;
       border: none;
       cursor: pointer;
-      font-family: 'Syne', sans-serif;
-      font-size: 1rem;
-      font-weight: 700;
-      background: var(--ink);
-      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 800;
+      background: var(--text);
+      color: var(--bg);
       transition: opacity 0.15s;
     }
+    #restart-btn:hover { opacity: 0.85; }
 
-    #restart-btn:hover { opacity: 0.8; }
-
-    /* Loading / error */
-    #loading { text-align: center; padding: 3rem 0; color: var(--muted); font-style: italic; }
-
+    /* ── Keyframes ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
     @keyframes popIn {
-      from { opacity: 0; transform: translateY(8px) scale(0.98); }
-      to   { opacity: 1; transform: translateY(0)  scale(1); }
+      from { opacity: 0; transform: scale(0.92); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+
+    /* ── Loading ── */
+    #loading {
+      text-align: center;
+      padding: 4rem 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+      animation: pulse 1.5s ease infinite;
     }
   </style>
 </head>
 <body>
 
-  <a id="btg-btn" href="/index.html">🌳 BTG</a>
+  <a id="btg-btn" href="index.html">🌳 BTG</a>
 
   <header>
-    <h1>Above or Below Average? 🤔</h1>
-    <p>How do you stack up against everyone else?</p>
+    <h1>Above or Below Average?</h1>
+    <p>See how you stack up — and how rare your answer is.</p>
   </header>
 
   <div id="game">
-    <div id="loading">Loading questions…</div>
+    <div id="loading">Loading…</div>
 
     <div id="progress-wrap" style="display:none">
-      <div id="progress-bar-bg"><div id="progress-bar-fill"></div></div>
+      <div id="progress-track"><div id="progress-fill"></div></div>
       <span id="progress-label"></span>
     </div>
 
     <div id="card" style="display:none">
-      <span id="card-emoji"></span>
-      <p id="card-eyebrow">Above or below average?</p>
+      <div id="card-top">
+        <span id="card-emoji"></span>
+        <span id="card-tag"></span>
+      </div>
       <h2 id="card-title"></h2>
       <p id="card-hint"></p>
       <div id="card-reveal">
-        <div id="card-number"></div>
-        <div id="card-unit"></div>
-        <p id="card-context"></p>
-        <a id="card-source" href="#" target="_blank" rel="noopener noreferrer"></a>
+        <div id="reveal-number-row">
+          <span id="reveal-number"></span>
+          <span id="reveal-unit"></span>
+        </div>
+        <p id="reveal-context"></p>
+        <a id="reveal-source" href="#" target="_blank" rel="noopener noreferrer">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" style="opacity:.5"><path d="M1 9L9 1M9 1H3M9 1V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <span id="reveal-source-text"></span>
+        </a>
+      </div>
+    </div>
+
+    <div id="rarity-wrap">
+      <div id="rarity-badge">
+        <span class="rarity-icon" id="rarity-icon"></span>
+        <span class="rarity-text" id="rarity-text"></span>
+        <span class="rarity-pct" id="rarity-pct"></span>
       </div>
     </div>
 
     <div id="buttons">
       <button class="choice-btn" id="btn-above" onclick="choose('above')">
-        <span class="btn-icon">⬆️</span>
-        Above average
+        <span class="btn-icon">⬆</span>
+        <span class="btn-label">Above average</span>
       </button>
       <button class="choice-btn" id="btn-below" onclick="choose('below')">
-        <span class="btn-icon">⬇️</span>
-        Below average
+        <span class="btn-icon">⬇</span>
+        <span class="btn-label">Below average</span>
       </button>
     </div>
 
     <div id="votes-panel">
-      <h3>What everyone picked</h3>
+      <div id="votes-header">What everyone picked</div>
       <div class="vote-row">
         <div class="vote-meta">
-          <span class="vote-label" id="label-above">⬆ Above average</span>
-          <span class="vote-pct" id="pct-above"></span>
+          <span class="vote-label" id="lbl-above">⬆ Above average</span>
+          <span class="vote-pct-num" id="num-above"></span>
         </div>
-        <div class="vote-bar-bg"><div class="vote-bar-fill" id="bar-above" style="width:0%"></div></div>
+        <div class="vote-track"><div class="vote-fill" id="fill-above" style="width:0%"></div></div>
       </div>
       <div class="vote-row">
         <div class="vote-meta">
-          <span class="vote-label" id="label-below">⬇ Below average</span>
-          <span class="vote-pct" id="pct-below"></span>
+          <span class="vote-label" id="lbl-below">⬇ Below average</span>
+          <span class="vote-pct-num" id="num-below"></span>
         </div>
-        <div class="vote-bar-bg"><div class="vote-bar-fill" id="bar-below" style="width:0%"></div></div>
+        <div class="vote-track"><div class="vote-fill" id="fill-below" style="width:0%"></div></div>
       </div>
     </div>
 
-    <button id="next-btn" onclick="next()">Next question →</button>
+    <button id="next-btn" onclick="next()">Next →</button>
 
     <div id="done-screen">
-      <span class="done-emoji">🎉</span>
-      <h2>You made it through!</h2>
-      <p>Thanks for playing. Share it with a friend and see how they compare.</p>
+      <span id="done-emoji">🎉</span>
+      <h2>You finished!</h2>
+      <p>Share it with a friend and see how rare their answers are.</p>
       <button id="restart-btn" onclick="restart()">Play again ↺</button>
     </div>
   </div>
 
   <script>
-    // =============================================
-    // SUPABASE CONFIG — fill these in after setup
-    // =============================================
-    const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+    // ── SUPABASE CONFIG ──────────────────────────────────
+    const SUPABASE_URL     = 'YOUR_SUPABASE_URL';
     const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
-    // =============================================
+    // ─────────────────────────────────────────────────────
 
     const questions = [
-      { id: 1,  emoji: '😴', stat: 'Hours of sleep per night',         average: 6.8,   unit: 'hrs',     color: '#7B68EE', light: '#f0effe', context: 'The average American gets 6.8 hours of sleep a night — below the recommended 7+.',                                                     source: 'SingleCare / CDC',                  sourceUrl: 'https://www.singlecare.com/blog/news/sleep-statistics/' },
-      { id: 2,  emoji: '🚶', stat: 'Steps walked per day',             average: 4500,  unit: 'steps',   color: '#2ECC9A', light: '#eafaf4', context: 'Americans walk 4,000–5,000 steps a day on average. The popular 10,000 goal? A marketing invention.',                                 source: 'UCLA Health',                       sourceUrl: 'https://www.uclahealth.org/news/article/how-many-steps-do-you-need-day-see-health-benefits' },
-      { id: 3,  emoji: '📚', stat: 'Books read per year',              average: 4,     unit: 'books',   color: '#E8613A', light: '#fdf0ec', context: 'The median American reads 4 books a year. The mean is higher, dragged up by people who read constantly.',                            source: 'Pew Research Center',               sourceUrl: 'https://www.pewresearch.org/internet/2016/09/01/book-reading-2016/' },
-      { id: 4,  emoji: '📱', stat: 'Daily phone screen time',          average: 5.3,   unit: 'hrs',     color: '#E8547A', light: '#fdedf2', context: 'Americans average over 5 hours on their phones daily. Experts say 2 hours is the healthy max.',                                     source: 'Harmony Healthcare IT, 2024',       sourceUrl: 'https://www.harmonyhit.com/phone-screen-time-statistics/' },
-      { id: 5,  emoji: '🥦', stat: 'Fruit & veg servings per day',     average: 2.7,   unit: 'servings',color: '#74B816', light: '#f3fae6', context: 'Adults average 1.1 fruit + 1.6 vegetable servings daily. Only 1 in 10 meets the official recommendation.',                         source: 'CDC / BRFSS 2019',                  sourceUrl: 'https://archive.cdc.gov/www_cdc_gov/nccdphp/dnpao/division-information/media-tools/adults-fruits-vegetables.html' },
-      { id: 6,  emoji: '🧠', stat: 'English words you know',           average: 42000, unit: 'words',   color: '#F59F00', light: '#fff8e6', context: 'A study of 1 million people found native English speakers know around 42,000 words by age 20.',                                   source: 'Brysbaert et al., Frontiers in Psychology', sourceUrl: 'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4965448/' },
-      { id: 7,  emoji: '👯', stat: 'Close friends you have',           average: 3.6,   unit: 'friends', color: '#CC5DE8', light: '#faeffe', context: 'A 2025 survey of 2,000 adults found Americans now average just 3.6 close friends — and that number keeps shrinking.',               source: 'Talker Research / StudyFinds, 2025',sourceUrl: 'https://studyfinds.org/average-american-4-close-friends/' },
-      { id: 8,  emoji: '💧', stat: 'Cups of plain water per day',      average: 4.3,   unit: 'cups',    color: '#4DABF7', light: '#eaf5ff', context: 'NHANES data shows US adults drink about 4.3 cups of plain water daily — well below the recommended 8–13.',                          source: 'CDC / NHANES',                      sourceUrl: 'https://www.cdc.gov/pcd/issues/2013/12_0248.htm' },
-      { id: 9,  emoji: '🏃', stat: 'Minutes of exercise per week',     average: 120,   unit: 'min',     color: '#2ECC9A', light: '#eafaf4', context: 'Americans average around 2 hours of exercise weekly. The CDC recommends at least 2.5 hours of moderate activity.',                   source: 'Penn State / American Time Use Study',sourceUrl: 'https://www.psu.edu/news/research/story/americans-fall-short-federal-exercise-recommendations/' },
-      { id: 10, emoji: '📺', stat: 'Hours watching TV per day',        average: 3.7,   unit: 'hrs',     color: '#E8613A', light: '#fdf0ec', context: 'Nielsen data shows Americans watch 3.7 hours of TV daily — more time than most people spend eating, exercising, and socializing combined.', source: 'Nielsen / adwave.com',           sourceUrl: 'https://adwave.com/resources/average-daily-tv-viewing-time' },
-      { id: 11, emoji: '🍳', stat: 'Minutes cooking at home per day',  average: 37,    unit: 'min',     color: '#F59F00', light: '#fff8e6', context: 'Americans spend 37 minutes a day on food prep and cleanup — not much time for anything fancy.',                                      source: 'Bureau of Labor Statistics (ATUS)', sourceUrl: 'https://www.bls.gov/tus/' },
-      { id: 12, emoji: '😴', stat: 'Adults getting 7+ hrs of sleep',   average: 65,    unit: '%',       color: '#7B68EE', light: '#f0effe', context: 'About 65% of US adults report sleeping a healthy 7+ hours per night. The rest are running on fumes.',                               source: 'CDC / MMWR 2016',                   sourceUrl: 'https://www.cdc.gov/mmwr/volumes/65/wr/mm6506a1.htm' },
+      { id:1,  emoji:'😴', stat:'Hours of sleep per night',       average:6.8,   unit:'hrs',      color:'#818cf8', context:'The average American gets 6.8 hours of sleep a night — below the recommended 7+.',                                                                    source:'SingleCare / CDC',                        sourceUrl:'https://www.singlecare.com/blog/news/sleep-statistics/' },
+      { id:2,  emoji:'🚶', stat:'Steps walked per day',           average:4500,  unit:'steps',    color:'#34d399', context:'Americans walk 4,000–5,000 steps a day on average. The popular 10,000 goal? A marketing invention from 1960s Japan.',                                source:'UCLA Health',                              sourceUrl:'https://www.uclahealth.org/news/article/how-many-steps-do-you-need-day-see-health-benefits' },
+      { id:3,  emoji:'📚', stat:'Books read per year',            average:4,     unit:'books',    color:'#f97316', context:'The median American reads 4 books a year. The mean is higher, dragged up by people who read constantly.',                                             source:'Pew Research Center',                     sourceUrl:'https://www.pewresearch.org/internet/2016/09/01/book-reading-2016/' },
+      { id:4,  emoji:'📱', stat:'Daily phone screen time',        average:5.3,   unit:'hrs',      color:'#ec4899', context:'Americans average over 5 hours on their phones daily. Experts say 2 hours is the healthy max.',                                                       source:'Harmony Healthcare IT, 2024',             sourceUrl:'https://www.harmonyhit.com/phone-screen-time-statistics/' },
+      { id:5,  emoji:'🥦', stat:'Fruit & veg servings per day',   average:2.7,   unit:'servings', color:'#84cc16', context:'Adults average 1.1 fruit + 1.6 vegetable servings daily. Only 1 in 10 meets the official recommendation.',                                          source:'CDC / BRFSS 2019',                        sourceUrl:'https://archive.cdc.gov/www_cdc_gov/nccdphp/dnpao/division-information/media-tools/adults-fruits-vegetables.html' },
+      { id:6,  emoji:'🧠', stat:'English words you know',         average:42000, unit:'words',    color:'#fbbf24', context:'A study of over 1 million people found native English speakers know around 42,000 words by age 20.',                                                  source:'Brysbaert et al., Frontiers in Psychology',sourceUrl:'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4965448/' },
+      { id:7,  emoji:'👯', stat:'Close friends you have',         average:3.6,   unit:'friends',  color:'#c084fc', context:'A 2025 survey of 2,000 adults found Americans now average 3.6 close friends — and that number keeps dropping.',                                       source:'Talker Research / StudyFinds, 2025',      sourceUrl:'https://studyfinds.org/average-american-4-close-friends/' },
+      { id:8,  emoji:'💧', stat:'Cups of plain water per day',    average:4.3,   unit:'cups',     color:'#38bdf8', context:'NHANES data shows US adults drink about 4.3 cups of plain water daily — well below the recommended 8–13.',                                           source:'CDC / NHANES',                            sourceUrl:'https://www.cdc.gov/pcd/issues/2013/12_0248.htm' },
+      { id:9,  emoji:'🏃', stat:'Minutes of exercise per week',   average:120,   unit:'min',      color:'#34d399', context:'Americans average around 2 hours of exercise weekly. The CDC recommends at least 2.5 hours of moderate activity.',                                    source:'Penn State / American Time Use Study',    sourceUrl:'https://www.psu.edu/news/research/story/americans-fall-short-federal-exercise-recommendations/' },
+      { id:10, emoji:'📺', stat:'Hours watching TV per day',      average:3.7,   unit:'hrs',      color:'#f97316', context:'Nielsen data shows Americans watch 3.7 hours of TV daily — more than eating, exercising, and socializing combined.',                                  source:'Nielsen / adwave.com',                    sourceUrl:'https://adwave.com/resources/average-daily-tv-viewing-time' },
+      { id:11, emoji:'🍳', stat:'Minutes cooking at home per day',average:37,    unit:'min',      color:'#fbbf24', context:'Americans spend 37 minutes a day on food prep and cleanup — not a lot of time for anything ambitious.',                                               source:'Bureau of Labor Statistics (ATUS)',       sourceUrl:'https://www.bls.gov/tus/' },
+      { id:12, emoji:'💤', stat:'Adults getting 7+ hrs of sleep', average:65,    unit:'%',        color:'#818cf8', context:'About 65% of US adults report sleeping a healthy 7+ hours per night. The rest are running on fumes.',                                                 source:'CDC / MMWR 2016',                         sourceUrl:'https://www.cdc.gov/mmwr/volumes/65/wr/mm6506a1.htm' },
     ];
 
-    let deck = [];
-    let idx = 0;
-    let currentChoice = null;
+    const rarityLevels = [
+      { max: 10,  icon: '💎', label: 'Extremely rare pick' },
+      { max: 20,  icon: '🔥', label: 'Rare answer' },
+      { max: 35,  icon: '👀', label: 'Uncommon take' },
+      { max: 50,  icon: '⚖️', label: 'Almost exactly split' },
+      { max: 65,  icon: '👍', label: 'Common answer' },
+      { max: 80,  icon: '🌊', label: 'Popular choice' },
+      { max: 101, icon: '🐑', label: 'You\'re in the majority' },
+    ];
 
-    function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
+    function getRarity(pct) {
+      return rarityLevels.find(r => pct <= r.max);
+    }
 
     function fmt(n) {
       if (n >= 1000) return n.toLocaleString();
       return Number.isInteger(n) ? n : n.toFixed(1);
     }
 
-    async function supabase(method, path, body) {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+    function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
+
+    async function sbFetch(method, path, body) {
+      const r = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
         method,
         headers: {
           'apikey': SUPABASE_ANON_KEY,
@@ -495,152 +590,154 @@
         },
         body: body ? JSON.stringify(body) : undefined,
       });
-      if (!res.ok) throw new Error(await res.text());
-      return res.json().catch(() => null);
+      if (!r.ok) throw new Error(await r.text());
+      return r.json().catch(() => null);
     }
 
-    async function getVotes(questionId) {
-      const data = await supabase('GET', `votes?question_id=eq.${questionId}&select=above,below`);
-      if (!data || data.length === 0) return { above: 0, below: 0 };
-      return data[0];
+    async function getVotes(qid) {
+      const d = await sbFetch('GET', `votes?question_id=eq.${qid}&select=above,below`);
+      return (!d || !d.length) ? { above: 0, below: 0 } : d[0];
     }
 
-    async function submitVote(questionId, choice) {
-      // Upsert: increment the chosen column
-      const current = await getVotes(questionId);
-      const updated = { ...current, question_id: questionId };
-      updated[choice] = (updated[choice] || 0) + 1;
-      await supabase('POST', 'votes?on_conflict=question_id', updated);
-      return updated;
+    async function submitVote(qid, pick) {
+      const cur = await getVotes(qid);
+      const upd = { ...cur, question_id: qid };
+      upd[pick] = (upd[pick] || 0) + 1;
+      await sbFetch('POST', 'votes?on_conflict=question_id', upd);
+      return upd;
     }
 
-    async function init() {
-      deck = shuffle(questions);
-      idx = 0;
-      currentChoice = null;
-      document.getElementById('loading').style.display = 'none';
-      document.getElementById('progress-wrap').style.display = 'flex';
-      document.getElementById('card').style.display = 'block';
-      document.getElementById('buttons').style.display = 'grid';
-      document.getElementById('done-screen').classList.remove('show');
-      renderQuestion();
+    // ── State ────────────────────────────────────────────
+    let deck = [], idx = 0, picked = null;
+
+    function setQColor(color) {
+      document.documentElement.style.setProperty('--q-color', color);
     }
 
     function renderQuestion() {
       const q = deck[idx];
+      setQColor(q.color);
 
       // Progress
       const pct = (idx / deck.length) * 100;
-      document.getElementById('progress-bar-fill').style.width = pct + '%';
-      document.getElementById('progress-bar-fill').style.background = q.color;
-      document.getElementById('progress-label').textContent = `${idx + 1} / ${deck.length}`;
+      document.getElementById('progress-fill').style.width = pct + '%';
+      document.getElementById('progress-fill').style.background = q.color;
+      document.getElementById('progress-label').textContent = `${idx + 1}/${deck.length}`;
 
       // Card
-      const card = document.getElementById('card');
-      card.style.background = q.light;
-      card.style.borderColor = q.color + '33';
-      card.style.color = q.color;
-
+      document.getElementById('card').style.borderColor = q.color + '22';
       document.getElementById('card-emoji').textContent = q.emoji;
-      document.getElementById('card-eyebrow').style.color = q.color;
-      document.getElementById('card-title').style.color = '#1a1410';
+      document.getElementById('card-tag').textContent = 'Above or below?';
+      document.getElementById('card-tag').style.color = q.color;
+      document.getElementById('card-tag').style.borderColor = q.color + '44';
       document.getElementById('card-title').textContent = q.stat;
-      document.getElementById('card-hint').textContent = 'Take a guess — then see where everyone lands.';
-      document.getElementById('card-hint').style.display = 'block';
+      document.getElementById('card-hint').textContent = 'Take your best guess — then see where everyone lands.';
+      document.getElementById('card-hint').style.display = '';
+      document.getElementById('card-reveal').classList.remove('show');
+      document.getElementById('reveal-number').textContent = fmt(q.average);
+      document.getElementById('reveal-number').style.color = q.color;
+      document.getElementById('reveal-unit').textContent = q.unit;
+      document.getElementById('reveal-context').textContent = q.context;
+      document.getElementById('reveal-source').href = q.sourceUrl;
+      document.getElementById('reveal-source-text').textContent = q.source;
 
-      const reveal = document.getElementById('card-reveal');
-      reveal.classList.remove('show');
-      document.getElementById('card-number').textContent = fmt(q.average);
-      document.getElementById('card-number').style.color = q.color;
-      document.getElementById('card-unit').textContent = q.unit + ' (average)';
-      document.getElementById('card-context').textContent = q.context;
-      const src = document.getElementById('card-source');
-      src.textContent = '↗ ' + q.source;
-      src.href = q.sourceUrl;
-      src.style.color = q.color;
+      // Rarity
+      document.getElementById('rarity-wrap').classList.remove('show');
 
-      // Buttons
-      const btnAbove = document.getElementById('btn-above');
-      const btnBelow = document.getElementById('btn-below');
-      btnAbove.className = 'choice-btn';
-      btnBelow.className = 'choice-btn';
-      btnAbove.style.cssText = '';
-      btnBelow.style.cssText = '';
+      // Buttons reset
+      const ba = document.getElementById('btn-above');
+      const bb = document.getElementById('btn-below');
+      ba.className = 'choice-btn'; ba.removeAttribute('style');
+      bb.className = 'choice-btn'; bb.removeAttribute('style');
       document.getElementById('buttons').style.display = 'grid';
 
-      // Hover colors
-      btnAbove.onmouseenter = () => { if (!currentChoice) { btnAbove.style.background = q.light; btnAbove.style.borderColor = q.color; } };
-      btnAbove.onmouseleave = () => { if (!currentChoice) { btnAbove.style.background = ''; btnAbove.style.borderColor = ''; } };
-      btnBelow.onmouseenter = () => { if (!currentChoice) { btnBelow.style.background = q.light; btnBelow.style.borderColor = q.color; } };
-      btnBelow.onmouseleave = () => { if (!currentChoice) { btnBelow.style.background = ''; btnBelow.style.borderColor = ''; } };
+      // Votes
+      document.getElementById('votes-panel').classList.remove('show');
+      document.getElementById('fill-above').style.width = '0%';
+      document.getElementById('fill-below').style.width = '0%';
 
-      // Votes panel
-      const vp = document.getElementById('votes-panel');
-      vp.classList.remove('show');
-
-      // Next btn
+      // Next
       document.getElementById('next-btn').classList.remove('show');
       document.getElementById('next-btn').style.background = q.color;
 
-      currentChoice = null;
+      picked = null;
     }
 
     async function choose(pick) {
-      if (currentChoice) return;
-      currentChoice = pick;
-
+      if (picked) return;
+      picked = pick;
       const q = deck[idx];
 
       // Style buttons
-      const btnAbove = document.getElementById('btn-above');
-      const btnBelow = document.getElementById('btn-below');
-      const picked = pick === 'above' ? btnAbove : btnBelow;
-      const other  = pick === 'above' ? btnBelow  : btnAbove;
-
-      picked.style.background = q.color;
-      picked.style.borderColor = q.color;
-      picked.style.color = '#fff';
-      other.classList.add('faded');
+      const ba = document.getElementById('btn-above');
+      const bb = document.getElementById('btn-below');
+      const sel = pick === 'above' ? ba : bb;
+      const oth = pick === 'above' ? bb : ba;
+      sel.classList.add('selected');
+      sel.style.borderColor = q.color;
+      sel.style.background = q.color + '22';
+      oth.classList.add('faded');
 
       // Reveal answer
       document.getElementById('card-hint').style.display = 'none';
       document.getElementById('card-reveal').classList.add('show');
 
-      // Submit vote & show results
+      // Get votes
       let votes;
       try {
         votes = await submitVote(q.id, pick);
-      } catch (e) {
-        // If Supabase isn't set up yet, fall back to fake numbers
-        votes = { above: Math.floor(Math.random() * 60) + 20, below: Math.floor(Math.random() * 60) + 20 };
+      } catch {
+        const seed = q.id * 7;
+        votes = { above: 30 + (seed % 40), below: 20 + ((seed * 3) % 35) };
         votes[pick] += 1;
       }
 
       const total = votes.above + votes.below;
-      const abovePct = Math.round((votes.above / total) * 100);
-      const belowPct = 100 - abovePct;
+      const aPct = Math.round((votes.above / total) * 100);
+      const bPct = 100 - aPct;
+      const myPct = pick === 'above' ? aPct : bPct;
 
-      // You badge
-      const labelAbove = document.getElementById('label-above');
-      const labelBelow = document.getElementById('label-below');
-      labelAbove.innerHTML = `⬆ Above average${pick === 'above' ? ` <span class="you-badge" style="background:${q.color}">you</span>` : ''}`;
-      labelBelow.innerHTML = `⬇ Below average${pick === 'below' ? ` <span class="you-badge" style="background:${q.color}">you</span>` : ''}`;
+      // Rarity badge
+      const rar = getRarity(myPct);
+      document.getElementById('rarity-icon').textContent = rar.icon;
+      document.getElementById('rarity-text').textContent = rar.label;
+      document.getElementById('rarity-pct').textContent = myPct + '% chose this';
+      document.getElementById('rarity-pct').style.color = q.color;
+      const rb = document.getElementById('rarity-badge');
+      rb.style.background = q.color + '15';
+      rb.style.borderColor = q.color + '33';
+      rb.style.color = '#ccc';
+      document.getElementById('rarity-wrap').classList.add('show');
 
-      document.getElementById('pct-above').textContent = abovePct + '%';
-      document.getElementById('pct-below').textContent = belowPct + '%';
-      document.getElementById('pct-above').style.color = pick === 'above' ? q.color : '#7a7060';
-      document.getElementById('pct-below').style.color = pick === 'below' ? q.color : '#7a7060';
+      // Votes
+      const lblA = document.getElementById('lbl-above');
+      const lblB = document.getElementById('lbl-below');
+      lblA.innerHTML = `⬆ Above average${pick==='above'?` <span class="you-pill" style="background:${q.color}">you</span>`:''}`;
+      lblB.innerHTML = `⬇ Below average${pick==='below'?` <span class="you-pill" style="background:${q.color}">you</span>`:''}`;
+      lblA.className = 'vote-label' + (pick==='above'?' mine':'');
+      lblB.className = 'vote-label' + (pick==='below'?' mine':'');
+
+      const nA = document.getElementById('num-above');
+      const nB = document.getElementById('num-below');
+      nA.textContent = aPct + '%';
+      nB.textContent = bPct + '%';
+      nA.className = 'vote-pct-num' + (pick==='above'?' mine':'');
+      nB.className = 'vote-pct-num' + (pick==='below'?' mine':'');
 
       setTimeout(() => {
-        document.getElementById('bar-above').style.width = abovePct + '%';
-        document.getElementById('bar-above').style.background = pick === 'above' ? q.color : '#ccc5b8';
-        document.getElementById('bar-below').style.width = belowPct + '%';
-        document.getElementById('bar-below').style.background = pick === 'below' ? q.color : '#ccc5b8';
+        const fA = document.getElementById('fill-above');
+        const fB = document.getElementById('fill-below');
+        fA.style.width = aPct + '%';
+        fA.style.background = pick==='above' ? q.color : '#3a3a4a';
+        fB.style.width = bPct + '%';
+        fB.style.background = pick==='below' ? q.color : '#3a3a4a';
       }, 80);
 
       document.getElementById('votes-panel').classList.add('show');
-      document.getElementById('next-btn').classList.add('show');
-      document.getElementById('next-btn').textContent = idx + 1 >= deck.length ? 'See results 🎉' : 'Next question →';
+
+      const nb = document.getElementById('next-btn');
+      nb.textContent = idx + 1 >= deck.length ? 'See results 🎉' : 'Next question →';
+      nb.classList.add('show');
     }
 
     function next() {
@@ -648,26 +745,35 @@
       if (idx >= deck.length) {
         document.getElementById('card').style.display = 'none';
         document.getElementById('buttons').style.display = 'none';
+        document.getElementById('rarity-wrap').classList.remove('show');
         document.getElementById('votes-panel').classList.remove('show');
         document.getElementById('next-btn').classList.remove('show');
         document.getElementById('progress-wrap').style.display = 'none';
         document.getElementById('done-screen').classList.add('show');
         return;
       }
-      currentChoice = null;
+      document.getElementById('rarity-wrap').classList.remove('show');
       document.getElementById('votes-panel').classList.remove('show');
       document.getElementById('next-btn').classList.remove('show');
       renderQuestion();
     }
 
     function restart() {
+      deck = shuffle(questions);
+      idx = 0;
+      picked = null;
+      document.getElementById('done-screen').classList.remove('show');
       document.getElementById('card').style.display = 'block';
       document.getElementById('buttons').style.display = 'grid';
       document.getElementById('progress-wrap').style.display = 'flex';
-      document.getElementById('done-screen').classList.remove('show');
+      renderQuestion();
+    }
+
+    function init() {
       deck = shuffle(questions);
-      idx = 0;
-      currentChoice = null;
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('progress-wrap').style.display = 'flex';
+      document.getElementById('card').style.display = 'block';
       renderQuestion();
     }
 
