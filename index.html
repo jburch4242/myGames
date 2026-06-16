@@ -71,16 +71,16 @@
       margin: 0 auto;
     }
 
-    /* ── Image Card (new style) ── */
+    /* ── Card ── */
     .card {
       position: relative;
       border-radius: 16px;
       overflow: hidden;
       text-decoration: none;
       color: inherit;
-      display: block;
-      aspect-ratio: 2 / 1;
-      background: #e4e0d8; /* placeholder color while image loads */
+      display: flex;
+      flex-direction: column;
+      background: #ffffff;
       box-shadow: 0 2px 8px rgba(44, 44, 40, 0.08);
       transition: transform 0.18s ease, box-shadow 0.18s ease;
     }
@@ -95,24 +95,27 @@
       outline-offset: 3px;
     }
 
-    /* The game image fills the whole card */
+    /* The game image fills the top portion of the card */
     .card-img {
       width: 100%;
-      height: 100%;
+      aspect-ratio: 2 / 1;
       object-fit: cover;
       display: block;
+      border-radius: 16px 16px 0 0;
     }
 
     /* Fallback shown when no image is provided */
     .card-fallback {
       width: 100%;
-      height: 100%;
+      aspect-ratio: 2 / 1;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       gap: 10px;
       padding: 24px;
+      background: #e4e0d8;
+      border-radius: 16px 16px 0 0;
     }
 
     .card-fallback .icon-bubble {
@@ -130,57 +133,26 @@
     .card-fallback .icon-bubble.sand  { background: #ede1c8; }
     .card-fallback .icon-bubble.stone { background: #dddbd3; }
 
-    .card-fallback .card-title {
-      font-family: 'Fraunces', serif;
-      font-size: 1.05rem;
-      font-weight: 600;
-      color: #2c2c28;
-      text-align: center;
-      line-height: 1.25;
-    }
-
-    .card-fallback .card-desc {
-      font-size: 0.8rem;
-      color: #888878;
-      text-align: center;
-      line-height: 1.55;
-    }
-
-    /* Gradient overlay so text reads over images */
-    .card-overlay {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(
-        to bottom,
-        rgba(20, 18, 14, 0) 30%,
-        rgba(20, 18, 14, 0.72) 100%
-      );
-    }
-
-    /* Title & description over the image */
+    /* Label sits below the image, no overlay */
     .card-label {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      padding: 16px 18px;
+      padding: 14px 18px 16px;
+      background: #ffffff;
+      border-radius: 0 0 16px 16px;
     }
 
     .card-label .card-title {
       font-family: 'Fraunces', serif;
-      font-size: 1.05rem;
+      font-size: 1.0rem;
       font-weight: 600;
-      color: #ffffff;
+      color: #2c2c28;
       line-height: 1.25;
-      text-shadow: 0 1px 3px rgba(0,0,0,0.3);
     }
 
     .card-label .card-desc {
-      font-size: 0.75rem;
-      color: rgba(255, 255, 255, 0.82);
+      font-size: 0.78rem;
+      color: #7a7a6a;
       line-height: 1.5;
-      margin-top: 3px;
-      text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+      margin-top: 4px;
     }
 
     /* ── Footer ── */
@@ -222,18 +194,8 @@
 
   <div class="grid">
 
-    <!--
-      HOW TO USE IMAGE CARDS:
-      1. Save your Canva exports to an "images/" folder next to this file.
-      2. Replace the src in each <img class="card-img"> with the correct filename.
-      3. The .card-overlay and .card-label will automatically appear over your image.
-      4. If you don't have an image yet, remove the <img> and .card-overlay and
-         .card-label elements, and use .card-fallback instead (see last card for example).
-    -->
-
     <a class="card" href="games/aboveorbelow.html">
       <img class="card-img" src="images/card-above-average.png" alt="Are You Above or Below Average?" />
-      <div class="card-overlay"></div>
       <div class="card-label">
         <div class="card-title">Are You Above or Below Average?</div>
         <div class="card-desc">Or do you just think you are?</div>
@@ -242,7 +204,6 @@
 
     <a class="card" href="games/artoffinals.html">
       <img class="card-img" src="images/card-art-of-finals.png" alt="The Art of Finals" />
-      <div class="card-overlay"></div>
       <div class="card-label">
         <div class="card-title">The Art of Finals</div>
         <div class="card-desc">Navigate freshman year using ancient wisdom</div>
@@ -251,7 +212,6 @@
 
     <a class="card" href="games/dailyrecommendations.html">
       <img class="card-img" src="images/card-daily-recommendations.png" alt="Daily Recommendations" />
-      <div class="card-overlay"></div>
       <div class="card-label">
         <div class="card-title">Daily Recommendations</div>
         <div class="card-desc">Listen to the experts</div>
@@ -260,9 +220,9 @@
 
     <a class="card" href="games/chess.html">
       <img class="card-img" src="images/card-chess-bots.png" alt="My Friends are (Chess) Bots!" />
-      <div class="card-overlay"></div>
       <div class="card-label">
-        
+        <div class="card-title">My Friends are (Chess) Bots!</div>
+        <div class="card-desc"></div>
       </div>
     </a>
 
