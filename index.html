@@ -315,11 +315,11 @@
 
   <!-- ── Bottom Actions ── -->
   <div class="bottom-actions">
-    <a class="action-btn" href="https://buymeacoffee.com/YOUR_USERNAME" target="_blank" rel="noopener">
+    <a class="action-btn" href="https://buymeacoffee.com/burchtreegames" target="_blank" rel="noopener">
       ☕ Buy me a coffee
     </a>
     <button class="action-btn" onclick="handleSubscribe()">
-      🌿 Newsletter
+      🌿 Stay Up To Date
     </button>
   </div>
 
@@ -338,13 +338,22 @@
       document.getElementById('newsletterPopover').classList.toggle('open');
     }
 
-    function submitSubscribe() {
+    async function submitSubscribe() {
       const input = document.querySelector('#newsletterPopover .email-input');
       if (!input.value || !input.value.includes('@')) { input.focus(); return; }
-      // Replace with your newsletter provider's submission logic
-      alert('Thanks! ' + input.value + ' has been added.');
+
+      const formData = new FormData();
+      formData.append('email', input.value);
+
+      await fetch('https://buttondown.com/api/emails/embed-subscribe/burchtreegames', {
+        method: 'POST',
+        body: formData,
+        mode: 'no-cors',
+      });
+
       input.value = '';
       document.getElementById('newsletterPopover').classList.remove('open');
+      alert('Thanks for subscribing!');
     }
   </script>
 
