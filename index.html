@@ -95,7 +95,6 @@
       outline-offset: 3px;
     }
 
-    /* The game image fills the top portion of the card */
     .card-img {
       width: 100%;
       aspect-ratio: 2 / 1;
@@ -104,7 +103,6 @@
       border-radius: 16px 16px 0 0;
     }
 
-    /* Fallback shown when no image is provided */
     .card-fallback {
       width: 100%;
       aspect-ratio: 2 / 1;
@@ -133,7 +131,6 @@
     .card-fallback .icon-bubble.sand  { background: #ede1c8; }
     .card-fallback .icon-bubble.stone { background: #dddbd3; }
 
-    /* Label sits below the image, no overlay */
     .card-label {
       padding: 14px 18px 16px;
       background: #ffffff;
@@ -153,6 +150,94 @@
       color: #7a7a6a;
       line-height: 1.5;
       margin-top: 4px;
+    }
+
+    /* ── Bottom Actions ── */
+    .bottom-actions {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 52px;
+    }
+
+    .action-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0 18px;
+      height: 38px;
+      background: #ffffff;
+      color: #2c2c28;
+      border: 1.5px solid #dddbd3;
+      border-radius: 999px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 0 1px 4px rgba(44,44,40,0.07);
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .action-btn:hover {
+      border-color: #4e8a40;
+      box-shadow: 0 3px 10px rgba(44,44,40,0.12);
+    }
+
+    /* ── Newsletter Popover ── */
+    .newsletter-popover {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      background: #ffffff;
+      border: 1.5px solid #dddbd3;
+      border-radius: 14px;
+      padding: 16px 20px;
+      width: 300px;
+      margin: 10px auto 0;
+      box-shadow: 0 4px 18px rgba(44,44,40,0.11);
+    }
+
+    .newsletter-popover.open {
+      display: flex;
+    }
+
+    .newsletter-popover .email-input {
+      width: 100%;
+      height: 38px;
+      border: 1.5px solid #dddbd3;
+      border-radius: 10px;
+      padding: 0 12px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      color: #2c2c28;
+      background: #f7f5f0;
+      outline: none;
+      transition: border-color 0.15s ease;
+    }
+
+    .newsletter-popover .email-input:focus { border-color: #4e8a40; }
+
+    .newsletter-popover .btn-primary {
+      width: 100%;
+      height: 38px;
+      background: #4e8a40;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+
+    .newsletter-popover .btn-primary:hover { background: #3d6e32; }
+
+    .newsletter-popover .popover-note {
+      font-size: 0.73rem;
+      color: #aaa898;
     }
 
     /* ── Footer ── */
@@ -228,9 +313,40 @@
 
   </div>
 
+  <!-- ── Bottom Actions ── -->
+  <div class="bottom-actions">
+    <a class="action-btn" href="https://buymeacoffee.com/YOUR_USERNAME" target="_blank" rel="noopener">
+      ☕ Buy me a coffee
+    </a>
+    <button class="action-btn" onclick="handleSubscribe()">
+      🌿 Newsletter
+    </button>
+  </div>
+
+  <div class="newsletter-popover" id="newsletterPopover">
+    <input class="email-input" type="email" placeholder="your@email.com" aria-label="Email address" />
+    <button class="btn-primary" onclick="submitSubscribe()">Subscribe</button>
+    <p class="popover-note">No spam. Unsubscribe anytime.</p>
+  </div>
+
   <footer>
     <span>&#x1F33F;</span> Burch Tree Games
   </footer>
+
+  <script>
+    function handleSubscribe() {
+      document.getElementById('newsletterPopover').classList.toggle('open');
+    }
+
+    function submitSubscribe() {
+      const input = document.querySelector('#newsletterPopover .email-input');
+      if (!input.value || !input.value.includes('@')) { input.focus(); return; }
+      // Replace with your newsletter provider's submission logic
+      alert('Thanks! ' + input.value + ' has been added.');
+      input.value = '';
+      document.getElementById('newsletterPopover').classList.remove('open');
+    }
+  </script>
 
 </body>
 </html>
