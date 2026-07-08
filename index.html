@@ -15,6 +15,9 @@
       background: #f7f5f0;
       color: #2c2c28;
       min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       padding: 60px 24px 80px;
     }
 
@@ -63,23 +66,26 @@
     }
 
     /* ── Game Grid ── */
+    /* Flex + justify-content:center so any number of cards (1, 2, 3...)
+       stays centered instead of stretching into empty grid columns. */
     .grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
       gap: 20px;
       max-width: 960px;
-      margin: 0 auto;
+      width: 100%;
     }
 
-    /* ── Card ── */
+    /* ── Card (image only, no separate title/description block) ── */
     .card {
       position: relative;
+      flex: 0 1 280px;
       border-radius: 16px;
       overflow: hidden;
       text-decoration: none;
       color: inherit;
-      display: flex;
-      flex-direction: column;
+      display: block;
       background: #ffffff;
       box-shadow: 0 2px 8px rgba(44, 44, 40, 0.08);
       transition: transform 0.18s ease, box-shadow 0.18s ease;
@@ -100,7 +106,7 @@
       aspect-ratio: 2 / 1;
       object-fit: cover;
       display: block;
-      border-radius: 16px 16px 0 0;
+      border-radius: 16px;
     }
 
     .card-fallback {
@@ -113,7 +119,7 @@
       gap: 10px;
       padding: 24px;
       background: #e4e0d8;
-      border-radius: 16px 16px 0 0;
+      border-radius: 16px;
     }
 
     .card-fallback .icon-bubble {
@@ -130,27 +136,6 @@
     .card-fallback .icon-bubble.clay  { background: #f0ddd3; }
     .card-fallback .icon-bubble.sand  { background: #ede1c8; }
     .card-fallback .icon-bubble.stone { background: #dddbd3; }
-
-    .card-label {
-      padding: 14px 18px 16px;
-      background: #ffffff;
-      border-radius: 0 0 16px 16px;
-    }
-
-    .card-label .card-title {
-      font-family: 'Fraunces', serif;
-      font-size: 1.0rem;
-      font-weight: 600;
-      color: #2c2c28;
-      line-height: 1.25;
-    }
-
-    .card-label .card-desc {
-      font-size: 0.78rem;
-      color: #7a7a6a;
-      line-height: 1.5;
-      margin-top: 4px;
-    }
 
     /* ── Bottom Actions ── */
     .bottom-actions {
@@ -254,12 +239,8 @@
     }
 
     /* ── Responsive ── */
-    @media (max-width: 700px) {
-      .grid { grid-template-columns: 1fr 1fr; }
-    }
-
     @media (max-width: 480px) {
-      .grid { grid-template-columns: 1fr; }
+      .card { flex: 1 1 100%; max-width: 340px; }
     }
   </style>
 </head>
@@ -281,22 +262,10 @@
 
     <a class="card" href="games/chess.html">
       <img class="card-img" src="images/card-chess-bots.png" alt="My Friends are (Chess) Bots!" />
-      <div class="card-label">
-        <div class="card-title">My Friends are (Chess) Bots!</div>
-        <div class="card-desc"></div>
-      </
+    </a>
 
     <a class="card" href="games/artoffinals.html">
       <img class="card-img" src="images/card-art-of-finals.png" alt="The Art of Finals" />
-      <div class="card-label">
-        <div class="card-title">The Art of Finals</div>
-        <div class="card-desc">Navigate freshman year using ancient wisdom</div>
-      </div>
-    </a>
-
-   
-
-    div>
     </a>
 
   </div>
