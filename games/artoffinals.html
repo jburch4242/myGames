@@ -395,14 +395,15 @@ body {
 .tut-frame::before {
   content: attr(data-panel);
   position: absolute;
-  top: -14px; left: 20px;
+  top: 0; left: 0;
   background: var(--red);
   color: var(--paper);
   font-family: 'Bebas Neue', sans-serif;
   font-size: 0.9em;
   letter-spacing: 2px;
-  padding: 2px 12px;
-  border: 2px solid var(--ink);
+  padding: 3px 14px;
+  border-bottom: 2px solid var(--ink);
+  border-right: 2px solid var(--ink);
   z-index: 5;
 }
 
@@ -1215,7 +1216,7 @@ body {
       <div class="hud-gpa-val" id="hval-gpa">4.0</div>
     </div>
     <div class="hud-nav">
-      <a class="nav-btn" href="index.html">🌳</a>
+      <a class="nav-btn" href="/index.html">🌳</a>
       <a class="nav-btn" href="meditations-on-a-2-8-gpa.html">Year II →</a>
     </div>
   </div>
@@ -1226,7 +1227,7 @@ body {
   <div class="title-art">
     <div class="title-panel-top">
       <div class="title-nav">
-        <a class="nav-btn" href="index.html">🌳 Burch Tree</a>
+        <a class="nav-btn" href="/index.html">🌳 Burch Tree</a>
       </div>
       <div class="title-year-badge">YEAR I · FRESHMAN</div>
       <div class="title-nav">
