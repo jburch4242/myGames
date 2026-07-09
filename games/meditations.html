@@ -1,0 +1,1414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meditations on a 2.8 GPA</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Special+Elite&family=Patrick+Hand&family=Bebas+Neue&display=swap');
+
+:root {
+  --marble: #e8e4dc;
+  --marble-dark: #c8c4bc;
+  --marble-deep: #a8a49c;
+  --ink: #0e0e18;
+  --navy: #1a2240;
+  --navy-mid: #243060;
+  --navy-light: #2e3c78;
+  --silver: #9aaabb;
+  --silver-light: #c8d8e8;
+  --silver-bright: #e0ecf8;
+  --amber: #b8901a;
+  --amber-light: #d4aa30;
+  --flame-lo: #6080c0;
+  --red: #7a1a2a;
+  --green: #2a5a3a;
+  --panel-w: 680px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #060810;
+  font-family: 'Patrick Hand', cursive;
+  color: var(--ink);
+  min-height: 100vh;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#stage {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── PANELS ──────────────────────────────────────────────── */
+.panel {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+}
+.panel.active { opacity: 1; pointer-events: all; }
+.panel.exit-left { animation: exitLeft 0.5s ease forwards; }
+.panel.enter-right { animation: enterRight 0.5s ease forwards; }
+.panel.exit-up { animation: exitUp 0.5s ease forwards; }
+.panel.enter-down { animation: enterDown 0.5s ease forwards; }
+
+@keyframes exitLeft { to { opacity:0; transform:translateX(-60px); } }
+@keyframes enterRight { from { opacity:0; transform:translateX(60px); } to { opacity:1; transform:none; } }
+@keyframes exitUp { to { opacity:0; transform:translateY(-40px); } }
+@keyframes enterDown { from { opacity:0; transform:translateY(30px); } to { opacity:1; transform:none; } }
+
+/* ── BACKGROUNDS ─────────────────────────────────────────── */
+.bg-stone {
+  background:
+    radial-gradient(ellipse at 25% 75%, rgba(26,34,64,0.3) 0%, transparent 55%),
+    radial-gradient(ellipse at 75% 25%, rgba(154,170,187,0.08) 0%, transparent 50%),
+    linear-gradient(160deg, #080c18 0%, #0e1428 50%, #060810 100%);
+}
+
+/* ── MARBLE TEXTURE ──────────────────────────────────────── */
+.marble-surface {
+  background:
+    linear-gradient(135deg, rgba(255,255,255,0.04) 0%, transparent 50%),
+    linear-gradient(225deg, rgba(154,170,187,0.06) 0%, transparent 40%),
+    linear-gradient(180deg, #e8e4dc 0%, #dcd8d0 60%, #ccc8c0 100%);
+  position: relative;
+}
+.marble-surface::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(transparent, transparent 27px, rgba(0,0,0,0.04) 28px);
+  pointer-events: none;
+}
+
+/* ── FRAME ────────────────────────────────────────────────── */
+.gn-frame {
+  width: var(--panel-w);
+  max-width: 96vw;
+  max-height: 96vh;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 3px solid var(--navy);
+  box-shadow:
+    inset 0 0 0 1px rgba(154,170,187,0.2),
+    6px 6px 0 rgba(0,0,0,0.8);
+}
+
+/* ── HUD ──────────────────────────────────────────────────── */
+#stats-hud {
+  position: fixed;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: var(--panel-w);
+  max-width: 96vw;
+  z-index: 100;
+  display: none;
+  background: var(--navy);
+  border-bottom: 2px solid var(--silver);
+  box-shadow: 0 2px 20px rgba(0,0,0,0.8);
+}
+.hud-inner { display: flex; align-items: center; }
+.hud-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1em;
+  color: var(--silver-light);
+  letter-spacing: 2px;
+  padding: 6px 14px;
+  border-right: 1px solid rgba(154,170,187,0.25);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.hud-stats { display: flex; flex: 1; }
+.hud-stat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4px 6px;
+  border-right: 1px solid rgba(154,170,187,0.12);
+}
+.hud-stat-label { font-family: 'Special Elite', cursive; font-size: 0.52em; color: rgba(154,170,187,0.6); letter-spacing: 1px; }
+.hud-bar-outer { width: 100%; height: 4px; background: rgba(255,255,255,0.08); border-radius: 2px; margin: 2px 0; overflow: hidden; }
+.hud-bar-inner { height: 100%; border-radius: 2px; transition: width 0.6s ease; }
+.hud-stat-val { font-family: 'Cinzel', serif; font-size: 0.62em; color: var(--silver-bright); font-weight: 700; }
+.hud-mot {
+  padding: 4px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-right: 1px solid rgba(154,170,187,0.25);
+  flex-shrink: 0;
+  min-width: 54px;
+}
+.hud-mot-label { font-family: 'Special Elite', cursive; font-size: 0.52em; color: rgba(154,170,187,0.6); letter-spacing: 1px; }
+.flame-wrap { position: relative; width: 20px; height: 24px; margin: 1px auto; }
+#flame-svg { width: 20px; height: 24px; transition: all 0.5s ease; transform-origin: bottom center; }
+.hud-mot-val { font-family: 'Cinzel', serif; font-size: 0.62em; color: var(--silver-bright); font-weight: 700; }
+.hud-gpa {
+  padding: 4px 12px;
+  display: flex; flex-direction: column; align-items: center;
+  border-left: 1px solid rgba(154,170,187,0.25); flex-shrink: 0;
+}
+.hud-gpa-label { font-family: 'Special Elite', cursive; font-size: 0.52em; color: rgba(154,170,187,0.6); letter-spacing: 1px; }
+.hud-gpa-val { font-family: 'Bebas Neue', sans-serif; font-size: 1.3em; color: var(--silver-bright); line-height: 1; }
+.hud-nav { display: flex; gap: 6px; padding: 0 10px; border-left: 1px solid rgba(154,170,187,0.25); flex-shrink: 0; align-items: center; }
+.nav-btn {
+  background: none; border: 1px solid rgba(154,170,187,0.3); color: var(--silver);
+  font-family: 'Special Elite', cursive; font-size: 0.68em; padding: 3px 9px;
+  border-radius: 2px; cursor: pointer; letter-spacing: 1px; transition: all 0.2s;
+  text-decoration: none; display: inline-block; white-space: nowrap;
+}
+.nav-btn:hover { border-color: var(--silver-bright); color: var(--silver-bright); }
+
+/* ── TITLE ────────────────────────────────────────────────── */
+#panel-title { background: var(--ink); }
+
+.title-art {
+  width: var(--panel-w);
+  max-width: 96vw;
+  height: min(96vh, 700px);
+  position: relative;
+  overflow: hidden;
+  border: 3px solid var(--silver);
+  box-shadow: 0 0 60px rgba(26,34,64,0.5), 8px 8px 0 rgba(0,0,0,0.9);
+  display: flex;
+  flex-direction: column;
+  background: var(--navy);
+}
+
+/* Column texture */
+.title-art::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(90deg, transparent, transparent 59px, rgba(154,170,187,0.04) 60px),
+    radial-gradient(ellipse at 50% 100%, rgba(154,170,187,0.08) 0%, transparent 60%);
+  z-index: 0;
+}
+
+.title-topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 16px; border-bottom: 2px solid rgba(154,170,187,0.25);
+  background: rgba(0,0,0,0.3); flex-shrink: 0; position: relative; z-index: 2;
+}
+.title-year-badge { font-family: 'Special Elite', cursive; font-size: 0.7em; color: var(--silver); letter-spacing: 3px; }
+
+.title-body {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 0; padding: 24px 20px;
+  position: relative; z-index: 2;
+}
+
+.title-eyebrow {
+  font-family: 'Special Elite', cursive; font-size: 0.72em; color: var(--silver);
+  letter-spacing: 5px; margin-bottom: 12px;
+  opacity: 0; animation: fadeUp 0.7s ease 0.4s forwards;
+}
+
+.title-main {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(2.8em, 8vw, 5em);
+  color: var(--marble);
+  line-height: 0.9;
+  text-align: center;
+  text-shadow: 3px 3px 0 var(--navy), -1px -1px 0 rgba(154,170,187,0.2);
+  letter-spacing: 3px;
+  opacity: 0; animation: fadeUp 0.8s ease 0.6s forwards;
+}
+.title-main span {
+  color: var(--silver-light);
+  display: block;
+  font-size: 0.48em;
+  letter-spacing: 8px;
+  text-shadow: 1px 1px 0 var(--navy);
+  margin-top: 4px;
+}
+
+.title-divider {
+  width: 80%; height: 2px;
+  background: linear-gradient(to right, transparent, var(--silver), transparent);
+  margin: 18px 0;
+  opacity: 0; animation: fadeUp 0.5s ease 0.9s forwards;
+}
+
+.title-quote {
+  font-family: 'Special Elite', cursive; font-size: 0.8em;
+  color: rgba(232,228,220,0.6); text-align: center;
+  max-width: 400px; line-height: 1.65; padding: 0 20px;
+  opacity: 0; animation: fadeUp 0.5s ease 1.1s forwards;
+}
+.title-quote em { color: rgba(232,228,220,0.35); font-size: 0.85em; display: block; margin-top: 5px; }
+
+.title-cta {
+  background: var(--navy-mid); border: 2px solid var(--silver);
+  color: var(--marble); font-family: 'Cinzel', serif; font-size: 1em;
+  letter-spacing: 3px; padding: 13px 40px; cursor: pointer; margin-top: 24px;
+  transition: all 0.2s; box-shadow: 3px 3px 0 rgba(0,0,0,0.8);
+  opacity: 0; animation: fadeUp 0.5s ease 1.4s forwards;
+}
+.title-cta:hover { background: var(--navy-light); transform: translate(-1px,-1px); box-shadow: 4px 4px 0 rgba(0,0,0,0.8); }
+.title-cta:active { transform: translate(1px,1px); box-shadow: 2px 2px 0; }
+
+@keyframes fadeUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:none; } }
+
+/* ── TUTORIAL ─────────────────────────────────────────────── */
+#panel-tutorial { background: #080c18; }
+
+.tut-frame {
+  width: var(--panel-w); max-width: 96vw; height: min(96vh, 700px);
+  display: flex; flex-direction: column; overflow: hidden;
+  border: 3px solid var(--navy); box-shadow: 8px 8px 0 rgba(0,0,0,0.9);
+}
+
+.tut-header {
+  background: var(--navy); border-bottom: 3px solid var(--silver);
+  flex-shrink: 0; display: flex; align-items: stretch;
+}
+.tut-badge {
+  background: var(--navy-mid); padding: 0 18px;
+  display: flex; align-items: center; justify-content: center;
+  border-right: 3px solid var(--silver); flex-shrink: 0;
+}
+.tut-badge-text {
+  font-family: 'Bebas Neue', sans-serif; font-size: 0.9em;
+  color: var(--silver-light); letter-spacing: 2px; text-align: center; line-height: 1.2;
+}
+.tut-header-main {
+  padding: 12px 20px; display: flex; flex-direction: column;
+  justify-content: center; gap: 2px;
+}
+.tut-num {
+  font-family: 'Special Elite', cursive; font-size: 0.68em;
+  color: var(--silver); letter-spacing: 3px;
+}
+.tut-name {
+  font-family: 'Bebas Neue', sans-serif; font-size: 1.8em;
+  color: var(--marble); line-height: 1; letter-spacing: 2px;
+  text-shadow: 2px 2px 0 var(--navy-light);
+}
+
+.tut-body {
+  flex: 1; overflow-y: auto; padding: 20px;
+  display: flex; flex-direction: column; gap: 16px;
+  background: #dcd8d0;
+  background-image: repeating-linear-gradient(transparent, transparent 27px, rgba(0,0,0,0.05) 28px);
+}
+
+.tut-quote-block {
+  background: var(--navy); padding: 14px 16px;
+  border-left: 5px solid var(--silver); position: relative;
+}
+.tut-quote-block::before {
+  content: '"'; position: absolute; top: -8px; left: 10px;
+  font-family: 'Cinzel', serif; font-size: 3em;
+  color: var(--silver); line-height: 1; opacity: 0.5;
+}
+.tut-quote-text {
+  font-family: 'Special Elite', cursive; font-size: 0.9em;
+  color: var(--marble); font-style: italic; line-height: 1.6; padding-top: 8px;
+}
+.tut-quote-attr {
+  font-family: 'Special Elite', cursive; font-size: 0.7em;
+  color: var(--silver); margin-top: 8px; text-align: right;
+}
+
+.tut-translation {
+  background: rgba(26,34,64,0.07); border: 1px solid rgba(26,34,64,0.2);
+  border-radius: 2px; padding: 14px 16px;
+}
+.tut-translation-label {
+  font-family: 'Bebas Neue', sans-serif; font-size: 1em;
+  color: var(--navy-mid); letter-spacing: 2px; margin-bottom: 6px;
+}
+.tut-translation-text { font-size: 0.95em; line-height: 1.65; color: var(--ink); }
+
+.tut-footer {
+  padding: 12px 20px; background: var(--navy);
+  border-top: 2px solid rgba(154,170,187,0.25);
+  display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+}
+.tut-progress { display: flex; gap: 4px; }
+.tut-pip { width: 18px; height: 3px; background: rgba(154,170,187,0.2); border-radius: 2px; transition: background 0.3s; }
+.tut-pip.done { background: var(--silver); }
+.tut-pip.current { background: var(--silver-bright); }
+
+.stone-btn {
+  background: var(--navy-mid); border: 2px solid var(--silver);
+  color: var(--marble); font-family: 'Cinzel', serif; font-size: 0.85em;
+  letter-spacing: 2px; padding: 8px 24px; cursor: pointer;
+  transition: all 0.15s; box-shadow: 3px 3px 0 rgba(0,0,0,0.6);
+}
+.stone-btn:hover { background: var(--navy-light); transform: translate(-1px,-1px); box-shadow: 4px 4px 0 rgba(0,0,0,0.6); }
+.stone-btn:active { transform: translate(1px,1px); box-shadow: 1px 1px 0; }
+.stone-btn-full { width: 100%; text-align: center; }
+
+/* ── CHOICE CARDS ─────────────────────────────────────────── */
+.choice-frame {
+  width: var(--panel-w); max-width: 96vw; height: min(96vh, 700px);
+  display: flex; flex-direction: column; overflow: hidden;
+  border: 3px solid var(--navy); box-shadow: 8px 8px 0 rgba(0,0,0,0.9);
+}
+.choice-header {
+  background: var(--navy); padding: 14px 20px;
+  border-bottom: 3px solid var(--silver); flex-shrink: 0;
+}
+.choice-header-label { font-family: 'Special Elite', cursive; font-size: 0.68em; color: var(--silver); letter-spacing: 4px; }
+.choice-header-title { font-family: 'Bebas Neue', sans-serif; font-size: 2em; color: var(--marble); letter-spacing: 2px; line-height: 1; text-shadow: 2px 2px 0 var(--navy-light); }
+.choice-body {
+  flex: 1; padding: 16px 20px; overflow-y: auto;
+  background: #dcd8d0;
+  background-image: repeating-linear-gradient(transparent, transparent 27px, rgba(0,0,0,0.04) 28px);
+  display: flex; flex-direction: column; gap: 10px;
+}
+.choice-intro { font-size: 0.88em; line-height: 1.6; color: rgba(14,14,24,0.6); padding-bottom: 8px; border-bottom: 1px solid rgba(0,0,0,0.1); }
+.id-card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; flex: 1; }
+.id-card {
+  background: var(--navy); border: 2px solid rgba(154,170,187,0.25);
+  padding: 14px; cursor: pointer; transition: all 0.15s;
+  display: flex; flex-direction: column; gap: 4px;
+  position: relative; overflow: hidden;
+}
+.id-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: var(--silver); transform: scaleX(0); transition: transform 0.2s;
+}
+.id-card:hover::before, .id-card.selected::before { transform: scaleX(1); }
+.id-card:hover { border-color: var(--silver); transform: translateY(-2px); box-shadow: 4px 4px 0 rgba(0,0,0,0.8); }
+.id-card.selected { border-color: var(--silver); box-shadow: 0 0 0 1px var(--silver), 4px 4px 0 rgba(0,0,0,0.8); }
+.id-card-icon { font-size: 1.5em; }
+.id-card-name { font-family: 'Bebas Neue', sans-serif; font-size: 1.05em; color: var(--silver-light); letter-spacing: 1px; }
+.id-card-desc { font-size: 0.75em; color: rgba(200,216,232,0.7); line-height: 1.4; }
+.id-card-effect { font-family: 'Special Elite', cursive; font-size: 0.67em; color: #90c890; margin-top: 4px; }
+.choice-footer { padding: 12px 20px; background: var(--navy); border-top: 2px solid rgba(154,170,187,0.2); flex-shrink: 0; }
+
+/* ── CALLBACKS ────────────────────────────────────────────── */
+.callback-q { font-family: 'Bebas Neue', sans-serif; font-size: 1.1em; color: var(--navy); letter-spacing: 1px; margin-bottom: 8px; }
+.callback-opts { display: flex; gap: 8px; }
+.callback-btn {
+  flex: 1; background: var(--navy); border: 2px solid rgba(154,170,187,0.3);
+  color: var(--marble); font-family: 'Patrick Hand', cursive; font-size: 0.88em;
+  padding: 10px 12px; cursor: pointer; transition: all 0.15s; text-align: center; line-height: 1.4;
+}
+.callback-btn:hover { border-color: var(--silver); background: var(--navy-mid); }
+.callback-btn.selected { border-color: var(--silver-bright); background: var(--navy-mid); box-shadow: inset 0 0 0 1px rgba(154,170,187,0.3); }
+
+/* ── SCENARIO ─────────────────────────────────────────────── */
+.scenario-frame {
+  width: var(--panel-w); max-width: 96vw; height: min(96vh, 700px);
+  display: flex; flex-direction: column; overflow: hidden;
+  border: 3px solid var(--navy); box-shadow: 8px 8px 0 rgba(0,0,0,0.9);
+}
+.scenario-header {
+  background: var(--navy); flex-shrink: 0;
+  border-bottom: 3px solid var(--navy); display: flex; align-items: stretch;
+}
+.scenario-header-left {
+  background: var(--navy-mid); padding: 10px 16px;
+  display: flex; flex-direction: column; justify-content: center;
+  min-width: 88px; border-right: 3px solid var(--silver);
+}
+.scenario-sem { font-family: 'Special Elite', cursive; font-size: 0.6em; color: var(--silver); letter-spacing: 2px; }
+.scenario-num-big { font-family: 'Bebas Neue', sans-serif; font-size: 2em; color: var(--marble); line-height: 1; }
+.scenario-header-main { flex: 1; padding: 10px 16px; display: flex; flex-direction: column; justify-content: center; }
+.scenario-concept-tag { font-family: 'Special Elite', cursive; font-size: 0.62em; color: var(--silver); letter-spacing: 3px; }
+.scenario-title-text { font-family: 'Bebas Neue', sans-serif; font-size: 1.45em; color: var(--marble); line-height: 1.1; letter-spacing: 1px; }
+
+.scenario-identity-strip {
+  background: #c8c4bc; border-bottom: 2px solid var(--navy);
+  padding: 5px 14px; font-family: 'Special Elite', cursive; font-size: 0.67em;
+  color: rgba(14,14,24,0.55); display: flex; gap: 14px; flex-wrap: wrap; flex-shrink: 0;
+}
+
+.scenario-body {
+  flex: 1; overflow-y: auto; padding: 16px 20px;
+  display: flex; flex-direction: column; gap: 12px;
+  background: #dcd8d0;
+  background-image: repeating-linear-gradient(transparent, transparent 27px, rgba(0,0,0,0.04) 28px);
+}
+
+.scenario-quote-strip { border-left: 4px solid var(--silver); background: rgba(26,34,64,0.07); padding: 8px 12px; }
+.scenario-quote-text { font-family: 'Special Elite', cursive; font-size: 0.82em; color: rgba(14,14,24,0.7); font-style: italic; line-height: 1.5; }
+.scenario-quote-attr { font-family: 'Special Elite', cursive; font-size: 0.67em; color: var(--navy-mid); margin-top: 4px; }
+
+.vera-note {
+  background: rgba(26,34,64,0.06); border: 1px dashed rgba(154,170,187,0.5);
+  border-radius: 2px; padding: 8px 12px;
+  font-size: 0.85em; font-style: italic; color: rgba(14,14,24,0.65);
+}
+.vera-note strong { font-style: normal; color: var(--navy-mid); }
+
+.scenario-text-main { font-size: 0.96em; line-height: 1.7; color: var(--ink); }
+
+.mot-warning {
+  background: rgba(122,26,42,0.1); border: 1px solid rgba(122,26,42,0.4);
+  padding: 7px 12px; font-family: 'Special Elite', cursive;
+  font-size: 0.8em; color: #8a2030; text-align: center;
+}
+
+.choices-grid { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }
+.choice-btn-gn {
+  background: var(--navy); border: 2px solid rgba(154,170,187,0.2);
+  color: var(--marble); padding: 10px 14px; font-family: 'Patrick Hand', cursive;
+  font-size: 0.92em; cursor: pointer; text-align: left; transition: all 0.15s;
+  line-height: 1.4; display: flex; align-items: flex-start; gap: 10px;
+  position: relative; overflow: hidden;
+}
+.choice-btn-gn::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+  background: var(--silver); transform: scaleY(0); transition: transform 0.15s;
+}
+.choice-btn-gn:hover::before, .choice-btn-gn.chosen::before { transform: scaleY(1); }
+.choice-btn-gn:hover:not(:disabled) { border-color: var(--silver); background: var(--navy-mid); transform: translateX(2px); }
+.choice-btn-gn:disabled { cursor: default; opacity: 0.5; }
+.choice-btn-gn.chosen { opacity: 1; border-color: var(--silver-bright); background: var(--navy-mid); }
+.choice-letter-gn { font-family: 'Bebas Neue', sans-serif; font-size: 1.1em; color: var(--silver-light); line-height: 1.2; flex-shrink: 0; width: 18px; }
+
+.outcome-reveal {
+  background: var(--navy); border: 2px solid var(--silver); padding: 12px 14px;
+  display: none; animation: revealOutcome 0.4s ease forwards; position: relative;
+}
+.outcome-reveal::before {
+  content: 'OUTCOME'; position: absolute; top: -9px; left: 12px;
+  background: var(--navy-mid); color: var(--marble);
+  font-family: 'Bebas Neue', sans-serif; font-size: 0.72em; letter-spacing: 2px;
+  padding: 1px 10px; border: 1px solid var(--silver);
+}
+@keyframes revealOutcome { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+.outcome-reveal.show { display: block; }
+.outcome-text { font-size: 0.9em; line-height: 1.6; color: var(--marble); }
+.outcome-text.good { color: #80d890; }
+.outcome-text.bad { color: #f08888; }
+.outcome-stats { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.stat-chip { font-family: 'Special Elite', cursive; font-size: 0.7em; padding: 2px 8px; border-radius: 2px; border: 1px solid rgba(255,255,255,0.1); }
+.stat-chip.plus { background: rgba(60,140,80,0.2); color: #80d890; border-color: rgba(60,140,80,0.3); }
+.stat-chip.minus { background: rgba(150,40,40,0.2); color: #f08888; border-color: rgba(150,40,40,0.3); }
+
+.scenario-footer {
+  padding: 10px 20px; background: var(--navy);
+  border-top: 2px solid rgba(154,170,187,0.2); display: none; flex-shrink: 0;
+}
+.continue-btn {
+  background: var(--navy-mid); border: 2px solid var(--silver);
+  color: var(--marble); font-family: 'Cinzel', serif; font-size: 0.85em;
+  letter-spacing: 2px; padding: 9px 24px; cursor: pointer;
+  transition: all 0.15s; box-shadow: 3px 3px 0 rgba(0,0,0,0.6); width: 100%;
+}
+.continue-btn:hover { background: var(--navy-light); transform: translate(-1px,-1px); box-shadow: 4px 4px 0; }
+
+/* ── SUMMARY ──────────────────────────────────────────────── */
+.summary-frame {
+  width: var(--panel-w); max-width: 96vw; height: min(96vh, 700px);
+  background: var(--navy); border: 3px solid var(--silver);
+  box-shadow: 8px 8px 0 rgba(0,0,0,0.9), 0 0 40px rgba(154,170,187,0.1);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.summary-banner {
+  background: var(--navy-mid); padding: 14px 20px;
+  border-bottom: 3px solid var(--silver); text-align: center; flex-shrink: 0;
+}
+.summary-banner-text { font-family: 'Bebas Neue', sans-serif; font-size: 2em; color: var(--marble); letter-spacing: 4px; text-shadow: 2px 2px 0 rgba(0,0,0,0.5); }
+.summary-body { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; }
+.stat-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; }
+.stat-block { background: rgba(232,228,220,0.05); border: 1px solid rgba(154,170,187,0.2); padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; }
+.stat-block-label { font-family: 'Special Elite', cursive; font-size: 0.67em; color: var(--silver); letter-spacing: 2px; }
+.stat-block-bar { width: 100%; height: 5px; background: rgba(255,255,255,0.07); border-radius: 3px; overflow: hidden; }
+.stat-block-bar-fill { height: 100%; border-radius: 3px; transition: width 0.8s ease; }
+.stat-block-val { font-family: 'Bebas Neue', sans-serif; font-size: 1.5em; color: var(--marble); line-height: 1; }
+.gpa-display-big { text-align: center; padding: 16px; background: rgba(154,170,187,0.06); border: 1px solid rgba(154,170,187,0.2); }
+.gpa-display-big-label { font-family: 'Special Elite', cursive; font-size: 0.7em; color: var(--silver); letter-spacing: 4px; }
+.gpa-display-big-val { font-family: 'Bebas Neue', sans-serif; font-size: 4em; color: var(--silver-bright); line-height: 1; text-shadow: 3px 3px 0 rgba(0,0,0,0.5); }
+
+/* ── WIN ──────────────────────────────────────────────────── */
+.win-frame {
+  width: var(--panel-w); max-width: 96vw; height: min(96vh, 700px);
+  background: var(--navy); border: 3px solid var(--silver);
+  box-shadow: 8px 8px 0 rgba(0,0,0,0.9), 0 0 60px rgba(154,170,187,0.12);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.win-banner {
+  background: linear-gradient(135deg, var(--navy-mid), #0e1428);
+  padding: 16px 20px; border-bottom: 3px solid var(--silver);
+  text-align: center; flex-shrink: 0; position: relative;
+}
+.win-banner::after {
+  content: ''; position: absolute; inset: 0;
+  background: repeating-conic-gradient(from 0deg at 50% 120%, transparent 0deg, transparent 8deg, rgba(154,170,187,0.04) 9deg);
+}
+.win-rank { font-family: 'Special Elite', cursive; font-size: 0.7em; color: var(--silver); letter-spacing: 4px; position: relative; z-index: 1; }
+.win-title { font-family: 'Bebas Neue', sans-serif; font-size: 2.5em; color: var(--marble); letter-spacing: 3px; line-height: 1; text-shadow: 3px 3px 0 rgba(0,0,0,0.5); position: relative; z-index: 1; }
+.win-body { flex: 1; padding: 16px 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; }
+.chronicle-block {
+  background: rgba(232,228,220,0.04); border: 1px solid rgba(154,170,187,0.2);
+  padding: 14px 16px; position: relative;
+}
+.chronicle-block::before {
+  content: attr(data-label); position: absolute; top: -9px; left: 12px;
+  background: var(--navy-mid); color: var(--marble);
+  font-family: 'Special Elite', cursive; font-size: 0.65em; padding: 1px 8px;
+  letter-spacing: 1px; border: 1px solid var(--silver);
+}
+.chronicle-text { font-family: 'Patrick Hand', cursive; font-size: 0.88em; line-height: 1.75; color: rgba(232,228,220,0.82); }
+.wisdom-strip {
+  background: rgba(154,170,187,0.07); border-top: 1px solid rgba(154,170,187,0.25);
+  border-bottom: 1px solid rgba(154,170,187,0.25); padding: 10px 16px;
+  text-align: center; font-family: 'Special Elite', cursive;
+  font-size: 0.82em; color: rgba(232,228,220,0.55); font-style: italic;
+}
+
+/* ── GAME OVER ────────────────────────────────────────────── */
+.gameover-frame {
+  width: var(--panel-w); max-width: 96vw; height: min(96vh, 700px);
+  background: #060810; border: 3px solid rgba(122,26,42,0.8);
+  box-shadow: 8px 8px 0 rgba(0,0,0,0.9), 0 0 40px rgba(122,26,42,0.2);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.gameover-banner { background: linear-gradient(135deg, #3a0a14, #0e0818); padding: 20px; border-bottom: 3px solid rgba(122,26,42,0.6); text-align: center; flex-shrink: 0; }
+.gameover-title { font-family: 'Bebas Neue', sans-serif; font-size: 2.8em; color: #c03050; letter-spacing: 4px; text-shadow: 0 0 20px rgba(192,48,80,0.5); }
+.gameover-body { flex: 1; padding: 20px; display: flex; flex-direction: column; gap: 14px; overflow-y: auto; align-items: center; justify-content: center; text-align: center; }
+.gameover-reason { font-size: 0.98em; line-height: 1.7; color: rgba(232,228,220,0.65); max-width: 480px; }
+
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+::-webkit-scrollbar-thumb { background: rgba(154,170,187,0.3); border-radius: 3px; }
+</style>
+</head>
+<body>
+<div id="stage">
+
+<!-- HUD -->
+<div id="stats-hud">
+  <div class="hud-inner">
+    <div class="hud-title">☯ MEDITATIONS</div>
+    <div class="hud-stats">
+      <div class="hud-stat">
+        <div class="hud-stat-label">ENERGY</div>
+        <div class="hud-bar-outer"><div class="hud-bar-inner" id="hbar-energy" style="background:#b09030;width:85%;"></div></div>
+        <div class="hud-stat-val" id="hval-energy">85</div>
+      </div>
+      <div class="hud-stat">
+        <div class="hud-stat-label">SOCIAL</div>
+        <div class="hud-bar-outer"><div class="hud-bar-inner" id="hbar-social" style="background:#a04050;width:75%;"></div></div>
+        <div class="hud-stat-val" id="hval-social">75</div>
+      </div>
+      <div class="hud-stat">
+        <div class="hud-stat-label">MONEY</div>
+        <div class="hud-bar-outer"><div class="hud-bar-inner" id="hbar-money" style="background:#308050;width:60%;"></div></div>
+        <div class="hud-stat-val" id="hval-money">60</div>
+      </div>
+    </div>
+    <div class="hud-mot">
+      <div class="hud-mot-label">WILL</div>
+      <div class="flame-wrap">
+        <svg id="flame-svg" viewBox="0 0 20 26" xmlns="http://www.w3.org/2000/svg">
+          <defs><radialGradient id="fg" cx="50%" cy="80%" r="60%"><stop offset="0%" stop-color="#c0d0ff"/><stop offset="40%" stop-color="#6080c0"/><stop offset="100%" stop-color="#2030a0"/></radialGradient></defs>
+          <path d="M10 2C10 2 16 8 16 14C16 18.4 13.3 22 10 23.5C6.7 22 4 18.4 4 14C4 8 10 2 10 2Z" fill="url(#fg)"/>
+          <path d="M10 12C10 12 12 15 12 17C12 19 11.1 20.5 10 21C8.9 20.5 8 19 8 17C8 15 10 12 10 12Z" fill="#d0e8ff" opacity="0.7"/>
+        </svg>
+      </div>
+      <div class="hud-mot-val" id="hval-mot">100</div>
+    </div>
+    <div class="hud-gpa">
+      <div class="hud-gpa-label">GPA</div>
+      <div class="hud-gpa-val" id="hval-gpa">3.8</div>
+    </div>
+    <div class="hud-nav">
+      <a class="nav-btn" href="/index.html">🌳</a>
+      <a class="nav-btn" href="art-of-finals.html">← I</a>
+      <a class="nav-btn" href="junior-year-inferno.html">III →</a>
+    </div>
+  </div>
+</div>
+
+<!-- TITLE -->
+<div class="panel active" id="panel-title" style="background:#060810;">
+  <div class="title-art">
+    <div class="title-topbar">
+      <div style="display:flex;gap:8px;">
+        <a class="nav-btn" href="/index.html">🌳 Burch Tree</a>
+        <a class="nav-btn" href="art-of-finals.html">← Year I</a>
+      </div>
+      <div class="title-year-badge">YEAR II · SOPHOMORE</div>
+      <div style="display:flex;gap:8px;">
+        <a class="nav-btn" href="junior-year-inferno.html">Year III →</a>
+      </div>
+    </div>
+    <div class="title-body">
+      <div class="title-eyebrow">Marcus Aurelius · Meditations · Sophomore Year</div>
+      <div class="title-main">Meditations on<span>a 2.8 GPA</span></div>
+      <div class="title-divider"></div>
+      <div class="title-quote">
+        "You have power over your mind, not outside events. Realize this, and you will find strength — and also, eventually, a passing grade."
+        <em>— Marcus Aurelius (paraphrased for academia)</em>
+      </div>
+      <button class="title-cta" onclick="goToCallbacks()">📖 BEGIN SOPHOMORE YEAR</button>
+    </div>
+  </div>
+</div>
+
+<!-- CALLBACKS -->
+<div class="panel bg-stone" id="panel-callbacks">
+  <div class="choice-frame">
+    <div class="choice-header">
+      <div class="choice-header-label">BEFORE WE BEGIN</div>
+      <div class="choice-header-title">FRESHMAN YEAR ECHOES</div>
+    </div>
+    <div class="choice-body">
+      <div class="choice-intro">Two questions about freshman year — your answers shape this year's story, whether you played <em>The Art of Finals</em> or not.</div>
+      <div style="display:flex;flex-direction:column;gap:18px;margin-top:8px;">
+        <div>
+          <div class="callback-q">What was your major freshman year?</div>
+          <div class="id-card-grid" id="major-cards"></div>
+        </div>
+        <div id="tyler-section" style="display:none;">
+          <div class="callback-q">In the Great Thermostat Incident, did you go off on Tyler?</div>
+          <div class="callback-opts">
+            <button class="callback-btn" id="tyler-yes" onclick="selectTyler('yes')">🌡️ Yes. He knew what he did.</button>
+            <button class="callback-btn" id="tyler-no" onclick="selectTyler('no')">🕊️ No. I chose peace.</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="choice-footer">
+      <button class="stone-btn stone-btn-full" id="cb-confirm" style="display:none;" onclick="goToHousing()">CONTINUE →</button>
+    </div>
+  </div>
+</div>
+
+<!-- HOUSING -->
+<div class="panel bg-stone" id="panel-housing">
+  <div class="choice-frame">
+    <div class="choice-header">
+      <div class="choice-header-label">SOPHOMORE DECISIONS</div>
+      <div class="choice-header-title">CHOOSE YOUR HOUSING</div>
+    </div>
+    <div class="choice-body">
+      <div class="choice-intro">Where you live shapes your energy, social life, and relationship with the concept of quiet.</div>
+      <div class="id-card-grid" id="housing-cards"></div>
+    </div>
+    <div class="choice-footer">
+      <button class="stone-btn stone-btn-full" id="housing-confirm" style="display:none;" onclick="confirmHousing()">CONFIRM →</button>
+    </div>
+  </div>
+</div>
+
+<!-- COMMITMENT -->
+<div class="panel bg-stone" id="panel-commit">
+  <div class="choice-frame">
+    <div class="choice-header">
+      <div class="choice-header-label">SOPHOMORE DECISIONS</div>
+      <div class="choice-header-title">CHOOSE YOUR COMMITMENT</div>
+    </div>
+    <div class="choice-body">
+      <div class="choice-intro">What are you doing this year beyond surviving your coursework? Marcus is watching. Choose carefully.</div>
+      <div class="id-card-grid" id="commit-cards"></div>
+    </div>
+    <div class="choice-footer">
+      <button class="stone-btn stone-btn-full" id="commit-confirm" style="display:none;" onclick="confirmCommit()">CONFIRM →</button>
+    </div>
+  </div>
+</div>
+
+<!-- FRIEND GROUP (mid-fall) -->
+<div class="panel bg-stone" id="panel-friends">
+  <div class="choice-frame">
+    <div class="choice-header">
+      <div class="choice-header-label">WEEK 3 · FIELD INTELLIGENCE</div>
+      <div class="choice-header-title">CHOOSE YOUR PEOPLE</div>
+    </div>
+    <div class="choice-body">
+      <div class="choice-intro">You've met people. Now you must choose your people. This shapes the rest of fall.</div>
+      <div class="id-card-grid" id="friend-cards"></div>
+    </div>
+    <div class="choice-footer">
+      <button class="stone-btn stone-btn-full" id="friend-confirm" style="display:none;" onclick="confirmFriends()">CHOOSE YOUR PEOPLE →</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCENARIO -->
+<div class="panel bg-stone" id="panel-scenario">
+  <div class="scenario-frame">
+    <div class="scenario-header">
+      <div class="scenario-header-left">
+        <div class="scenario-sem" id="sc-sem">FALL</div>
+        <div class="scenario-num-big" id="sc-num">1</div>
+      </div>
+      <div class="scenario-header-main">
+        <div class="scenario-concept-tag" id="sc-concept">☯ CONCEPT</div>
+        <div class="scenario-title-text" id="sc-title">SCENARIO TITLE</div>
+      </div>
+    </div>
+    <div class="scenario-identity-strip" id="sc-identity"></div>
+    <div class="scenario-body" id="scenario-body"></div>
+    <div class="scenario-footer" id="scenario-footer">
+      <button class="continue-btn" onclick="advanceScenario()">CONTINUE →</button>
+    </div>
+  </div>
+</div>
+
+<!-- SEMESTER END -->
+<div class="panel bg-stone" id="panel-sem-end">
+  <div class="summary-frame">
+    <div class="summary-banner"><div class="summary-banner-text" id="sem-end-title">FALL SEMESTER COMPLETE</div></div>
+    <div class="summary-body" id="sem-end-body"></div>
+  </div>
+</div>
+
+<!-- WIN -->
+<div class="panel bg-stone" id="panel-win">
+  <div class="win-frame">
+    <div class="win-banner">
+      <div class="win-rank" id="win-rank">RANK ACHIEVED</div>
+      <div class="win-title">SOPHOMORE YEAR COMPLETE</div>
+    </div>
+    <div class="win-body" id="win-body"></div>
+  </div>
+</div>
+
+<!-- GAME OVER -->
+<div class="panel bg-stone" id="panel-gameover">
+  <div class="gameover-frame">
+    <div class="gameover-banner"><div class="gameover-title">THE SLUMP WINS</div></div>
+    <div class="gameover-body" id="gameover-body"></div>
+  </div>
+</div>
+
+<script>
+// ── STATE ─────────────────────────────────────────────────────────────────────
+const S = {
+  tutStep: 0, semester: 0, scIndex: 0,
+  gpa: 3.8, energy: 85, social: 75, money: 60, motivation: 100,
+  major: null, housing: null, commitment: null, friendGroup: null,
+  tylerStatus: null, selectedCard: null, _curSc: null,
+  slumpChoice: null, internshipChoice: null, groupChoice: null, finalChoice: null,
+};
+
+// ── DATA ──────────────────────────────────────────────────────────────────────
+const CONCEPTS = [
+  { name:'You Have Power Over Your Mind', marcus:'You have power over your mind, not outside events. Realize this and you will find strength.', body:'Stop refreshing your grade portal at 2am. The grade is what it is. Your spiral, however, is entirely optional and entirely your fault. The D exists whether you look at it or not. What you do next — that part is yours.' },
+  { name:'Waste No More Time Arguing', marcus:'Waste no more time arguing about what a good person should be. Be one.', body:'Stop composing the perfect complaint text about your group project. Stop drafting the hypothetical email. Stop narrating your suffering to the group chat. Just. Do. The thing.' },
+  { name:'The Impediment to Action Advances Action', marcus:'The impediment to action advances action. What stands in the way becomes the way.', body:'You got rejected from the internship. Good. Now you know exactly what you\'re missing. The rejection is a map. Consult the map. Stop mourning the map.' },
+  { name:'Accept the Things to Which Fate Binds You', marcus:'Accept the things to which fate binds you, and love the people with whom fate brings you together.', body:'Your advisor scheduled your required course at 8am. The dining hall discontinued the good soup. Your roommate exists. These are your conditions. Marcus Aurelius ran an empire under worse ones. Probably.' },
+  { name:'Prepare for Difficult People', marcus:'When you wake up in the morning, tell yourself: the people I deal with today will be meddling, ungrateful, arrogant, dishonest, jealous and surly.', body:'Marcus started every day listing every type of annoying person he\'d encounter — and decided in advance not to let any of them win. This is not pessimism. This is preparation. This is Marcus being extremely ready for Marcus.' },
+  { name:'The Art of Living Is More Like Wrestling', marcus:'The art of living is more like wrestling than dancing, in that it should stand ready against the accidental and the unforeseen.', body:'Junior year is coming. Internship rejections are coming. A professor who grades on vibes is coming. Be a wrestler, not a dancer. Dancers fall when surprised. Wrestlers widen their stance.' },
+  { name:'If It Is Not Right, Do Not Do It', marcus:'If it is not right, do not do it. If it is not true, do not say it.', body:'The résumé line you\'re considering — "proficient in Python" because you watched one YouTube tutorial — is not true. Do not write it. Marcus knew about this specific situation somehow.' },
+  { name:'Never Esteem Anything As of Advantage', marcus:'Never esteem anything as of advantage to you that will make you break your word or lose your self-respect.', body:'The shortcut that compromises your integrity is not a shortcut. It is a longer, worse path that smells bad at the end. This applies to academic dishonesty, group project sabotage, and stealing someone\'s dining hall dessert.' },
+  { name:'Look Within', marcus:'Look within. Within is the fountain of good, and it will ever bubble up, if you will ever dig.', body:'The sophomore slump is real. Everything feels grey and pointless. They haven\'t figured it out either. The fountain is still there. You have to dig for it. This is annoying but it is the only option.' },
+  { name:'Confine Yourself to the Present', marcus:'Confine yourself to the present.', body:'Marcus literally repeated this to himself constantly, which tells you everything about how hard it is. Don\'t spiral about graduation. Don\'t spiral about your GPA from freshman year. You are here. Do the thing that is in front of you. Now.' },
+];
+
+const MAJORS = [
+  { id:'business',    icon:'💼', name:'Business',        desc:'The major your parents approved of immediately.',              effect:'Money events favorable. GPA pressure moderate.',    mods:{ moneyBonus:5, gpaScale:0.1 } },
+  { id:'engineering', icon:'⚙️', name:'Engineering',    desc:'You are still doing this. Respect.',                           effect:'GPA hardest. Energy penalties reduced.',            mods:{ gpaScale:-0.15, energyDiscount:0.2 } },
+  { id:'liberalarts', icon:'🎭', name:'Liberal Arts',    desc:'You have answers for every question except "what\'s your plan?"', effect:'Social bonuses high. GPA flexible.',             mods:{ socialBonus:8 } },
+  { id:'science',     icon:'🔬', name:'Sciences',        desc:'Lab reports. So many lab reports.',                            effect:'GPA very hard. Energy drains faster.',             mods:{ gpaScale:-0.2, energyScale:1.2 } },
+  { id:'compsci',     icon:'💻', name:'Computer Science', desc:'Junior year is when it gets genuinely difficult.',           effect:'GPA hard. Money events very favorable.',            mods:{ gpaScale:-0.1, moneyBonus:10 } },
+];
+const HOUSING = [
+  { id:'dorms',     icon:'🏠', name:'Dorms Again',          desc:'You know the layout. You know the RA. You know the thermostat.', effect:'Social events easier. Energy slightly lower.',   mods:{ socialBonus:5, energyPenalty:5 } },
+  { id:'apartment', icon:'🏢', name:'Off-Campus Apartment', desc:'Freedom. Also dishes. Also rent.',                             effect:'Money drains faster. Energy higher from real sleep.', mods:{ moneyCost:10, energyBonus:8 } },
+  { id:'greek',     icon:'🏛️', name:'Greek Life',           desc:'You pledged. Everything is fine.',                            effect:'Social always high. Money drains. GPA harder.',   mods:{ socialBonus:15, moneyCost:12, gpaScale:-0.1 } },
+];
+const COMMITMENTS = [
+  { id:'research',   icon:'🔭', name:'Research Position', desc:'Work for a professor in exchange for a rec letter and existential clarity.', effect:'GPA bonus. Motivation drains slower.',      mods:{ gpaBuff:0.1, motShield:true, energyScale:1.15 } },
+  { id:'leadership', icon:'📣', name:'Campus Leadership', desc:'You are president of something. A mistake and also a great decision.',       effect:'Social bonus. Motivation stays stable.',   mods:{ socialBonus:10, motStable:true } },
+  { id:'job',        icon:'💵', name:'Part-Time Job',     desc:'Eight dollars an hour and a staff discount.',                                effect:'Money recovers each scenario. Energy higher cost.', mods:{ moneyRegen:8, energyScale:1.2 } },
+  { id:'nothing',   icon:'🛋️', name:'The Slump',         desc:'Committing to nothing. Marcus would not understand.',                       effect:'No bonuses. Motivation drains extra each scenario.', mods:{ motDrain:10 } },
+];
+const FRIEND_GROUPS = [
+  { id:'studiers', icon:'📖', name:'The Studiers', desc:'They color-code their notes. You are intimidated and inspired.', effect:'GPA bonus rest of Fall. Social harder to raise.', mods:{ gpaBonus:0.2, socialScale:0.6 } },
+  { id:'partiers', icon:'🎉', name:'The Partiers', desc:'They know every event. You will never sleep again.',           effect:'Social high. Energy drains faster.',              mods:{ socialBonus:15, energyScale:1.3 } },
+  { id:'gamers',   icon:'🎮', name:'The Gamers',   desc:'Nocturnal, loyal, and extremely online.',                      effect:'Energy stable. Money drains slowly.',              mods:{ energyShield:true, moneySlow:true } },
+  { id:'loners',   icon:'🎧', name:'Going Solo',   desc:'You don\'t need a group. You have a playlist.',              effect:'No modifiers. No favors to call in Spring.',       mods:{ noFavors:true } },
+];
+
+const VERA_LINES = [
+  '"The obstacle is the way," Vera said, gesturing at your empty coffee cup.',
+  '"Did you consider just not doing that?" Vera looked up from her Meditations.',
+  '"Marcus would call this a preferred indifferent," Vera said. You nodded as if you knew what that meant.',
+  '"You have power over your mind, not outside events," Vera said, appearing briefly and then vanishing.',
+  '"That which doesn\'t kill you," Vera began. "Still counts against your GPA," she finished.',
+];
+let veraIdx = 0;
+function veraLine() { return VERA_LINES[veraIdx++ % VERA_LINES.length]; }
+
+// ── SCENARIOS ─────────────────────────────────────────────────────────────────
+const FALL_SCENARIOS = [
+  {
+    title:'The Sophomore Slump Arrives On Schedule', concept:'Look Within',
+    quote:'Look within. Within is the fountain of good, and it will ever bubble up, if you will ever dig.',
+    text:'Week 2. You expected sophomore year to feel different — more confident, more purposeful. Instead everything feels vaguely grey. Your freshman enthusiasm has evaporated. The fountain, Marcus says, is still there. You have to dig.',
+    trackKey:'slumpChoice',
+    choices:[
+      { text:'Acknowledge the slump. See your advisor. Make a plan.', outcome:'Not glamorous. Deeply effective. You leave with a roadmap and a restored sense of direction. The fountain bubbles.', stats:{ gpa:+0.2, energy:+5, social:+5, motivation:+20 }, trackVal:'acknowledged the slump with dignity and sought counsel from the academic advisor, emerging with a roadmap and restored purpose' },
+      { text:'Push through it. Work harder. Feel nothing.', outcome:'Stoic in the wrong direction. Results are produced. The grey persists. Marcus would say this is not what he meant.', stats:{ gpa:+0.1, energy:-20, social:-10, motivation:-15 }, trackVal:'responded to the sophomore slump by working harder and feeling less, a strategy Marcus described as "close but no"' },
+      { text:'Call home. Your mom has opinions. She is not wrong.', outcome:'Surprisingly effective. She was right about the planner. She is always right about the planner.', stats:{ gpa:+0.1, energy:+10, social:+5, motivation:+15 }, trackVal:'called home during the slump and received maternal wisdom that was, frustratingly, entirely correct' },
+      { text:'Ignore it. It will pass. Probably.', outcome:'It does not pass on its own. It compounds. By week 6 the grey has a name and a schedule.', stats:{ gpa:-0.2, energy:-10, social:-5, motivation:-25 }, trackVal:'ignored the sophomore slump entirely, allowing it to schedule itself into every subsequent week' },
+    ]
+  },
+  { title:'The Housing Situation Has Developed', concept:'Accept the Things to Which Fate Binds You', quote:'Accept the things to which fate binds you, and love the people with whom fate brings you together.', isDynamic:true, dynamicKey:'housing_fall' },
+  { title:'The Internship Application Gauntlet', concept:'The Impediment to Action Advances Action', quote:'The impediment to action advances action. What stands in the way becomes the way.', veraNote:true, isDynamic:true, dynamicKey:'internship', trackKey:'internshipChoice' },
+  {
+    title:'The Group Project Returns', concept:'Waste No More Time Arguing',
+    quote:'Waste no more time arguing about what a good person should be. Be one.',
+    isDynamic:true, dynamicKey:'groupproject', trackKey:'groupChoice',
+  },
+  {
+    title:'The Motivation Crisis', concept:'Confine Yourself to the Present',
+    quote:'Confine yourself to the present.',
+    isDynamic:true, dynamicKey:'motivation_crisis',
+    choices:[
+      { text:'Write down three things actually in your control right now.', outcome:'Absurdly effective. The list is short. That\'s the point. The flame steadies.', stats:{ gpa:+0.1, energy:+10, social:0, motivation:+25 } },
+      { text:'Go for a long walk. Come back different.', outcome:'Something about the motion helps. The fountain was still there, as Marcus promised.', stats:{ gpa:0, energy:+5, social:0, motivation:+20 } },
+      { text:'Power through to winter break. Rest is the reward.', outcome:'You make it. Barely. The flame is a flicker. Winter break restores it somewhat.', stats:{ gpa:+0.1, energy:-20, social:-10, motivation:-10 } },
+      { text:'Spiral thoroughly about every life decision you\'ve ever made.', outcome:'Thorough. Unproductive. A spiral about the spiral begins. Marcus is shaking his ancient head.', stats:{ gpa:-0.2, energy:-15, social:-10, motivation:-30 } },
+    ]
+  },
+];
+
+const SPRING_SCENARIOS = [
+  { title:'The Major Commitment Reckoning', concept:'If It Is Not Right, Do Not Do It', quote:'If it is not right, do not do it. If it is not true, do not say it.', isDynamic:true, dynamicKey:'major_spring',
+    choices:[
+      { text:'Double down. You chose this. Own it completely.', outcome:'Full commitment unlocks a clarity that ambivalence never could. The path is hard. It is your path.', stats:{ gpa:+0.2, energy:-10, social:0, motivation:+15 } },
+      { text:'Add a minor that fills the gaps you feel.', outcome:'Elegant supplementation. The minor answers the questions the major doesn\'t.', stats:{ gpa:0, energy:-5, social:+5, motivation:+10 } },
+      { text:'Switch majors. The impediment IS the way.', outcome:'Terrifying. Correct. You lose credits and gain purpose. Net positive.', stats:{ gpa:-0.1, energy:-10, social:0, motivation:+20 } },
+      { text:'Stay in the major but stop caring about it.', outcome:'The worst of both worlds. The coursework continues. The meaning does not.', stats:{ gpa:-0.2, energy:+5, social:+5, motivation:-20 } },
+    ]
+  },
+  {
+    title:'The Comparison Trap', concept:'Never Esteem Anything As of Advantage', veraNote:true,
+    quote:'Never esteem anything as of advantage to you that will make you break your word or lose your self-respect.',
+    text:'Someone in your major got a Goldman Sachs internship. Someone else is doing research abroad. Everyone\'s LinkedIn is a highlight reel. The comparison trap opens beneath your feet.',
+    choices:[
+      { text:'Log off LinkedIn. Measure only against yourself.', outcome:'STOIC MASTERY. The comparison trap closes. Your actual progress is real.', stats:{ gpa:+0.1, energy:+15, social:0, motivation:+20 } },
+      { text:'Use it as fuel. Channel the comparison into action.', outcome:'Dangerous but occasionally effective. You apply to three more things. One doesn\'t reject you.', stats:{ gpa:0, energy:-10, social:0, money:+10, motivation:+5 } },
+      { text:'Congratulate them genuinely. Be the bigger person.', outcome:'Restorative. Generosity of spirit is its own reward. Also they might refer you later.', stats:{ gpa:0, energy:+5, social:+20, motivation:+10 } },
+      { text:'Spiral. Update your LinkedIn. Spiral more.', outcome:'You added a new skill endorsement. It did not help. The spiral continues.', stats:{ gpa:-0.1, energy:-15, social:-5, motivation:-20 } },
+    ]
+  },
+  {
+    title:'The Professor Who Grades on Vibes', concept:'Prepare for Difficult People',
+    quote:'When you wake up in the morning, tell yourself: the people I deal with today will be meddling, ungrateful, arrogant, dishonest, jealous and surly.',
+    text:'Professor Harwick grades on "scholarly presence and intellectual contribution." There is no rubric. Midterm feedback: "shows promise but lacks conviction." Nobody knows what this means. Marcus would have prepared for this.',
+    choices:[
+      { text:'Go to office hours. Ask directly what "conviction" means.', outcome:'He respects the directness. It was about citation formatting. You will never fully understand Professor Harwick.', stats:{ gpa:+0.3, energy:-5, social:+5, motivation:+5 } },
+      { text:'Speak more in class. Volume as conviction.', outcome:'Partially effective. Your grade improves. Neither of you is sure why.', stats:{ gpa:+0.2, energy:-5, social:+5, motivation:0 } },
+      { text:'Accept the unknowable. Write the best paper you can.', outcome:'Pure Stoic acceptance. You cannot control the vibe rubric. You can control your paper. It works.', stats:{ gpa:+0.2, energy:-5, social:0, motivation:+10 } },
+      { text:'Send a passive-aggressive email asking for clarification.', outcome:'The tone is noted. "Lacks conviction" remains. The email has not helped the vibe.', stats:{ gpa:-0.1, energy:-5, social:-5, motivation:-10 } },
+    ]
+  },
+  { title:'The Commitment Pays Off (Or Doesn\'t)', concept:'The Art of Living Is More Like Wrestling', quote:'The art of living is more like wrestling than dancing, in that it should stand ready against the accidental and the unforeseen.', isDynamic:true, dynamicKey:'commitment_spring' },
+  {
+    title:'The Final Reckoning: Sophomore Year', concept:'You Have Power Over Your Mind',
+    quote:'You have power over your mind, not outside events. Realize this and you will find strength.',
+    text:'Finals week, sophomore year. You are a different person than the one who arrived last fall — quieter about some things, more certain about others. One last set of battles.',
+    trackKey:'finalChoice',
+    choices:[
+      { text:'Review everything systematically. The wrestler prepares.', outcome:'Disciplined. Thorough. You walk into each exam knowing exactly what you know and what you don\'t.', stats:{ gpa:+0.4, energy:-15, social:0, motivation:+10 }, trackVal:'closed the year with systematic preparation, walking into every final as a wrestler who had studied the terrain' },
+      { text:'Focus on the hardest exam first. Triage the battlefield.', outcome:'Correct prioritization. Your weakest subject becomes your strongest performance.', stats:{ gpa:+0.3, energy:-10, social:0, motivation:+15 }, trackVal:'prioritized the hardest exam first, converting the greatest obstacle into the greatest achievement of finals week' },
+      { text:'Study with others. Shared suffering is halved suffering.', outcome:'You learn from the group and it learns from you. Social investment pays academic dividends.', stats:{ gpa:+0.2, energy:-5, social:+15, motivation:+10 }, trackVal:'endured finals week through collective effort, discovering that shared suffering is, in fact, halved' },
+      { text:'Surrender to the present moment. What will be, will be.', outcome:'"Confine yourself to the present" did not mean stop studying. Marcus is very clear about this.', stats:{ gpa:-0.1, energy:+15, social:+5, motivation:-5 }, trackVal:'interpreted "confine yourself to the present" as permission to stop preparing, a misreading Marcus addressed in twelve passages' },
+    ]
+  },
+];
+
+// ── DYNAMIC SCENARIOS ─────────────────────────────────────────────────────────
+function getDynamic(sc) {
+  if (!sc.isDynamic) return sc;
+  const out = Object.assign({}, sc, { choices: sc.choices ? sc.choices.map(c=>Object.assign({},c)) : [] });
+
+  if (sc.dynamicKey === 'housing_fall') {
+    if (S.housing === 'dorms') {
+      out.text = 'You\'re back in the dorms. You know the layout. What you did not anticipate: your new roommate plays guitar at midnight and considers this a reasonable activity.';
+      out.choices = [
+        { text:'Have a direct, calm conversation about hours.', outcome:'Shockingly effective. He apologizes. He means it. The guitar is now a daytime instrument.', stats:{ gpa:+0.1, energy:+15, social:+10, motivation:+10 } },
+        { text:'Invest in noise-cancelling headphones. Adapt.', outcome:'Marcus would approve of accepting what cannot be changed. The headphones cost $80. Worth it.', stats:{ gpa:+0.1, energy:+5, social:0, money:-10, motivation:+5 } },
+        { text:'Request a room transfer. This is the hill.', outcome:'Transfer takes two weeks. Temporary room is smaller. The quiet is profound.', stats:{ gpa:0, energy:+10, social:-10, motivation:+5 } },
+        { text:'Leave passive aggressive notes. Anonymously. On the door.', outcome:'He knows it\'s you. Everyone knows it\'s you. The guitar continues. The hallway energy is now a separate problem.', stats:{ gpa:-0.1, energy:-20, social:-5, motivation:-15 } },
+      ];
+    } else if (S.housing === 'apartment') {
+      out.text = 'Off-campus freedom is real. So is the electric bill, which is higher than expected. So are the dishes. So is the 20-minute commute you forgot to account for.';
+      out.choices = [
+        { text:'Create a chore chart. Enforce the chore chart.', outcome:'You are now the apartment\'s de facto manager. The dishes are clean. Housemates find you slightly intimidating.', stats:{ gpa:+0.1, energy:-5, social:+5, motivation:+10 } },
+        { text:'Have a house meeting about shared expectations.', outcome:'Three people attend. One sends a text saying they\'ll "read the notes." Partial success.', stats:{ gpa:0, energy:-5, social:+10, motivation:+5 } },
+        { text:'Adjust your budget. Accept the electric bill.', outcome:'Stoic acceptance of the utility rate. You eat out less. You save more than expected.', stats:{ gpa:0, energy:+5, social:0, money:+10, motivation:+5 } },
+        { text:'Do your own dishes and ignore everyone else\'s. Detachment.', outcome:'"Detachment" and "passive hostility" are close neighbors. Your housemates notice.', stats:{ gpa:0, energy:+5, social:-15, motivation:-5 } },
+      ];
+    } else {
+      out.text = 'Greek life has delivered on the social promise. It has also delivered mandatory chapter meetings on Tuesday nights, a philanthropy event you\'re co-chairing, and a formal in six weeks.';
+      out.choices = [
+        { text:'Lean in fully. This is what you signed up for.', outcome:'The chapter loves you. Your GPA has opinions. The formal was worth it.', stats:{ gpa:-0.1, energy:-15, social:+25, money:-15, motivation:+10 } },
+        { text:'Fulfill obligations strategically. No more, no less.', outcome:'Present but not overextended. The balance holds, barely, with effort.', stats:{ gpa:+0.1, energy:-5, social:+10, money:-8, motivation:+5 } },
+        { text:'Ask for reduced responsibilities this semester.', outcome:'The chapter understands. One senior gives you a look. You maintain your GPA. Worth the look.', stats:{ gpa:+0.2, energy:+5, social:0, money:-5, motivation:+10 } },
+        { text:'Miss too many events. The unspoken expectations accumulate.', outcome:'The chapter mood shifts. The social gains start reversing. Marcus had words about obligations.', stats:{ gpa:+0.1, energy:+10, social:-20, money:-5, motivation:-10 } },
+      ];
+    }
+  }
+
+  if (sc.dynamicKey === 'internship') {
+    const flavors = {
+      business:    { extra:'Your Business major means the field is crowded. Every sophomore is applying to the same fifteen firms.', opt:'Network aggressively. Coffee chats with every LinkedIn connection.', optOut:'Three coffee chats. One referral. The referral leads somewhere. Business is, in fact, about who you know.' },
+      engineering: { extra:'Engineering internships pay well and require a portfolio you don\'t yet have.', opt:'Build a small project specifically for applications. Show, don\'t tell.', optOut:'The project is modest. It is real. It gets you an interview.' },
+      liberalarts: { extra:'Liberal Arts internship paths are wide and therefore difficult to aim.', opt:'Write a compelling cover letter. This is actually your advantage.', optOut:'You write the best cover letter in the stack. The hiring manager says so.' },
+      science:     { extra:'Research internships require a faculty recommendation you don\'t have yet.', opt:'Volunteer in a lab for free to build credentials.', optOut:'Unpaid. Educational. The professor notices and mentions you to a colleague. A door opens.' },
+      compsci:     { extra:'CS internships at top companies are extremely competitive.', opt:'Grind leetcode problems systematically. Treat it like coursework.', optOut:'You solve twelve medium problems in two weeks. The next technical screen goes differently.' },
+    };
+    const f = flavors[S.major] || flavors.business;
+    out.text = `Every sophomore is applying for summer internships simultaneously. Three rejections have already arrived. ${f.extra} The impediment, Marcus says, is the way.`;
+    out.choices = [
+      { text:f.opt, outcome:f.optOut, stats:{ gpa:0, energy:-15, social:0, money:+15, motivation:+15 }, trackVal:'deployed a major-specific strategy against the internship gauntlet and found a door that opened' },
+      { text:'Treat each rejection as a map. Revise and reapply broadly.', outcome:'You apply to twelve more with targeted revisions. Two respond. One leads somewhere.', stats:{ gpa:0, energy:-10, social:0, money:+10, motivation:+10 }, trackVal:'treated every rejection as a map and reapplied with surgical revisions' },
+      { text:'Pivot to a professor\'s research position instead.', outcome:'Unpaid, but rich in résumé substance and letters of recommendation.', stats:{ gpa:+0.2, energy:-10, social:0, money:0, motivation:+10 }, trackVal:'pivoted from internship rejections to a professor\'s research position, gaining substance and approximately zero dollars' },
+      { text:'Give up for the semester. Regroup next year.', outcome:'Strategic retreat or avoidance? The line is thin. The motivation loss is not.', stats:{ gpa:0, energy:+15, social:+5, money:0, motivation:-20 }, trackVal:'declared a strategic retreat from internship applications' },
+    ];
+  }
+
+  if (sc.dynamicKey === 'groupproject') {
+    const hasTyler = S.tylerStatus === 'yes';
+    const tylerLine = hasTyler
+      ? 'And there — impossibly, inevitably — is Tyler. Different class. Same energy. He has learned nothing from the thermostat incident.'
+      : 'New faces. The same human dynamics. One person has gone quiet. One is overconfident.';
+    out.text = `A new group project. ${tylerLine} The blank Google Doc waits.`;
+    let bonusChoice;
+    if (S.commitment==='leadership') bonusChoice = { text:'Call an efficient meeting. You\'ve been running organizations all semester.', outcome:'Leadership experience pays off. You run the tightest 20-minute meeting the group has ever seen.', stats:{ gpa:+0.35, energy:-5, social:+15, motivation:+10 }, trackVal:'applied campus leadership skills to organize the group project with terrifying efficiency' };
+    else if (S.commitment==='research') bonusChoice = { text:'Structure it like a research project. Clear methodology, clear deliverables.', outcome:'Your academic rigor reframes the group\'s approach entirely. The professor praises the structure.', stats:{ gpa:+0.4, energy:-10, social:+5, motivation:+10 }, trackVal:'applied research-position discipline to the group project, earning specific praise for methodological rigor' };
+    else if (S.commitment==='job') bonusChoice = { text:'Treat it like a work project. Deadlines are real where you come from.', outcome:'Your professional energy is contagious to two of four people. That\'s enough.', stats:{ gpa:+0.3, energy:-10, social:+10, motivation:+5 }, trackVal:'brought part-time job professionalism to the group project, which worked on exactly half the group' };
+    else bonusChoice = { text:'Organize immediately. Assign roles. Be the falcon.', outcome:'The group produces something. It is not perfect. It is done. Marcus would approve.', stats:{ gpa:+0.3, energy:-10, social:+5, motivation:+5 }, trackVal:'organized the group project immediately and became the falcon for the second consecutive year' };
+    out.choices = [
+      bonusChoice,
+      { text:'Do your part perfectly. Let others manage theirs.', outcome:'Your section is excellent. The other sections are variable. The grade averages to acceptable.', stats:{ gpa:+0.2, energy:-5, social:+5, motivation:0 }, trackVal:'completed their own section with excellence and accepted the variable quality of others with Stoic equanimity' },
+      { text:'Have a frank expectations conversation upfront.', outcome:'Two people appreciate it. One was going to be a problem regardless. You identified them early.', stats:{ gpa:+0.3, energy:-5, social:+10, motivation:+10 }, trackVal:'initiated a frank expectations conversation, identifying the problem person before they became a problem' },
+      { text:'Complain extensively in texts instead of acting.', outcome:'Cathartic. Unproductive. Marcus specifically said not to do this.', stats:{ gpa:-0.1, energy:-5, social:+5, motivation:-15 }, trackVal:'spent project preparation time composing detailed complaint texts, which Marcus Aurelius had specifically addressed' },
+    ];
+  }
+
+  if (sc.dynamicKey === 'motivation_crisis') {
+    const slumpPath = S.commitment === 'nothing';
+    out.title = slumpPath ? 'The Slump Has a Name Now' : 'The Motivation Crisis';
+    out.text = slumpPath
+      ? 'Week 12. You committed to nothing this semester. The Slump has moved in and learned your schedule. Marcus wrote "confine yourself to the present" forty times. This is the present. It requires attention.'
+      : 'Week 12. The semester is almost over and your flame is low. You\'ve been spiraling about graduation, your major, what everyone else seems to know that you don\'t.';
+  }
+
+  if (sc.dynamicKey === 'major_spring') {
+    const texts = {
+      business:    'Career fairs have started. Everyone is wearing blazers to class on Tuesdays. There is a question underneath all of it: is this actually what you want, or is it what made sense at eighteen?',
+      engineering: 'You have survived Calc II, Physics, and a lab partner who disappeared in October. The question: is this the mountain you want to climb for the next forty years?',
+      liberalarts: 'Your relatives asked "what are you going to do with that?" four times at Thanksgiving. The question underneath their question: do you have an answer that satisfies you, regardless of them?',
+      science:     'The lab hours are real. The GPA has opinions. The question is not whether science is hard — you knew it was hard. The question is whether the hard thing is the right thing.',
+      compsci:     'You have been to two hackathons. You are slightly better at Python than your résumé suggests. The question emerging through the code: is this a career or a calling?',
+    };
+    out.text = texts[S.major] || 'The major stares at you. The question underneath the coursework: is this right?';
+  }
+
+  if (sc.dynamicKey === 'commitment_spring') {
+    if (S.commitment === 'research') {
+      out.title = 'The Research Position Reaches Its Conclusion';
+      out.text = 'Your research position ends with the semester. The professor asks if you\'d like to co-author a paper — a minor paper, but your name on it. It requires six more weeks of work after finals.';
+      out.choices = [
+        { text:'Say yes. Your name on a paper changes the trajectory.', outcome:'Six weeks of work. Your name in print. The letter of recommendation that follows is the best you\'ve ever received.', stats:{ gpa:+0.2, energy:-20, social:-5, money:0, motivation:+25 } },
+        { text:'Negotiate — contribute to one section only.', outcome:'The professor respects the boundary. You contribute meaningfully without sacrificing your summer.', stats:{ gpa:+0.1, energy:-10, social:0, money:0, motivation:+15 } },
+        { text:'Decline gracefully. You need the summer.', outcome:'A fine choice. The trajectory bends slightly later. The summer bends toward you.', stats:{ gpa:0, energy:+15, social:0, money:+10, motivation:+10 } },
+        { text:'Say yes and then progressively ghost the project.', outcome:'Not the Stoic path. The professor notices. The letter of recommendation is notably shorter.', stats:{ gpa:-0.1, energy:+5, social:-5, money:0, motivation:-15 } },
+      ];
+    } else if (S.commitment === 'leadership') {
+      out.title = 'The Leadership Position Wants More';
+      out.text = 'Spring elections are approaching and your organization wants you to run for president. Significant honor. Significant time commitment. You are, at present, extremely tired.';
+      out.choices = [
+        { text:'Run for president. The impediment is the way.', outcome:'You win. The work is real. The growth, in connections and in self, is also real.', stats:{ gpa:-0.1, energy:-20, social:+25, money:0, motivation:+20 } },
+        { text:'Run for a smaller officer role. Contribute without overextending.', outcome:'Wise calibration. You contribute meaningfully without losing the semester to it.', stats:{ gpa:+0.1, energy:-10, social:+15, money:0, motivation:+10 } },
+        { text:'Decline and focus on academics this semester.', outcome:'The organization understands. Your GPA thanks you. Your social circle shrinks slightly. Acceptable trade.', stats:{ gpa:+0.2, energy:+5, social:-5, money:0, motivation:+5 } },
+        { text:'Say you\'ll run and then back out last minute.', outcome:'The organization is disappointed. The relationships take a hit. Marcus had words about keeping your word.', stats:{ gpa:0, energy:+5, social:-20, money:0, motivation:-15 } },
+      ];
+    } else if (S.commitment === 'job') {
+      out.title = 'The Job Offers More Hours';
+      out.text = 'Your manager wants to increase your hours from 12 to 20 per week. The extra money is real. So is the timing — it\'s the same semester as your hardest course load yet.';
+      out.choices = [
+        { text:'Accept the hours. Money is a resource.', outcome:'Your bank account recovers. Your energy does not. The GPA holds by a thread. The thread holds.', stats:{ gpa:-0.1, energy:-20, social:-5, money:+25, motivation:-5 } },
+        { text:'Negotiate 15 hours. Compromise the calendar.', outcome:'Both parties accept. The compromise is not comfortable. It is sustainable.', stats:{ gpa:0, energy:-10, social:0, money:+15, motivation:+5 } },
+        { text:'Decline the extra hours. Protect the semester.', outcome:'Your manager is slightly disappointed. Your GPA is not. The fountain needed the time.', stats:{ gpa:+0.2, energy:+5, social:0, money:0, motivation:+15 } },
+        { text:'Accept and quietly reduce study time to compensate.', outcome:'The math does not work out. It never works out. The GPA has noticed the missing hours.', stats:{ gpa:-0.3, energy:-10, social:0, money:+20, motivation:-15 } },
+      ];
+    } else {
+      out.title = 'The Slump Asks for One More Semester';
+      out.text = 'Spring semester. You committed to nothing last semester and the slump followed you here. It has unpacked. It knows where the good coffee is.';
+      out.choices = [
+        { text:'Sign up for something, anything, before the deadline.', outcome:'You join a club two weeks into spring. It is awkward at first. By April it is the best part of your week.', stats:{ gpa:+0.1, energy:-5, social:+20, money:0, motivation:+25 } },
+        { text:'Start showing up consistently to one thing you already do.', outcome:'Consistency itself is the commitment. Motivation follows action, not the other way around.', stats:{ gpa:+0.1, energy:0, social:+10, money:0, motivation:+20 } },
+        { text:'Commit to your academics as the one thing.', outcome:'Narrow but honest. The grades improve. The social life remains thin. The foundation is real.', stats:{ gpa:+0.3, energy:-10, social:-5, money:0, motivation:+10 } },
+        { text:'Let the slump finish the year. Junior year will be different.', outcome:'Junior year will, in fact, be different. It will be harder. The slump does not cancel; it rolls over.', stats:{ gpa:-0.2, energy:+10, social:-10, money:0, motivation:-25 } },
+      ];
+    }
+  }
+  return out;
+}
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+function clamp(v,lo,hi){return Math.max(lo,Math.min(hi,v));}
+function gpaStr(v){return v.toFixed(2);}
+
+function applyMods(stats, sc) {
+  const d = Object.assign({}, stats);
+  const maj = MAJORS.find(m=>m.id===S.major);
+  if (maj) {
+    if (maj.mods.gpaScale && d.gpa) d.gpa += d.gpa>0 ? maj.mods.gpaScale : -Math.abs(maj.mods.gpaScale);
+    if (maj.mods.moneyBonus && d.money) d.money=(d.money||0)+maj.mods.moneyBonus;
+    if (maj.mods.energyDiscount && d.energy<0) d.energy=Math.floor(d.energy*(1-maj.mods.energyDiscount));
+    if (maj.mods.energyScale && d.energy<0) d.energy=Math.round(d.energy*maj.mods.energyScale);
+    if (maj.mods.socialBonus && d.social>0) d.social=(d.social||0)+maj.mods.socialBonus;
+  }
+  const com = COMMITMENTS.find(c=>c.id===S.commitment);
+  if (com) {
+    if (com.mods.motShield && d.motivation<0) d.motivation=Math.max(d.motivation,-5);
+    if (com.mods.motStable && d.motivation<0) d.motivation=Math.max(d.motivation,-8);
+    if (com.mods.moneyRegen) d.money=(d.money||0)+com.mods.moneyRegen;
+    if (com.mods.energyScale && d.energy<0) d.energy=Math.round(d.energy*com.mods.energyScale);
+    if (com.mods.gpaBuff && d.gpa>0) d.gpa+=com.mods.gpaBuff;
+    if (com.mods.socialBonus && d.social>0) d.social=(d.social||0)+com.mods.socialBonus;
+  }
+  const hou = HOUSING.find(h=>h.id===S.housing);
+  if (hou) {
+    if (hou.mods.socialBonus && d.social>0) d.social=(d.social||0)+hou.mods.socialBonus;
+    if (hou.mods.energyPenalty && d.energy>0) d.energy=Math.max(0,d.energy-hou.mods.energyPenalty);
+  }
+  const fg = FRIEND_GROUPS.find(f=>f.id===S.friendGroup);
+  if (fg) {
+    if (fg.mods.socialScale && d.social) d.social=Math.round(d.social*fg.mods.socialScale);
+    if (fg.mods.socialBonus && d.social>0) d.social+=fg.mods.socialBonus;
+    if (fg.mods.energyScale && d.energy<0) d.energy=Math.round(d.energy*fg.mods.energyScale);
+    if (fg.mods.moneySlow && d.money>0) d.money=Math.max(0,d.money-3);
+    if (fg.mods.energyShield && d.energy<0) d.energy=Math.max(d.energy,-10);
+    if (fg.mods.gpaBonus && d.gpa>0) d.gpa+=fg.mods.gpaBonus;
+  }
+  return d;
+}
+
+function updateFlame() {
+  const pct = S.motivation/100;
+  const svg = document.getElementById('flame-svg');
+  if (!svg) return;
+  svg.style.transform = `scale(${0.35+pct*0.65})`;
+  svg.style.opacity = 0.2+pct*0.8;
+  document.getElementById('hval-mot').textContent = S.motivation;
+}
+
+function updateHUD() {
+  document.getElementById('stats-hud').style.display = 'block';
+  document.getElementById('hval-gpa').textContent = gpaStr(S.gpa);
+  ['energy','social','money'].forEach(k=>{
+    document.getElementById('hbar-'+k).style.width=clamp(S[k],0,100)+'%';
+    document.getElementById('hval-'+k).textContent=S[k];
+  });
+  updateFlame();
+}
+
+function identityText() {
+  const maj=MAJORS.find(m=>m.id===S.major), hou=HOUSING.find(h=>h.id===S.housing),
+        com=COMMITMENTS.find(c=>c.id===S.commitment), fg=FRIEND_GROUPS.find(f=>f.id===S.friendGroup);
+  return [maj,hou,com,fg].filter(Boolean).map(x=>`${x.icon} ${x.name}`).join('  ·  ');
+}
+
+// ── TRANSITIONS ───────────────────────────────────────────────────────────────
+let currentPanel = 'panel-title';
+function goTo(id, dir='right') {
+  const cur=document.getElementById(currentPanel), next=document.getElementById(id);
+  const exitCls=dir==='right'?'exit-left':'exit-up', enterCls=dir==='right'?'enter-right':'enter-down';
+  cur.classList.remove('active'); cur.classList.add(exitCls);
+  setTimeout(()=>cur.classList.remove(exitCls,'active'),600);
+  next.style.opacity='0'; next.classList.add('active',''+enterCls);
+  setTimeout(()=>next.classList.remove(enterCls),600);
+  setTimeout(()=>next.style.opacity='',50);
+  currentPanel=id;
+}
+
+// ── SCREENS ───────────────────────────────────────────────────────────────────
+function goToCallbacks() {
+  renderCards('major-cards', MAJORS, 'cb-major', selectCBMajor);
+  document.getElementById('cb-confirm').style.display='none';
+  document.getElementById('tyler-section').style.display='none';
+  goTo('panel-callbacks');
+}
+
+function renderCards(containerId, items, prefix, clickFn) {
+  document.getElementById(containerId).innerHTML = items.map(item=>`
+    <div class="id-card" id="${prefix}-${item.id}" onclick="${clickFn.name}('${item.id}')">
+      <div class="id-card-icon">${item.icon}</div>
+      <div class="id-card-name">${item.name}</div>
+      <div class="id-card-desc">${item.desc}</div>
+      <div class="id-card-effect">${item.effect}</div>
+    </div>`).join('');
+}
+
+function selectCBMajor(id) {
+  document.querySelectorAll('[id^="cb-major-"]').forEach(c=>c.classList.remove('selected'));
+  document.getElementById('cb-major-'+id).classList.add('selected');
+  S.major=id;
+  document.getElementById('tyler-section').style.display='block';
+}
+function selectTyler(val) {
+  document.querySelectorAll('[id^="tyler-"]').forEach(c=>c.classList.remove('selected'));
+  document.getElementById('tyler-'+val).classList.add('selected');
+  S.tylerStatus=val;
+  document.getElementById('cb-confirm').style.display='block';
+}
+function goToHousing() {
+  renderCards('housing-cards', HOUSING, 'hou', selectHousing);
+  document.getElementById('housing-confirm').style.display='none';
+  goTo('panel-housing');
+}
+function selectHousing(id) {
+  document.querySelectorAll('[id^="hou-"]').forEach(c=>c.classList.remove('selected'));
+  document.getElementById('hou-'+id).classList.add('selected');
+  S.selectedCard=id;
+  document.getElementById('housing-confirm').style.display='block';
+}
+function confirmHousing() {
+  S.housing=S.selectedCard; S.selectedCard=null;
+  const h=HOUSING.find(h=>h.id===S.housing);
+  if(h.mods.moneyCost) S.money=clamp(S.money-h.mods.moneyCost,0,100);
+  if(h.mods.energyBonus) S.energy=clamp(S.energy+h.mods.energyBonus,0,100);
+  renderCards('commit-cards', COMMITMENTS, 'com', selectCommit);
+  document.getElementById('commit-confirm').style.display='none';
+  goTo('panel-commit');
+}
+function selectCommit(id) {
+  document.querySelectorAll('[id^="com-"]').forEach(c=>c.classList.remove('selected'));
+  document.getElementById('com-'+id).classList.add('selected');
+  S.selectedCard=id;
+  document.getElementById('commit-confirm').style.display='block';
+}
+function confirmCommit() {
+  S.commitment=S.selectedCard; S.selectedCard=null;
+  updateHUD(); S.semester=0; S.scIndex=0;
+  showScenario(); goTo('panel-scenario');
+}
+
+function renderFriendCards() {
+  renderCards('friend-cards', FRIEND_GROUPS, 'fg', selectFriend);
+  document.getElementById('friend-confirm').style.display='none';
+}
+function selectFriend(id) {
+  document.querySelectorAll('[id^="fg-"]').forEach(c=>c.classList.remove('selected'));
+  document.getElementById('fg-'+id).classList.add('selected');
+  S.selectedCard=id;
+  document.getElementById('friend-confirm').style.display='block';
+}
+function confirmFriends() {
+  S.friendGroup=S.selectedCard; S.selectedCard=null;
+  const fg=FRIEND_GROUPS.find(f=>f.id===S.friendGroup);
+  if(fg.mods.socialBonus) S.social=clamp(S.social+fg.mods.socialBonus,0,100);
+  updateHUD(); S.scIndex=2; showScenario(); goTo('panel-scenario');
+}
+
+// ── SCENARIO ENGINE ───────────────────────────────────────────────────────────
+function showScenario() {
+  const scens=S.semester===0?FALL_SCENARIOS:SPRING_SCENARIOS;
+  if(S.semester===0 && S.scIndex===1 && !S.friendGroup) { renderFriendCards(); goTo('panel-friends'); return; }
+  if(S.scIndex>=scens.length){showSemEnd();return;}
+  const sc=getDynamic(scens[S.scIndex]); S._curSc=sc;
+  const semLabel=S.semester===0?'FALL':'SPRING';
+  document.getElementById('sc-sem').textContent=semLabel;
+  document.getElementById('sc-num').textContent=S.scIndex+1;
+  document.getElementById('sc-concept').textContent=`☯ ${sc.concept}`;
+  document.getElementById('sc-title').textContent=sc.title;
+  document.getElementById('sc-identity').textContent=identityText();
+  const letters=['A','B','C','D'];
+  const vera = sc.veraNote ? `<div class="vera-note"><strong>Vera, a senior:</strong> "${veraLine()}"</div>` : '';
+  const motWarn = S.motivation<=30 ? `<div class="mot-warning">⚠ Will critical — ${S.motivation} remaining. The flame is almost out. "Look within."</div>` : '';
+  document.getElementById('scenario-body').innerHTML=`
+    ${motWarn}
+    <div class="scenario-quote-strip">
+      <div class="scenario-quote-text">"${sc.quote}"</div>
+      <div class="scenario-quote-attr">— Marcus Aurelius, Meditations</div>
+    </div>
+    ${vera}
+    <div class="scenario-text-main">${sc.text}</div>
+    <div class="choices-grid">
+      ${sc.choices.map((ch,i)=>`
+        <button class="choice-btn-gn" onclick="resolveChoice(${i})" id="ch${i}">
+          <span class="choice-letter-gn">${letters[i]}</span><span>${ch.text}</span>
+        </button>`).join('')}
+    </div>
+    <div class="outcome-reveal" id="outcome-panel"></div>`;
+  document.getElementById('scenario-footer').style.display='none';
+}
+
+function resolveChoice(idx) {
+  const sc=S._curSc, ch=sc.choices[idx];
+  document.querySelectorAll('.choice-btn-gn').forEach((b,i)=>{b.disabled=true;if(i===idx)b.classList.add('chosen');else b.style.opacity='0.35';});
+  document.getElementById('ch'+idx).style.borderColor='var(--silver)';
+  if(sc.trackKey&&ch.trackVal) S[sc.trackKey]=ch.trackVal;
+  let d=applyMods(ch.stats,sc);
+  // passive motivation drain
+  d.motivation=(d.motivation||0)-8;
+  const com=COMMITMENTS.find(c=>c.id===S.commitment);
+  if(com&&com.mods.motDrain) d.motivation-=com.mods.motDrain;
+  S.gpa=clamp(S.gpa+(d.gpa||0),0,4.0);
+  S.energy=clamp(S.energy+(d.energy||0),0,100);
+  S.social=clamp(S.social+(d.social||0),0,100);
+  S.money=clamp(S.money+(d.money||0),0,100);
+  S.motivation=clamp(S.motivation+(d.motivation||0),0,100);
+  updateHUD();
+  const good=(d.gpa||0)>=0&&(d.energy||0)>=-10;
+  const chips=[];
+  if(d.gpa)        chips.push(`<span class="stat-chip ${d.gpa>0?'plus':'minus'}">GPA ${d.gpa>0?'+':''}${d.gpa.toFixed(1)}</span>`);
+  if(d.energy)     chips.push(`<span class="stat-chip ${d.energy>0?'plus':'minus'}">Energy ${d.energy>0?'+':''}${d.energy}</span>`);
+  if(d.social)     chips.push(`<span class="stat-chip ${d.social>0?'plus':'minus'}">Social ${d.social>0?'+':''}${d.social}</span>`);
+  if(d.money)      chips.push(`<span class="stat-chip ${d.money>0?'plus':'minus'}">Money ${d.money>0?'+':''}${d.money}</span>`);
+  if(d.motivation) chips.push(`<span class="stat-chip ${d.motivation>0?'plus':'minus'}">Will ${d.motivation>0?'+':''}${d.motivation}</span>`);
+  const op=document.getElementById('outcome-panel');
+  op.innerHTML=`<div class="outcome-text ${good?'good':'bad'}">${ch.outcome}</div><div class="outcome-stats">${chips.join('')}</div>`;
+  op.classList.add('show');
+  op.scrollIntoView({behavior:'smooth',block:'nearest'});
+  document.getElementById('scenario-footer').style.display='block';
+  if(S.gpa<2.0||S.energy<=0||S.social<=0||S.money<=0||S.motivation<=0) setTimeout(showGameOver,1400);
+}
+
+function advanceScenario() {
+  S.scIndex++;
+  if(S.gpa<2.0||S.energy<=0||S.social<=0||S.money<=0||S.motivation<=0){showGameOver();return;}
+  showScenario();
+}
+
+function showSemEnd() {
+  const isFall=S.semester===0;
+  if(isFall){S.energy=clamp(S.energy+10,0,100);S.motivation=clamp(S.motivation+20,0,100);}
+  const maj=MAJORS.find(m=>m.id===S.major), hou=HOUSING.find(h=>h.id===S.housing), com=COMMITMENTS.find(c=>c.id===S.commitment);
+  document.getElementById('sem-end-title').textContent=isFall?'📖 FALL SEMESTER COMPLETE':'🌿 SPRING SEMESTER COMPLETE';
+  document.getElementById('sem-end-body').innerHTML=`
+    <div class="gpa-display-big">
+      <div class="gpa-display-big-label">CURRENT GPA</div>
+      <div class="gpa-display-big-val">${gpaStr(S.gpa)}</div>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-block"><div class="stat-block-label">ENERGY</div><div class="stat-block-bar"><div class="stat-block-bar-fill" style="background:#b09030;width:${S.energy}%;"></div></div><div class="stat-block-val">${S.energy}</div></div>
+      <div class="stat-block"><div class="stat-block-label">SOCIAL</div><div class="stat-block-bar"><div class="stat-block-bar-fill" style="background:#a04050;width:${S.social}%;"></div></div><div class="stat-block-val">${S.social}</div></div>
+      <div class="stat-block"><div class="stat-block-label">MONEY</div><div class="stat-block-bar"><div class="stat-block-bar-fill" style="background:#308050;width:${S.money}%;"></div></div><div class="stat-block-val">${S.money}</div></div>
+      <div class="stat-block"><div class="stat-block-label">WILL 🔥</div><div class="stat-block-bar"><div class="stat-block-bar-fill" style="background:#6080c0;width:${S.motivation}%;"></div></div><div class="stat-block-val">${S.motivation}</div></div>
+    </div>
+    <div style="background:rgba(154,170,187,0.07);border:1px solid rgba(154,170,187,0.2);padding:10px 14px;">
+      <div style="font-family:'Special Elite',cursive;font-size:0.67em;color:var(--silver);letter-spacing:2px;margin-bottom:6px;">IDENTITY</div>
+      <div style="font-size:0.85em;color:rgba(232,228,220,0.7);line-height:1.8;">
+        ${maj?`${maj.icon} <strong style="color:var(--marble);">${maj.name}</strong><br>`:''}
+        ${hou?`${hou.icon} <strong style="color:var(--marble);">${hou.name}</strong><br>`:''}
+        ${com?`${com.icon} <strong style="color:var(--marble);">${com.name}</strong>`:''}
+      </div>
+    </div>
+    <div style="padding-top:4px;">
+      ${isFall
+        ? `<button class="continue-btn" onclick="startSpring()">🌿 BEGIN SPRING SEMESTER →</button>`
+        : `<button class="continue-btn" onclick="showWin()">📖 SEE YOUR FINAL RESULT →</button>`}
+    </div>`;
+  goTo('panel-sem-end','up');
+}
+
+function startSpring(){S.semester=1;S.scIndex=0;updateHUD();showScenario();goTo('panel-scenario');}
+
+// ── CHRONICLE ─────────────────────────────────────────────────────────────────
+function buildChronicle() {
+  const maj=MAJORS.find(m=>m.id===S.major), hou=HOUSING.find(h=>h.id===S.housing), com=COMMITMENTS.find(c=>c.id===S.commitment);
+  const majName=maj?maj.name:'undeclared disciplines', houName=hou?hou.name.toLowerCase():'an unnamed dwelling', comName=com?com.name.toLowerCase():'a vague commitment';
+  const slump=S.slumpChoice||'confronted the sophomore slump through methods the historians consider inconclusive';
+  const intern=S.internshipChoice||'navigated the internship gauntlet with variable success';
+  const group=S.groupChoice||'handled the group project in a manner consistent with their character';
+  const final=S.finalChoice||'approached finals week with the full weight of sophomore identity';
+  const tyler=S.tylerStatus==='yes'?' Tyler, whose thermostat crimes of freshman year had not been expunged from the record, reappeared in the group project like a recurring dream the subconscious refuses to release.':'';
+  const tier=S.gpa>=3.3?'triumph':S.gpa>=2.6?'middling':'disaster';
+
+  const STORIES={
+    triumph:[
+      `Thus continues the chronicle of a ${majName} scholar who descended upon sophomore year with the hard-won wisdom of one who had survived freshman year — and the optimism of one who had not yet experienced the sophomore slump arriving on a Tuesday with luggage. Housed in ${houName} and committed — somewhat improbably — to ${comName}, our hero encountered the grey fog in week two and ${slump}. The ancient masters, peering down through the philosophical ether, noted this response was neither obvious nor guaranteed.`,
+      `The spring semester arrived.${tyler} The internship gauntlet had seen our scholar ${intern}, a fact processed with Stoic equanimity. The group project — that eternal crucible — found the warrior ${group}. Marcus Aurelius remarked: "Waste no more time arguing about what a good student should be. Be one." Our hero, to their credit, largely was one.`,
+      `Sophomore year concluded with a GPA of ${gpaStr(S.gpa)}, a number suggesting genuine growth rather than mere survival. The final examinations found our scholar ${final}. They emerged from the year quieter — less certain of some things, more certain of others. "You have power over your mind, not outside events," the Meditations reminded them — and for the first time, they believed it without having to remind themselves first. — The Deeply Impressed Stoic Historians, Year Two.`,
+    ],
+    middling:[
+      `The sophomore chronicle begins, as all sophomore chronicles must, with the Slump. Our ${majName} scholar, installed in ${houName} and theoretically committed to ${comName}, met the grey fog of week two and ${slump}. This was not the response of a general; it was the response of a person doing their reasonable best — which Marcus Aurelius would have recognized with something approaching solidarity.`,
+      `Spring offered new challenges.${tyler} The internship season had seen our hero ${intern}, falling somewhere between the triumph of strategy and the chaos of circumstance. The group project found our scholar ${group}. Vera appeared twice with Stoic observations that were technically correct and poorly timed. The flame of motivation flickered with the consistency of a candle in a room where someone keeps opening the window.`,
+      `Sophomore year ended with a GPA of ${gpaStr(S.gpa)} — a number telling the story of someone who tried, adapted, occasionally spiraled, and ultimately did not withdraw from any classes, which is its own category of victory. Marcus Aurelius wrote: "Confine yourself to the present." The scholar confined themselves, mostly, to approximately the present. The historians consider this adequate and, quietly, human. — The Moderately Encouraged Stoic Historians, Year Two.`,
+    ],
+    disaster:[
+      `Let the record show that the sophomore year of a ${majName} student was, by most measurable metrics, a reckoning the Meditations did not fully anticipate. Housed in ${houName}, committed in theory to ${comName}, armed with wisdom not entirely absorbed, our hero met the Slump and ${slump}. The ancient masters acknowledge that the path of wisdom is not always taken on the first attempt. Or the second.`,
+      `Spring arrived not as recovery but as prolonged negotiation with consequences.${tyler} The internship season had found our scholar ${intern}. The group project saw our hero ${group}. Vera appeared in the hallway with the correct quote at the wrong moment. The flame guttered. Marcus wrote "look within" but the within was, at this juncture, also not in great shape.`,
+      `And yet — the year ended. A GPA of ${gpaStr(S.gpa)} stands in the record above the threshold of academic probation, and the historians would like to point out that this threshold exists for a reason. Marcus Aurelius wrote: "Within is the fountain of good, and it will ever bubble up, if you will ever dig." The digging continues. Junior Year: An Inferno awaits. — The Grimly Optimistic Stoic Historians, Year Two.`,
+    ],
+  };
+  return STORIES[tier].map((p,i)=>
+    `<div class="chronicle-block" data-label="${['Fall Semester','Spring Semester','The Verdict of Aurelius'][i]}"><div class="chronicle-text">${p}</div></div>`
+  ).join('');
+}
+
+// ── WIN / LOSE ─────────────────────────────────────────────────────────────────
+function showWin() {
+  let rank,wisdom;
+  if(S.gpa>=3.5){rank='STOIC SCHOLAR';wisdom='"He is a wise man who does not grieve for what he has not, but rejoices for what he has." You had quite a lot.';}
+  else if(S.gpa>=3.0){rank='ADEQUATE PHILOSOPHER';wisdom='"Confine yourself to the present." You did, mostly. The present was survivable.';}
+  else if(S.gpa>=2.5){rank='RESILIENT PEDESTRIAN';wisdom='"The impediment to action advances action." You were impeded frequently. You advanced anyway.';}
+  else{rank='BATTLE-TESTED STOIC';wisdom='"It is not death that a man should fear, but he should fear never beginning to live." You are still beginning.';}
+  const maj=MAJORS.find(m=>m.id===S.major), hou=HOUSING.find(h=>h.id===S.housing), com=COMMITMENTS.find(c=>c.id===S.commitment);
+  document.getElementById('win-rank').textContent=rank;
+  document.getElementById('win-body').innerHTML=`
+    <div class="stat-grid">
+      <div class="stat-block"><div class="stat-block-label">FINAL GPA</div><div class="stat-block-val" style="font-size:2em;color:var(--silver-bright);">${gpaStr(S.gpa)}</div></div>
+      <div class="stat-block"><div class="stat-block-label">ENERGY</div><div class="stat-block-bar"><div class="stat-block-bar-fill" style="background:#b09030;width:${S.energy}%;"></div></div><div class="stat-block-val">${S.energy}</div></div>
+      <div class="stat-block"><div class="stat-block-label">SOCIAL</div><div class="stat-block-bar"><div class="stat-block-bar-fill" style="background:#a04050;width:${S.social}%;"></div></div><div class="stat-block-val">${S.social}</div></div>
+      <div class="stat-block"><div class="stat-block-label">MONEY</div><div class="stat-block-bar"><div class="stat-block-bar-fill" style="background:#308050;width:${S.money}%;"></div></div><div class="stat-block-val">${S.money}</div></div>
+    </div>
+    <div style="background:rgba(154,170,187,0.06);border:1px solid rgba(154,170,187,0.2);padding:10px 14px;">
+      <div style="font-family:'Special Elite',cursive;font-size:0.67em;color:var(--silver);letter-spacing:2px;margin-bottom:6px;">SOPHOMORE IDENTITY</div>
+      <div style="font-size:0.85em;color:rgba(232,228,220,0.72);line-height:1.8;">
+        ${maj?`${maj.icon} <strong style="color:var(--marble);">${maj.name}</strong><br>`:''}
+        ${hou?`${hou.icon} <strong style="color:var(--marble);">${hou.name}</strong><br>`:''}
+        ${com?`${com.icon} <strong style="color:var(--marble);">${com.name}</strong>`:''}
+      </div>
+    </div>
+    <div class="wisdom-strip">"${wisdom}"<br><em style="font-size:0.85em;opacity:0.5;">— Marcus Aurelius, Meditations</em></div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:0.95em;color:var(--silver);letter-spacing:3px;margin-top:4px;">☯ THE CHRONICLE OF SOPHOMORE YEAR</div>
+    <div style="font-family:'Special Elite',cursive;font-size:0.7em;color:rgba(154,170,187,0.4);margin-bottom:10px;letter-spacing:1px;">AS RECORDED BY THE STOIC HISTORIANS</div>
+    ${buildChronicle()}
+    <div style="background:rgba(154,170,187,0.05);border:1px solid rgba(154,170,187,0.15);padding:12px;text-align:center;margin-top:4px;">
+      <div style="font-family:'Bebas Neue',sans-serif;color:var(--silver);letter-spacing:3px;font-size:0.9em;margin-bottom:6px;">THE SERIES CONTINUES</div>
+      <a class="nav-btn" href="junior-year-inferno.html" style="font-size:0.82em;padding:6px 14px;">Continue → Year III: An Inferno</a>
+    </div>
+    <button class="continue-btn" style="margin-top:8px;" onclick="restartGame()">↩ PLAY AGAIN</button>`;
+  document.getElementById('stats-hud').style.display='none';
+  goTo('panel-win','up');
+}
+
+function showGameOver() {
+  let reason='Your GPA collapsed below 2.0. Academic probation. Marcus saw this coming.';
+  if(S.motivation<=0) reason='The flame went out entirely. Motivation hit zero. You withdrew and stared at the ceiling. Marcus called this "failing to dig for the fountain."';
+  else if(S.energy<=0) reason='Energy hit zero. You fell asleep in the library during midterms and woke up with no memory of October.';
+  else if(S.social<=0) reason='Social life flatlined. You stopped responding to texts. The dorm forgot you existed. Isolation is not Stoicism.';
+  else if(S.money<=0) reason='Funds evaporated entirely. The apartment has opinions about rent that are non-negotiable.';
+  document.getElementById('gameover-body').innerHTML=`
+    <div class="gameover-reason">${reason}<br><br>The Meditations were available. Marcus wrote them down specifically so future scholars would not have to learn this the hard way. And yet.</div>
+    <div class="wisdom-strip" style="max-width:440px;">"You have power over your mind, not outside events."<br><em style="font-size:0.85em;opacity:0.5;">— Marcus Aurelius · still right · always right</em></div>
+    <button class="continue-btn" style="max-width:300px;" onclick="restartGame()">↩ TRY AGAIN</button>`;
+  document.getElementById('stats-hud').style.display='none';
+  goTo('panel-gameover','up');
+}
+
+function restartGame() {
+  Object.assign(S,{tutStep:0,semester:0,scIndex:0,gpa:3.8,energy:85,social:75,money:60,motivation:100,major:null,housing:null,commitment:null,friendGroup:null,tylerStatus:null,selectedCard:null,_curSc:null,slumpChoice:null,internshipChoice:null,groupChoice:null,finalChoice:null});
+  document.getElementById('stats-hud').style.display='none';
+  veraIdx=0;
+  goTo('panel-title','right');
+}
+</script>
+</body>
+</html>
