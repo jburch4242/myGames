@@ -392,39 +392,53 @@ body {
 }
 
 /* Panel number badge */
-.tut-frame::before {
-  content: attr(data-panel);
-  position: absolute;
-  top: 0; left: 0;
-  background: var(--red);
-  color: var(--paper);
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 0.9em;
-  letter-spacing: 2px;
-  padding: 3px 14px;
-  border-bottom: 2px solid var(--ink);
-  border-right: 2px solid var(--ink);
-  z-index: 5;
-}
+.tut-frame::before { display: none; }
 
 .tut-header {
   background: var(--ink);
-  padding: 14px 20px 12px;
   border-bottom: 3px solid var(--gold);
   flex-shrink: 0;
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+}
+
+.tut-header-badge {
+  background: var(--red);
+  padding: 0 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 3px solid var(--gold);
+  flex-shrink: 0;
+}
+
+.tut-header-badge-text {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.95em;
+  color: var(--paper);
+  letter-spacing: 2px;
+  white-space: nowrap;
+}
+
+.tut-header-main {
+  padding: 12px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
 }
 
 .tut-principle-num {
   font-family: 'Special Elite', cursive;
-  font-size: 0.72em;
+  font-size: 0.68em;
   color: var(--gold);
-  letter-spacing: 4px;
-  margin-bottom: 4px;
+  letter-spacing: 3px;
 }
 
 .tut-principle-name {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 2em;
+  font-size: 1.8em;
   color: var(--paper);
   line-height: 1;
   text-shadow: 2px 2px 0 var(--red);
@@ -1251,8 +1265,11 @@ body {
 <div class="panel" id="panel-tutorial">
   <div class="tut-frame" id="tut-frame" data-panel="ANCIENT WISDOM">
     <div class="tut-header">
-      <div class="tut-principle-num" id="tut-num">PRINCIPLE I OF X</div>
-      <div class="tut-principle-name" id="tut-name">KNOW YOUR ENEMY</div>
+      <div class="tut-header-badge"><div class="tut-header-badge-text">ANCIENT<br>WISDOM</div></div>
+      <div class="tut-header-main">
+        <div class="tut-principle-num" id="tut-num">1 OF 10</div>
+        <div class="tut-principle-name" id="tut-name">KNOW YOUR ENEMY</div>
+      </div>
     </div>
     <div class="tut-body" id="tut-body"></div>
     <div class="tut-footer">
@@ -1712,7 +1729,7 @@ function goToTutorial() {
 
 function renderTutorial() {
   const con = CONCEPTS[S.tutStep];
-  document.getElementById('tut-num').textContent = `PRINCIPLE ${con.num} OF ${CONCEPTS.length}`;
+  document.getElementById('tut-num').textContent = `${S.tutStep + 1} OF ${CONCEPTS.length}`;
   document.getElementById('tut-name').textContent = con.name;
   document.getElementById('tut-body').innerHTML = `
     <div class="tut-quote-block">
