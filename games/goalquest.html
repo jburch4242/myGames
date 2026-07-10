@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Goal Quest — Chart Your Trails</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,600&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --forest:#2c3a2a;
+    --forest-deep:#212c20;
+    --moss:#6f8a5a;
+    --moss-dim:#8fa87c;
+    --clay:#a85a36;
+    --clay-bright:#c06a3f;
+    --sand:#e8ddc2;
+    --parchment:#f2ead6;
+    --bark:#3c332a;
+    --bark-soft:#6b6052;
+    --gold:#bd9430;
+    --line:rgba(60,51,42,0.18);
+    --shadow: 0 4px 14px rgba(44,58,42,0.14);
+    --radius: 4px;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; scroll-behavior:auto !important;}
+  }
+
+  body{
+    margin:0;
+    min-height:100vh;
+    background:
+      radial-gradient(ellipse at top left, rgba(111,138,90,0.10), transparent 55%),
+      radial-gradient(ellipse at bottom right, rgba(168,90,54,0.08), transparent 50%),
+      var(--parchment);
+    background-attachment:fixed;
+    color:var(--bark);
+    font-family:'Archivo', sans-serif;
+    position:relative;
+  }
+
+  /* subtle topo-line texture */
+  body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    opacity:0.5;
+    background-image:
+      repeating-radial-gradient(circle at 12% 18%, transparent 0, transparent 38px, rgba(60,51,42,0.035) 39px, transparent 40px, transparent 78px),
+      repeating-radial-gradient(circle at 85% 72%, transparent 0, transparent 46px, rgba(60,51,42,0.03) 47px, transparent 48px, transparent 92px);
+    z-index:0;
+  }
+
+  #app{position:relative; z-index:1; max-width:1080px; margin:0 auto; padding:28px 20px 80px;}
+
+  h1,h2,h3{font-family:'Fraunces', serif; margin:0; color:var(--forest-deep);}
+
+  a, button{font-family:inherit;}
+
+  /* ---------- Header ---------- */
+  .site-header{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:6px 4px 26px;
+    border-bottom:1px solid var(--line);
+    margin-bottom:30px;
+    flex-wrap:wrap; gap:14px;
+  }
+  .brand{display:flex; align-items:center; gap:12px; cursor:pointer; background:none; border:none; padding:0;}
+  .brand-mark{width:40px; height:40px; flex-shrink:0;}
+  .brand-text{display:flex; flex-direction:column; text-align:left;}
+  .brand-text .title{font-size:1.5rem; font-weight:700; letter-spacing:0.01em; line-height:1;}
+  .brand-text .sub{font-size:0.72rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--bark-soft); margin-top:4px;}
+
+  .nav-actions{display:flex; gap:10px;}
+  .pill-btn{
+    display:inline-flex; align-items:center; gap:8px;
+    background:transparent;
+    border:1.5px solid var(--forest);
+    color:var(--forest-deep);
+    padding:9px 16px;
+    border-radius:999px;
+    font-size:0.86rem;
+    font-weight:600;
+    cursor:pointer;
+    transition:background .18s ease, color .18s ease, transform .18s ease;
+  }
+  .pill-btn:hover{background:var(--forest); color:var(--parchment); transform:translateY(-1px);}
+  .pill-btn:focus-visible, button:focus-visible, [tabindex]:focus-visible{
+    outline:3px solid var(--clay-bright); outline-offset:2px;
+  }
+  .pill-btn svg{width:16px; height:16px;}
+
+  /* ---------- Home: gallery ---------- */
+  .gallery-intro{max-width:640px; margin-bottom:8px;}
+  .gallery-intro .eyebrow{
+    font-size:0.72rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--clay); font-weight:700; margin-bottom:8px; display:block;
+  }
+  .gallery-intro h2{font-size:2rem; line-height:1.15; font-weight:600;}
+  .gallery-intro p{color:var(--bark-soft); font-size:1rem; line-height:1.55; margin-top:12px;}
+
+  .filter-row{display:flex; flex-wrap:wrap; gap:8px; margin:26px 0 22px;}
+  .filter-chip{
+    border:1px solid var(--line);
+    background:rgba(255,255,255,0.35);
+    color:var(--bark);
+    padding:7px 14px;
+    border-radius:999px;
+    font-size:0.82rem;
+    font-weight:600;
+    cursor:pointer;
+    transition:all .16s ease;
+  }
+  .filter-chip.active, .filter-chip:hover{
+    background:var(--moss); border-color:var(--moss); color:#fff;
+  }
+
+  .goal-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(230px, 1fr));
+    gap:22px 18px;
+    margin-top:8px;
+  }
+  .goal-card{
+    background:rgba(255,255,255,0.55);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:20px 18px 18px;
+    cursor:pointer;
+    position:relative;
+    transition:transform .2s ease, box-shadow .2s ease, background .2s ease;
+    display:flex; flex-direction:column; gap:12px;
+    text-align:left;
+  }
+  .goal-grid > .goal-card:nth-child(3n+2){ transform:translateY(10px); }
+  .goal-grid > .goal-card:nth-child(3n+2):hover{ transform:translateY(6px); }
+  .goal-card:hover{ box-shadow:var(--shadow); background:rgba(255,255,255,0.78); transform:translateY(-3px); }
+  .goal-grid > .goal-card:nth-child(3n+2):hover{ transform:translateY(7px); }
+
+  .goal-card .top-row{display:flex; align-items:flex-start; justify-content:space-between; gap:10px;}
+  .cat-icon{
+    width:34px; height:34px; flex-shrink:0;
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--sand);
+    border:1px solid var(--line);
+  }
+  .cat-icon svg{width:18px; height:18px; stroke:var(--forest-deep);}
+
+  .goal-card h3{font-size:1.12rem; font-weight:600; line-height:1.25;}
+  .goal-card .cat-tag{
+    font-size:0.68rem; letter-spacing:0.1em; text-transform:uppercase; font-weight:700; color:var(--clay);
+  }
+  .goal-card .blurb{font-size:0.85rem; color:var(--bark-soft); line-height:1.45; flex-grow:1;}
+
+  .progress-track{
+    height:6px; border-radius:3px; background:var(--sand); overflow:hidden; margin-top:4px;
+  }
+  .progress-fill{height:100%; background:linear-gradient(90deg, var(--moss), var(--gold)); border-radius:3px; transition:width .4s ease;}
+  .progress-label{font-size:0.72rem; color:var(--bark-soft); display:flex; justify-content:space-between; margin-top:2px;}
+
+  .empty-state{
+    padding:40px 20px; text-align:center; color:var(--bark-soft); border:1px dashed var(--line); border-radius:var(--radius); grid-column:1/-1;
+  }
+
+  /* ---------- Detail view ---------- */
+  .back-link{
+    display:inline-flex; align-items:center; gap:6px;
+    background:none; border:none; cursor:pointer;
+    font-size:0.86rem; font-weight:600; color:var(--bark-soft);
+    padding:4px 0; margin-bottom:18px;
+  }
+  .back-link:hover{color:var(--forest-deep);}
+  .back-link svg{width:14px; height:14px;}
+
+  .detail-header{
+    display:flex; gap:18px; align-items:flex-start; margin-bottom:8px; flex-wrap:wrap;
+  }
+  .detail-header .cat-icon{width:52px; height:52px;}
+  .detail-header .cat-icon svg{width:26px; height:26px;}
+  .detail-title h2{font-size:1.9rem; font-weight:600;}
+  .detail-title .cat-tag{font-size:0.72rem; letter-spacing:0.12em; text-transform:uppercase; font-weight:700; color:var(--clay); display:block; margin-bottom:6px;}
+  .detail-blurb{color:var(--bark-soft); max-width:560px; line-height:1.55; margin-top:10px;}
+
+  .detail-progress-summary{
+    display:flex; align-items:center; gap:12px; margin:22px 0 6px;
+    font-size:0.86rem; color:var(--bark-soft); font-weight:600;
+  }
+  .detail-progress-summary .progress-track{flex-grow:1; max-width:260px; height:8px;}
+
+  .trail-wrap{margin-top:10px;}
+  .trail-svg{width:100%; height:auto; display:block;}
+
+  .waypoint-group{cursor:pointer;}
+  .waypoint-group:focus-visible circle.wp-outer{outline:3px solid var(--clay-bright); outline-offset:2px;}
+
+  .wp-label-title{font-family:'Archivo', sans-serif; font-weight:600; font-size:15px; fill:var(--bark);}
+  .wp-label-num{font-family:'Fraunces', serif; font-weight:700; font-size:11px; fill:var(--bark-soft);}
+  .wp-hint{font-family:'Archivo', sans-serif; font-size:11px; fill:var(--bark-soft); font-style:italic;}
+
+  .complete-banner{
+    margin-top:26px; padding:20px 22px; border-radius:var(--radius);
+    background:linear-gradient(120deg, rgba(189,148,48,0.16), rgba(111,138,90,0.14));
+    border:1px solid rgba(189,148,48,0.4);
+    display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+  }
+  .complete-banner svg{width:38px; height:38px; flex-shrink:0;}
+  .complete-banner strong{display:block; font-family:'Fraunces', serif; font-size:1.05rem; margin-bottom:2px;}
+  .complete-banner span{font-size:0.86rem; color:var(--bark-soft);}
+
+  /* ---------- Badges ---------- */
+  .badges-header{margin-bottom:26px;}
+  .badges-header h2{font-size:1.9rem; font-weight:600; margin-bottom:8px;}
+  .badges-header p{color:var(--bark-soft); max-width:560px; line-height:1.5;}
+
+  .badge-count{
+    display:inline-block; margin-top:12px; font-size:0.82rem; font-weight:700; color:var(--forest-deep);
+    background:var(--sand); padding:6px 14px; border-radius:999px;
+  }
+
+  .badge-grid{
+    display:grid; grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); gap:22px 16px; margin-top:14px;
+  }
+  .badge{
+    display:flex; flex-direction:column; align-items:center; text-align:center; gap:10px;
+    padding:16px 10px 14px;
+  }
+  .seal{
+    width:84px; height:84px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    position:relative;
+    background:radial-gradient(circle at 35% 30%, #d3a94a, #a5761f 65%, #7c5814 100%);
+    box-shadow: inset 0 2px 4px rgba(255,255,255,0.35), inset 0 -4px 8px rgba(0,0,0,0.25), 0 3px 8px rgba(0,0,0,0.18);
+    border:2px solid rgba(124,88,20,0.5);
+  }
+  .seal svg{width:36px; height:36px; stroke:#3c2e10; fill:none;}
+  .seal.locked{
+    background:var(--sand);
+    box-shadow: inset 0 2px 4px rgba(255,255,255,0.4), inset 0 -3px 6px rgba(60,51,42,0.12);
+    border:2px dashed var(--line);
+    opacity:0.75;
+  }
+  .seal.locked svg{stroke:var(--bark-soft); opacity:0.55;}
+  .badge-name{font-family:'Fraunces', serif; font-weight:600; font-size:0.88rem; line-height:1.25;}
+  .badge.locked .badge-name{color:var(--bark-soft);}
+  .badge-desc{font-size:0.72rem; color:var(--bark-soft); line-height:1.3;}
+
+  footer.note{
+    margin-top:60px; text-align:center; font-size:0.76rem; color:var(--bark-soft); padding-top:18px; border-top:1px solid var(--line);
+  }
+
+  @media (max-width: 480px){
+    .brand-text .title{font-size:1.25rem;}
+    .gallery-intro h2{font-size:1.55rem;}
+    .detail-title h2{font-size:1.5rem;}
+  }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+(function(){
+
+  /* ============ ICONS (category line-icons, hand-simplified) ============ */
+  const ICONS = {
+    creative: `<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20L14 10M14 10L20 4C20.5 6 19 8.5 17.5 10C16 11.5 13.5 13 12 13.5" /><path d="M12 13.5C10.5 14 8 14.5 6.5 14C7 15.5 8 16 10 16.5" /><circle cx="14" cy="10" r="0.6" fill="currentColor"/></svg>`,
+    physical: `<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="9" cy="7" rx="1.6" ry="2"/><ellipse cx="15.5" cy="12.5" rx="1.5" ry="2.1"/><path d="M9 9c-1 2-1.2 4-2 5.5-.6 1.2-1.5 2-1.5 3.5" /><path d="M15.5 14.5c.6 2 .3 3.5-.3 4.7-.5 1-1.7 1.3-2.7 1.3" /></svg>`,
+    mental: `<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5L13 13l-4.5 2.5L11 11l4.5-2.5z"/></svg>`,
+    endurance: `<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18L8 9l3 4 3-6 3 5 1 6" /><path d="M3 18h18"/></svg>`,
+    craft: `<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 6.5l3 3L8 19l-4 1 1-4z"/><path d="M13 8l3-3 3 3-3 3"/></svg>`,
+    mindfulness: `<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c-4-1-6-4-6-7 2 1 3 0 3-2-1 0-2-1-1.5-3 1.5.5 2.5 2 2.5 4 1-2 .5-4-1-6 2 0 4 2 4 5 0-3 1.5-4.5 3.5-5-1 2-1 4 0 5.5 1-1 1-2.5 0-3.5.8 1.7.8 3.3 0 5 1.2-.2 1.7-1 1.5-2.3.8 1.7.3 3.6-2 4.8-1 .5-2.5.8-4 .5z"/></svg>`
+  };
+
+  const CHECK_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>`;
+  const BACK_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>`;
+  const MARKER_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-11.5A7 7 0 0 0 5 9.5C5 14.5 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.2"/></svg>`;
+
+  /* ============ DATA ============ */
+  const CATS = {
+    creative:{label:'Creative'},
+    physical:{label:'Physical'},
+    mental:{label:'Mental'},
+    endurance:{label:'Endurance'},
+    craft:{label:'Craft'},
+    mindfulness:{label:'Mindfulness'}
+  };
+
+  const GOALS = [
+    {id:'novel', title:'Write a Novel', category:'creative', badgeName:'The Novelist',
+     blurb:'Turn a spark of an idea into a finished manuscript, one chapter at a time.',
+     subgoals:['Choose a story idea and genre','Outline the plot and main characters','Write the first chapter','Reach 10,000 words','Reach the halfway point','Finish the first full draft','Complete one full revision pass','Share it with a beta reader']},
+    {id:'handstand', title:'Learn to Handstand', category:'physical', badgeName:'The Balanced',
+     blurb:'Build the strength and balance to stand on your hands, unsupported.',
+     subgoals:['Build wrist and shoulder mobility','Hold a wall plank for 30 seconds','Practice wall walks','Hold chest-to-wall for 30 seconds','Attempt freestanding kick-ups','Hold freestanding for 5 seconds','Hold freestanding for 30 seconds','Press into a handstand from standing']},
+    {id:'instrument', title:'Learn an Instrument', category:'creative', badgeName:'The Musician',
+     blurb:'From first note to first real performance.',
+     subgoals:['Pick an instrument and get one','Learn basic posture and hold','Learn your first five notes or chords','Play a scale cleanly','Learn one full song','Play along with a recording','Play a song from memory','Perform for someone else']},
+    {id:'language', title:'Learn a New Language', category:'mental', badgeName:'The Polyglot',
+     blurb:'Move from silent letters to comfortable conversation.',
+     subgoals:['Learn the alphabet and sounds','Learn 100 common words','Hold a 1-minute basic conversation','Understand simple spoken sentences','Read a short children\u2019s book','Have a 10-minute conversation','Watch a show without subtitles','Catch yourself thinking in the language']},
+    {id:'ultra', title:'Run an Ultramarathon', category:'endurance', badgeName:'The Ultrarunner',
+     blurb:'Build from your first steady run to distances most people never attempt.',
+     subgoals:['Run a continuous 5K','Run a continuous 10K','Complete a half marathon','Complete a full marathon','Run back-to-back long training days','Practice running on trail terrain','Complete a 50K','Complete your target ultra distance']},
+    {id:'code', title:'Learn to Code', category:'craft', badgeName:'The Builder',
+     blurb:'Go from your first script to something someone else can actually use.',
+     subgoals:['Write your first "hello world"','Learn variables and loops','Write a small script that solves a real task','Learn functions and basic structure','Build a small project end-to-end','Learn to read someone else\u2019s code','Contribute to or share a project','Build something for someone else to use']},
+    {id:'draw', title:'Learn to Draw', category:'creative', badgeName:'The Illustrator',
+     blurb:'Train your eye and hand from basic shapes to a body of work.',
+     subgoals:['Draw simple shapes and lines daily','Learn basic perspective','Draw from observation, like a still life','Study light and shadow','Draw a full figure or portrait','Develop a personal style','Complete a small series of works','Share your work publicly']},
+    {id:'meditation', title:'Build a Meditation Practice', category:'mindfulness', badgeName:'The Still Mind',
+     blurb:'Grow a daily practice of sitting with your own mind.',
+     subgoals:['Sit for 2 minutes daily','Build a steady 10-minute daily habit','Try a guided body scan','Sit in silence for 20 minutes','Notice thoughts without judgment','Sit through real discomfort','Build a 30-day streak','Meditate in a group or class']},
+    {id:'speaking', title:'Get Comfortable Public Speaking', category:'mental', badgeName:'The Orator',
+     blurb:'Move from nervous rehearsal to speaking with real confidence.',
+     subgoals:['Practice speaking in front of a mirror','Record yourself speaking','Speak in front of one friend','Give a short talk to a small group','Field a question you didn\u2019t expect','Speak without notes','Give a talk to a larger audience','Speak live on a topic you\u2019re passionate about']},
+    {id:'cook', title:'Cook Like a Chef', category:'craft', badgeName:'The Chef',
+     blurb:'Build real kitchen instincts, from knife skills to your own recipes.',
+     subgoals:['Learn basic knife skills','Cook five staple recipes well','Learn to season by taste','Cook a full meal without a recipe','Master one cuisine\u2019s fundamentals','Host a dinner for others','Develop an original recipe','Cook a full multi-course meal']},
+    {id:'swim', title:'Learn to Swim Confidently', category:'physical', badgeName:'The Swimmer',
+     blurb:'From floating comfortably to swimming real distances.',
+     subgoals:['Get comfortable floating in water','Learn to breathe rhythmically','Swim one length of freestyle','Swim continuously for 5 minutes','Learn a second stroke','Swim 500m continuously','Try swimming in open water','Complete a swim event or distance goal']},
+    {id:'garden', title:'Grow a Garden', category:'craft', badgeName:'The Grower',
+     blurb:'From a single seed to a harvest you can share.',
+     subgoals:['Choose what you want to grow','Prepare the soil and plant','Care for it through first sprouts','Manage a pest or problem','Harvest your first crop','Grow something from seed to seed','Expand into a second growing season','Grow enough to share or preserve']},
+    {id:'chess', title:'Learn Chess', category:'mental', badgeName:'The Strategist',
+     blurb:'From knowing how the pieces move to genuinely improving your game.',
+     subgoals:['Learn how each piece moves','Play your first full game','Learn a few basic openings','Learn to spot simple tactics','Beat someone who used to beat you','Learn one endgame technique well','Study one of your own games','Reach a rating or skill milestone that matters to you']},
+    {id:'climb', title:'Climb a Mountain', category:'endurance', badgeName:'The Summiteer',
+     blurb:'Train up from a local trail to a real summit attempt.',
+     subgoals:['Hike a local trail','Hike a route with real elevation gain','Learn basic gear and layering','Do a longer training hike','Learn basic navigation and route reading','Attempt a moderate peak','Push through a weather or fatigue setback','Summit your target mountain']}
+  ];
+
+  const META_BADGES = [
+    {id:'first-steps', name:'First Steps', desc:'Complete your first waypoint.', test:s => s.totalCompleted >= 1},
+    {id:'trailblazer', name:'Trailblazer', desc:'Finish your first full trail.', test:s => s.completedGoals >= 1},
+    {id:'wanderer', name:'The Wanderer', desc:'Start 3 different trails.', test:s => s.startedGoals >= 3},
+    {id:'summit-collector', name:'Summit Collector', desc:'Finish 3 full trails.', test:s => s.completedGoals >= 3},
+    {id:'renaissance', name:'Renaissance Wanderer', desc:'Finish trails in 3+ categories.', test:s => s.categoriesCompleted >= 3},
+    {id:'full-compass', name:'Full Compass', desc:'Complete every trail.', test:s => s.completedGoals >= GOALS.length},
+  ];
+
+  /* ============ STATE / STORAGE ============ */
+  const STORAGE_KEY = 'goalquest-v1';
+
+  function loadState(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(raw) return JSON.parse(raw);
+    }catch(e){ /* ignore corrupt state */ }
+    const progress = {};
+    GOALS.forEach(g => progress[g.id] = new Array(g.subgoals.length).fill(false));
+    return {progress};
+  }
+
+  let state = loadState();
+  // ensure any goal shape changes are covered
+  GOALS.forEach(g => {
+    if(!state.progress[g.id]) state.progress[g.id] = new Array(g.subgoals.length).fill(false);
+  });
+
+  function saveState(){
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+    catch(e){ /* storage unavailable, continue silently */ }
+  }
+
+  function goalProgress(goal){
+    const arr = state.progress[goal.id];
+    const done = arr.filter(Boolean).length;
+    return {done, total: goal.subgoals.length, pct: Math.round((done/goal.subgoals.length)*100)};
+  }
+
+  function computeBadgeStats(){
+    let totalCompleted = 0, startedGoals = 0, completedGoals = 0;
+    const catsCompleted = new Set();
+    GOALS.forEach(g => {
+      const {done, total} = goalProgress(g);
+      totalCompleted += done;
+      if(done > 0) startedGoals++;
+      if(done === total){ completedGoals++; catsCompleted.add(g.category); }
+    });
+    return {totalCompleted, startedGoals, completedGoals, categoriesCompleted: catsCompleted.size};
+  }
+
+  function earnedMetaBadges(){
+    const stats = computeBadgeStats();
+    return META_BADGES.map(b => ({...b, earned: b.test(stats)}));
+  }
+
+  /* ============ ROUTING ============ */
+  let route = {view:'home', goalId:null};
+  let activeFilter = 'all';
+
+  const app = document.getElementById('app');
+
+  function go(newRoute){
+    route = newRoute;
+    window.scrollTo({top:0, behavior:'instant' in window ? 'instant' : 'auto'});
+    render();
+  }
+
+  /* ============ RENDER: HEADER ============ */
+  function renderHeader(){
+    return `
+      <header class="site-header">
+        <button class="brand" data-action="go-home" aria-label="Go to trail gallery">
+          <svg class="brand-mark" viewBox="0 0 40 40" fill="none">
+            <circle cx="20" cy="20" r="18.5" stroke="#3c332a" stroke-width="1.3" fill="#e8ddc2"/>
+            <path d="M8 24L15 12L20 20L25 9L32 24" stroke="#6f8a5a" stroke-width="1.8" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+            <circle cx="20" cy="20" r="1.6" fill="#a85a36"/>
+          </svg>
+          <span class="brand-text">
+            <span class="title">Goal Quest</span>
+            <span class="sub">Chart your trails</span>
+          </span>
+        </button>
+        <div class="nav-actions">
+          <button class="pill-btn" data-action="go-badges">
+            ${MARKER_ICON}
+            Badges
+          </button>
+        </div>
+      </header>
+    `;
+  }
+
+  /* ============ RENDER: HOME ============ */
+  function renderHome(){
+    const cats = ['all', ...Object.keys(CATS)];
+    const filtered = activeFilter === 'all' ? GOALS : GOALS.filter(g => g.category === activeFilter);
+
+    const cards = filtered.map(g => {
+      const {done, total, pct} = goalProgress(g);
+      return `
+        <div class="goal-card" tabindex="0" role="button" data-action="open-goal" data-goal="${g.id}" aria-label="Open trail: ${g.title}, ${pct} percent complete">
+          <div class="top-row">
+            <div class="cat-icon">${ICONS[g.category]}</div>
+          </div>
+          <div>
+            <span class="cat-tag">${CATS[g.category].label}</span>
+            <h3>${g.title}</h3>
+          </div>
+          <p class="blurb">${g.blurb}</p>
+          <div>
+            <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+            <div class="progress-label"><span>${done}/${total} waypoints</span><span>${pct}%</span></div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    return `
+      <div class="gallery-intro">
+        <span class="eyebrow">Trailhead</span>
+        <h2>Pick a trail. Start wherever you already are.</h2>
+        <p>Every big goal is really a path of smaller waypoints. Browse the trails below, jump in at whatever point fits you, and mark off what you've already covered.</p>
+      </div>
+      <div class="filter-row">
+        ${cats.map(c => `<button class="filter-chip ${activeFilter===c?'active':''}" data-action="filter" data-cat="${c}">${c==='all' ? 'All trails' : CATS[c].label}</button>`).join('')}
+      </div>
+      <div class="goal-grid">
+        ${filtered.length ? cards : `<div class="empty-state">No trails in this category yet.</div>`}
+      </div>
+      <footer class="note">Your progress is saved right in this browser — no account needed.</footer>
+    `;
+  }
+
+  /* ============ RENDER: DETAIL ============ */
+  function renderDetail(goalId){
+    const goal = GOALS.find(g => g.id === goalId);
+    if(!goal) { go({view:'home', goalId:null}); return ''; }
+    const {done, total, pct} = goalProgress(goal);
+    const arr = state.progress[goal.id];
+
+    // build zigzag waypoint coordinates
+    const colX = [95, 245];
+    const rowGap = 108;
+    const topPad = 60;
+    const points = goal.subgoals.map((title, i) => ({
+      x: colX[i % 2],
+      y: topPad + i * rowGap,
+      title, i
+    }));
+    const svgHeight = topPad + (points.length - 1) * rowGap + 70;
+
+    // segments between consecutive points
+    let segments = '';
+    for(let i = 0; i < points.length - 1; i++){
+      const a = points[i], b = points[i+1];
+      const midY = (a.y + b.y) / 2;
+      const d = `M ${a.x} ${a.y} C ${a.x} ${midY}, ${b.x} ${midY}, ${b.x} ${b.y}`;
+      const filled = arr[i+1]; // segment "arrives" when the next waypoint is done
+      segments += `<path d="${d}" fill="none" stroke="${filled ? 'var(--moss)' : 'var(--line)'}"
+        stroke-width="${filled ? 3 : 2}" stroke-dasharray="${filled ? 'none' : '2 8'}" stroke-linecap="round"/>`;
+    }
+
+    // waypoints
+    let waypoints = '';
+    const lastDoneIdx = arr.reduce((acc, v, i) => v ? i : acc, -1);
+    points.forEach((p, i) => {
+      const isDone = arr[i];
+      const isCurrent = i === lastDoneIdx + 1 && !isDone;
+      const labelSide = p.x < 170 ? 'end' : 'start';
+      const labelX = p.x < 170 ? p.x - 28 : p.x + 28;
+      const titleLines = wrapLabel(p.title, 26);
+
+      waypoints += `
+        <g class="waypoint-group" tabindex="0" role="button"
+           aria-pressed="${isDone}"
+           aria-label="${p.title}, ${isDone ? 'completed' : 'not completed'}"
+           data-action="toggle-sub" data-goal="${goal.id}" data-idx="${i}">
+          <circle class="wp-outer" cx="${p.x}" cy="${p.y}" r="16"
+            fill="${isDone ? 'var(--gold)' : '#f2ead6'}"
+            stroke="${isDone ? 'var(--gold)' : (isCurrent ? 'var(--clay-bright)' : 'var(--line)')}"
+            stroke-width="${isCurrent ? 2.4 : 1.6}"/>
+          ${isDone ? `<g transform="translate(${p.x-7},${p.y-7}) scale(0.6)"><path d="M5 13l4 4L19 7" fill="none" stroke="#3c332a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>`
+                    : `<text x="${p.x}" y="${p.y+4}" text-anchor="middle" class="wp-label-num">${i+1}</text>`}
+          <text x="${labelX}" y="${p.y - 6}" text-anchor="${labelSide}" class="wp-label-title">
+            ${titleLines.map((line,li) => `<tspan x="${labelX}" dy="${li===0?0:16}">${escapeXml(line)}</tspan>`).join('')}
+          </text>
+          ${isCurrent ? `<text x="${labelX}" y="${p.y + 16 + (titleLines.length-1)*16}" text-anchor="${labelSide}" class="wp-hint">you are here</text>` : ''}
+        </g>
+      `;
+    });
+
+    const completeBanner = (done === total) ? `
+      <div class="complete-banner">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.6"><circle cx="12" cy="9" r="6"/><path d="M9 14.5L7 21l5-3 5 3-2-6.5"/></svg>
+        <div>
+          <strong>Trail complete — you've earned "${goal.badgeName}"</strong>
+          <span>Check your badge collection to see it alongside the rest of your journeys.</span>
+        </div>
+      </div>
+    ` : '';
+
+    return `
+      <button class="back-link" data-action="go-home">${BACK_ICON} All trails</button>
+      <div class="detail-header">
+        <div class="cat-icon">${ICONS[goal.category]}</div>
+        <div class="detail-title">
+          <span class="cat-tag">${CATS[goal.category].label}</span>
+          <h2>${goal.title}</h2>
+          <p class="detail-blurb">${goal.blurb}</p>
+        </div>
+      </div>
+      <div class="detail-progress-summary">
+        <span>${done}/${total} waypoints</span>
+        <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+        <span>${pct}%</span>
+      </div>
+      ${completeBanner}
+      <div class="trail-wrap">
+        <svg class="trail-svg" viewBox="0 0 340 ${svgHeight}" xmlns="http://www.w3.org/2000/svg">
+          ${segments}
+          ${waypoints}
+        </svg>
+      </div>
+    `;
+  }
+
+  function wrapLabel(text, maxChars){
+    const words = text.split(' ');
+    const lines = [];
+    let cur = '';
+    words.forEach(w => {
+      if((cur + ' ' + w).trim().length > maxChars){
+        lines.push(cur.trim());
+        cur = w;
+      } else {
+        cur = (cur + ' ' + w).trim();
+      }
+    });
+    if(cur) lines.push(cur);
+    return lines;
+  }
+
+  function escapeXml(s){
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  /* ============ RENDER: BADGES ============ */
+  function renderBadges(){
+    const meta = earnedMetaBadges();
+    const earnedMetaCount = meta.filter(b => b.earned).length;
+
+    const goalBadges = GOALS.map(g => {
+      const {done, total} = goalProgress(g);
+      const earned = done === total;
+      return {
+        earned,
+        name: g.badgeName,
+        desc: `Complete the "${g.title}" trail.`,
+        icon: ICONS[g.category]
+      };
+    });
+    const earnedGoalCount = goalBadges.filter(b => b.earned).length;
+
+    function sealHtml(iconSvg, locked){
+      return `<div class="seal ${locked ? 'locked' : ''}">${iconSvg}</div>`;
+    }
+
+    const metaHtml = meta.map(b => `
+      <div class="badge ${b.earned ? '' : 'locked'}">
+        ${sealHtml(MARKER_ICON, !b.earned)}
+        <span class="badge-name">${b.name}</span>
+        <span class="badge-desc">${b.desc}</span>
+      </div>
+    `).join('');
+
+    const goalHtml = goalBadges.map(b => `
+      <div class="badge ${b.earned ? '' : 'locked'}">
+        ${sealHtml(b.icon, !b.earned)}
+        <span class="badge-name">${b.name}</span>
+        <span class="badge-desc">${b.desc}</span>
+      </div>
+    `).join('');
+
+    return `
+      <button class="back-link" data-action="go-home">${BACK_ICON} All trails</button>
+      <div class="badges-header">
+        <h2>Your Badge Collection</h2>
+        <p>Milestone seals for the way you travel, and a badge for every trail you finish.</p>
+        <span class="badge-count">${earnedMetaCount + earnedGoalCount} / ${meta.length + goalBadges.length} earned</span>
+      </div>
+      <h3 style="font-size:1rem; font-weight:600; margin:26px 0 4px; color:var(--bark-soft); text-transform:uppercase; letter-spacing:0.08em; font-family:'Archivo',sans-serif;">Journey milestones</h3>
+      <div class="badge-grid">${metaHtml}</div>
+      <h3 style="font-size:1rem; font-weight:600; margin:34px 0 4px; color:var(--bark-soft); text-transform:uppercase; letter-spacing:0.08em; font-family:'Archivo',sans-serif;">Trail badges</h3>
+      <div class="badge-grid">${goalHtml}</div>
+      <footer class="note">Badges update automatically as you check off waypoints.</footer>
+    `;
+  }
+
+  /* ============ MAIN RENDER ============ */
+  function render(){
+    let body = '';
+    if(route.view === 'home') body = renderHome();
+    else if(route.view === 'detail') body = renderDetail(route.goalId);
+    else if(route.view === 'badges') body = renderBadges();
+
+    app.innerHTML = renderHeader() + body;
+  }
+
+  /* ============ EVENTS ============ */
+  app.addEventListener('click', (e) => {
+    const el = e.target.closest('[data-action]');
+    if(!el) return;
+    handleAction(el);
+  });
+  app.addEventListener('keydown', (e) => {
+    if(e.key !== 'Enter' && e.key !== ' ') return;
+    const el = e.target.closest('[data-action]');
+    if(!el) return;
+    e.preventDefault();
+    handleAction(el);
+  });
+
+  function handleAction(el){
+    const action = el.getAttribute('data-action');
+    if(action === 'go-home'){ go({view:'home', goalId:null}); }
+    else if(action === 'go-badges'){ go({view:'badges', goalId:null}); }
+    else if(action === 'open-goal'){ go({view:'detail', goalId: el.getAttribute('data-goal')}); }
+    else if(action === 'filter'){ activeFilter = el.getAttribute('data-cat'); render(); }
+    else if(action === 'toggle-sub'){
+      const goalId = el.getAttribute('data-goal');
+      const idx = parseInt(el.getAttribute('data-idx'), 10);
+      state.progress[goalId][idx] = !state.progress[goalId][idx];
+      saveState();
+      render();
+    }
+  }
+
+  render();
+})();
+</script>
+</body>
+</html>
