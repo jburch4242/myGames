@@ -27,6 +27,7 @@
 
   *{box-sizing:border-box;}
   html{scroll-behavior:smooth;}
+  html, body{overflow-x:hidden; max-width:100%;}
 
   @media (prefers-reduced-motion: reduce){
     *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; scroll-behavior:auto !important;}
@@ -194,15 +195,33 @@
   }
   .detail-progress-summary .progress-track{flex-grow:1; max-width:260px; height:8px;}
 
-  .trail-wrap{margin-top:10px;}
-  .trail-svg{width:100%; height:auto; display:block;}
+  .trail-wrap{margin-top:18px; max-width:520px;}
+  .trail-item{display:flex; gap:16px; align-items:stretch;}
+  .wp-col{display:flex; flex-direction:column; align-items:center; width:38px; flex-shrink:0;}
+  .wp-marker{
+    width:38px; height:38px; border-radius:50%; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--parchment); border:1.6px solid var(--line);
+    font-family:'Fraunces', serif; font-weight:700; font-size:0.85rem; color:var(--bark-soft);
+    transition:background .18s ease, border-color .18s ease, transform .18s ease;
+  }
+  .wp-marker svg{width:16px; height:16px; stroke:#3c332a;}
+  .wp-marker.done{background:var(--gold); border-color:var(--gold);}
+  .wp-marker.current{border-color:var(--clay-bright); border-width:2.2px; color:var(--clay-bright);}
+  .wp-connector{width:2px; flex-grow:1; min-height:22px; background:var(--line); margin:2px 0;}
+  .wp-connector.filled{background:var(--moss); width:3px;}
 
-  .waypoint-group{cursor:pointer;}
-  .waypoint-group:focus-visible circle.wp-outer{outline:3px solid var(--clay-bright); outline-offset:2px;}
+  .trail-item{cursor:pointer; outline-offset:4px;}
+  .trail-item:focus-visible{outline:3px solid var(--clay-bright); border-radius:4px;}
+  .trail-item:hover .wp-marker{transform:scale(1.06);}
 
-  .wp-label-title{font-family:'Archivo', sans-serif; font-weight:600; font-size:15px; fill:var(--bark);}
-  .wp-label-num{font-family:'Fraunces', serif; font-weight:700; font-size:11px; fill:var(--bark-soft);}
-  .wp-hint{font-family:'Archivo', sans-serif; font-size:11px; fill:var(--bark-soft); font-style:italic;}
+  .wp-content{min-width:0; flex-grow:1; padding-bottom:26px;}
+  .wp-title{
+    font-family:'Archivo', sans-serif; font-weight:600; font-size:0.98rem; line-height:1.4;
+    color:var(--bark); word-wrap:break-word; overflow-wrap:break-word; padding-top:6px;
+  }
+  .trail-item.is-done .wp-title{color:var(--bark-soft); text-decoration:line-through; text-decoration-color:var(--moss-dim); text-decoration-thickness:1.5px;}
+  .wp-hint{font-family:'Archivo', sans-serif; font-size:0.76rem; font-style:italic; color:var(--clay-bright); margin-top:4px;}
 
   .complete-banner{
     margin-top:26px; padding:20px 22px; border-radius:var(--radius);
@@ -255,10 +274,99 @@
     margin-top:60px; text-align:center; font-size:0.76rem; color:var(--bark-soft); padding-top:18px; border-top:1px solid var(--line);
   }
 
+  /* ---------- Manage dashboard ---------- */
+  .manage-header{margin-bottom:22px;}
+  .manage-header h2{font-size:1.8rem; font-weight:600; margin-bottom:8px;}
+  .manage-header p{color:var(--bark-soft); max-width:560px; line-height:1.5; margin-bottom:16px;}
+
+  .manage-list{display:flex; flex-direction:column; gap:10px;}
+  .manage-row{
+    display:flex; align-items:center; gap:14px;
+    background:rgba(255,255,255,0.55);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:12px 16px;
+  }
+  .manage-row-icon{width:38px; height:38px; flex-shrink:0;}
+  .manage-row-icon svg{width:18px; height:18px;}
+  .manage-row-info{display:flex; flex-direction:column; gap:2px; flex-grow:1; min-width:0;}
+  .manage-row-info strong{font-family:'Fraunces', serif; font-size:1rem; font-weight:600;}
+  .manage-row-info span{font-size:0.78rem; color:var(--bark-soft);}
+  .manage-row-actions{display:flex; gap:8px; flex-shrink:0;}
+
+  .btn-small{
+    display:inline-flex; align-items:center; gap:6px;
+    background:transparent; border:1.4px solid var(--line); color:var(--forest-deep);
+    padding:7px 12px; border-radius:6px; font-size:0.8rem; font-weight:600; cursor:pointer;
+    transition:background .16s ease, border-color .16s ease;
+  }
+  .btn-small:hover{background:var(--sand); border-color:var(--bark-soft);}
+  .btn-small svg{width:14px; height:14px;}
+  .btn-danger{color:var(--clay);}
+  .btn-danger:hover{background:rgba(168,90,54,0.12); border-color:var(--clay);}
+  .btn-add{margin-top:10px;}
+
+  .goal-form{
+    background:rgba(255,255,255,0.55);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:22px 22px 20px;
+    max-width:560px;
+    display:flex; flex-direction:column; gap:16px;
+  }
+  .form-label{
+    display:flex; flex-direction:column; gap:6px;
+    font-size:0.84rem; font-weight:600; color:var(--forest-deep);
+  }
+  .form-hint{font-weight:500; color:var(--bark-soft); font-size:0.76rem;}
+  .text-input{
+    font-family:'Archivo', sans-serif; font-size:0.92rem; font-weight:400; color:var(--bark);
+    border:1.4px solid var(--line); border-radius:6px; padding:9px 11px;
+    background:rgba(255,255,255,0.7);
+    resize:vertical;
+  }
+  .text-input:focus-visible{outline:2.5px solid var(--clay-bright); outline-offset:1px;}
+
+  .new-cat-panel{
+    display:flex; flex-direction:column; gap:10px;
+    padding:14px; border:1px dashed var(--line); border-radius:6px;
+    background:rgba(232,221,194,0.35); margin-top:-6px;
+  }
+  .icon-picker{display:flex; gap:8px; flex-wrap:wrap;}
+  .icon-swatch{
+    width:38px; height:38px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--sand); border:1.6px solid var(--line); cursor:pointer;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .icon-swatch svg{width:18px; height:18px; stroke:var(--forest-deep);}
+  .icon-swatch.selected{border-color:var(--clay-bright); background:#fff; border-width:2.2px;}
+
+  .subgoal-edit-list{display:flex; flex-direction:column; gap:8px;}
+  .subgoal-edit-row{display:flex; align-items:center; gap:8px;}
+  .subgoal-num{
+    width:22px; flex-shrink:0; text-align:center; font-family:'Fraunces', serif;
+    font-weight:700; font-size:0.82rem; color:var(--bark-soft);
+  }
+  .subgoal-edit-row .text-input{flex-grow:1; min-width:0;}
+  .subgoal-edit-actions{display:flex; gap:4px; flex-shrink:0;}
+  .icon-btn{
+    width:30px; height:30px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    border:1.4px solid var(--line); border-radius:6px; background:rgba(255,255,255,0.6); cursor:pointer;
+    transition:background .15s ease;
+  }
+  .icon-btn svg{width:14px; height:14px; stroke:var(--forest-deep);}
+  .icon-btn:hover:not(:disabled){background:var(--sand);}
+  .icon-btn:disabled{opacity:0.35; cursor:default;}
+
+  .form-actions{display:flex; align-items:center; gap:16px; margin-top:4px;}
+
   @media (max-width: 480px){
     .brand-text .title{font-size:1.25rem;}
     .gallery-intro h2{font-size:1.55rem;}
     .detail-title h2{font-size:1.5rem;}
+    .manage-row{flex-wrap:wrap;}
   }
 </style>
 </head>
@@ -281,9 +389,14 @@
   const CHECK_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>`;
   const BACK_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>`;
   const MARKER_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-11.5A7 7 0 0 0 5 9.5C5 14.5 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.2"/></svg>`;
+  const GEAR_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 13.5a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.04 1.56V19.5a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1.04-1.56 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.56-1.04H4.5a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.56-1.04 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34H10.5a1.7 1.7 0 0 0 1.04-1.56V4.5a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1.04 1.56 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87V10.5a1.7 1.7 0 0 0 1.56 1.04H19.5a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.56 1.04z"/></svg>`;
+  const PLUS_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>`;
+  const TRASH_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4.5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1V7M18 7l-.8 12.4a2 2 0 0 1-2 1.6H8.8a2 2 0 0 1-2-1.6L6 7"/></svg>`;
+  const UP_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg>`;
+  const DOWN_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>`;
 
   /* ============ DATA ============ */
-  const CATS = {
+  const DEFAULT_CATS = {
     creative:{label:'Creative'},
     physical:{label:'Physical'},
     mental:{label:'Mental'},
@@ -292,7 +405,24 @@
     mindfulness:{label:'Mindfulness'}
   };
 
-  const GOALS = [
+  // Shapes available for custom categories (reuses the hand-drawn icon set)
+  const ICON_SHAPES = [
+    {key:'creative', label:'Quill'},
+    {key:'physical', label:'Runner'},
+    {key:'mental', label:'Compass'},
+    {key:'endurance', label:'Peaks'},
+    {key:'craft', label:'Tools'},
+    {key:'mindfulness', label:'Leaf'}
+  ];
+
+  function iconFor(catId){
+    if(ICONS[catId]) return ICONS[catId];
+    const shapeKey = customCatShapes[catId];
+    if(shapeKey && ICONS[shapeKey]) return ICONS[shapeKey];
+    return ICONS.creative;
+  }
+
+  const DEFAULT_GOALS = [
     {id:'novel', title:'Write a Novel', category:'creative', badgeName:'The Novelist',
      blurb:'Turn a spark of an idea into a finished manuscript, one chapter at a time.',
      subgoals:['Choose a story idea and genre','Outline the plot and main characters','Write the first chapter','Reach 10,000 words','Reach the halfway point','Finish the first full draft','Complete one full revision pass','Share it with a beta reader']},
@@ -336,6 +466,53 @@
      blurb:'Train up from a local trail to a real summit attempt.',
      subgoals:['Hike a local trail','Hike a route with real elevation gain','Learn basic gear and layering','Do a longer training hike','Learn basic navigation and route reading','Attempt a moderate peak','Push through a weather or fatigue setback','Summit your target mountain']}
   ];
+
+  /* ============ CUSTOM GOALS / CATEGORIES STORAGE ============ */
+  const GOALS_KEY = 'goalquest-goals-v2';
+  const CATS_KEY = 'goalquest-cats-v2';
+
+  function loadGoals(){
+    try{
+      const raw = localStorage.getItem(GOALS_KEY);
+      if(raw) return JSON.parse(raw);
+    }catch(e){ /* ignore corrupt data */ }
+    return DEFAULT_GOALS.map(g => ({...g, subgoals:[...g.subgoals]}));
+  }
+  function saveGoals(){
+    try{ localStorage.setItem(GOALS_KEY, JSON.stringify(GOALS)); }
+    catch(e){ /* storage unavailable, continue silently */ }
+  }
+
+  function loadCats(){
+    try{
+      const raw = localStorage.getItem(CATS_KEY);
+      if(raw){
+        const parsed = JSON.parse(raw);
+        return {cats: parsed.cats || {}, shapes: parsed.shapes || {}};
+      }
+    }catch(e){ /* ignore corrupt data */ }
+    return {cats: {...DEFAULT_CATS}, shapes: {}};
+  }
+  function saveCats(){
+    try{ localStorage.setItem(CATS_KEY, JSON.stringify({cats: CATS, shapes: customCatShapes})); }
+    catch(e){ /* storage unavailable, continue silently */ }
+  }
+
+  let GOALS = loadGoals();
+  const catsData = loadCats();
+  let CATS = catsData.cats;
+  let customCatShapes = catsData.shapes;
+
+  function slugify(str){
+    let base = str.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    if(!base) base = 'item';
+    return base;
+  }
+  function uniqueId(base, existingIds){
+    let id = base, n = 2;
+    while(existingIds.includes(id)){ id = `${base}-${n}`; n++; }
+    return id;
+  }
 
   const META_BADGES = [
     {id:'first-steps', name:'First Steps', desc:'Complete your first waypoint.', test:s => s.totalCompleted >= 1},
@@ -396,13 +573,42 @@
   /* ============ ROUTING ============ */
   let route = {view:'home', goalId:null};
   let activeFilter = 'all';
+  let draft = null; // goal currently being created/edited in the Manage view
 
   const app = document.getElementById('app');
 
   function go(newRoute){
     route = newRoute;
+    draft = null;
     window.scrollTo({top:0, behavior:'instant' in window ? 'instant' : 'auto'});
     render();
+  }
+
+  function blankDraft(){
+    const firstCat = Object.keys(CATS)[0] || 'creative';
+    return {
+      originalId: null,
+      title: '',
+      category: firstCat,
+      blurb: '',
+      badgeName: '',
+      subgoals: [''],
+      newCatLabel: '',
+      newCatShape: ICON_SHAPES[0].key
+    };
+  }
+
+  function draftFromGoal(goal){
+    return {
+      originalId: goal.id,
+      title: goal.title,
+      category: goal.category,
+      blurb: goal.blurb,
+      badgeName: goal.badgeName,
+      subgoals: [...goal.subgoals],
+      newCatLabel: '',
+      newCatShape: ICON_SHAPES[0].key
+    };
   }
 
   /* ============ RENDER: HEADER ============ */
@@ -421,6 +627,14 @@
           </span>
         </button>
         <div class="nav-actions">
+          <a class="pill-btn" href="/index.html">
+            ${BACK_ICON}
+            BTG
+          </a>
+          <button class="pill-btn" data-action="go-manage">
+            ${GEAR_ICON}
+            Manage
+          </button>
           <button class="pill-btn" data-action="go-badges">
             ${MARKER_ICON}
             Badges
@@ -438,15 +652,15 @@
     const cards = filtered.map(g => {
       const {done, total, pct} = goalProgress(g);
       return `
-        <div class="goal-card" tabindex="0" role="button" data-action="open-goal" data-goal="${g.id}" aria-label="Open trail: ${g.title}, ${pct} percent complete">
+        <div class="goal-card" tabindex="0" role="button" data-action="open-goal" data-goal="${g.id}" aria-label="Open trail: ${escapeXml(g.title)}, ${pct} percent complete">
           <div class="top-row">
-            <div class="cat-icon">${ICONS[g.category]}</div>
+            <div class="cat-icon">${iconFor(g.category)}</div>
           </div>
           <div>
-            <span class="cat-tag">${CATS[g.category].label}</span>
-            <h3>${g.title}</h3>
+            <span class="cat-tag">${escapeXml(CATS[g.category] ? CATS[g.category].label : g.category)}</span>
+            <h3>${escapeXml(g.title)}</h3>
           </div>
-          <p class="blurb">${g.blurb}</p>
+          <p class="blurb">${escapeXml(g.blurb)}</p>
           <div>
             <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
             <div class="progress-label"><span>${done}/${total} waypoints</span><span>${pct}%</span></div>
@@ -478,62 +692,37 @@
     const {done, total, pct} = goalProgress(goal);
     const arr = state.progress[goal.id];
 
-    // build zigzag waypoint coordinates
-    const colX = [95, 245];
-    const rowGap = 108;
-    const topPad = 60;
-    const points = goal.subgoals.map((title, i) => ({
-      x: colX[i % 2],
-      y: topPad + i * rowGap,
-      title, i
-    }));
-    const svgHeight = topPad + (points.length - 1) * rowGap + 70;
-
-    // segments between consecutive points
-    let segments = '';
-    for(let i = 0; i < points.length - 1; i++){
-      const a = points[i], b = points[i+1];
-      const midY = (a.y + b.y) / 2;
-      const d = `M ${a.x} ${a.y} C ${a.x} ${midY}, ${b.x} ${midY}, ${b.x} ${b.y}`;
-      const filled = arr[i+1]; // segment "arrives" when the next waypoint is done
-      segments += `<path d="${d}" fill="none" stroke="${filled ? 'var(--moss)' : 'var(--line)'}"
-        stroke-width="${filled ? 3 : 2}" stroke-dasharray="${filled ? 'none' : '2 8'}" stroke-linecap="round"/>`;
-    }
-
-    // waypoints
-    let waypoints = '';
     const lastDoneIdx = arr.reduce((acc, v, i) => v ? i : acc, -1);
-    points.forEach((p, i) => {
+
+    const trailItems = goal.subgoals.map((title, i) => {
       const isDone = arr[i];
       const isCurrent = i === lastDoneIdx + 1 && !isDone;
-      const labelSide = p.x < 170 ? 'end' : 'start';
-      const labelX = p.x < 170 ? p.x - 28 : p.x + 28;
-      const titleLines = wrapLabel(p.title, 26);
-
-      waypoints += `
-        <g class="waypoint-group" tabindex="0" role="button"
-           aria-pressed="${isDone}"
-           aria-label="${p.title}, ${isDone ? 'completed' : 'not completed'}"
-           data-action="toggle-sub" data-goal="${goal.id}" data-idx="${i}">
-          <circle class="wp-outer" cx="${p.x}" cy="${p.y}" r="16"
-            fill="${isDone ? 'var(--gold)' : '#f2ead6'}"
-            stroke="${isDone ? 'var(--gold)' : (isCurrent ? 'var(--clay-bright)' : 'var(--line)')}"
-            stroke-width="${isCurrent ? 2.4 : 1.6}"/>
-          ${isDone ? `<g transform="translate(${p.x-7},${p.y-7}) scale(0.6)"><path d="M5 13l4 4L19 7" fill="none" stroke="#3c332a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>`
-                    : `<text x="${p.x}" y="${p.y+4}" text-anchor="middle" class="wp-label-num">${i+1}</text>`}
-          <text x="${labelX}" y="${p.y - 6}" text-anchor="${labelSide}" class="wp-label-title">
-            ${titleLines.map((line,li) => `<tspan x="${labelX}" dy="${li===0?0:16}">${escapeXml(line)}</tspan>`).join('')}
-          </text>
-          ${isCurrent ? `<text x="${labelX}" y="${p.y + 16 + (titleLines.length-1)*16}" text-anchor="${labelSide}" class="wp-hint">you are here</text>` : ''}
-        </g>
+      const isLast = i === goal.subgoals.length - 1;
+      const connectorFilled = arr[i+1]; // the stretch leading into the next completed waypoint
+      return `
+        <div class="trail-item ${isDone ? 'is-done' : ''}" tabindex="0" role="button"
+             aria-pressed="${isDone}"
+             aria-label="${escapeXml(title)}, ${isDone ? 'completed' : 'not completed'}"
+             data-action="toggle-sub" data-goal="${goal.id}" data-idx="${i}">
+          <div class="wp-col">
+            <div class="wp-marker ${isDone ? 'done' : ''} ${isCurrent ? 'current' : ''}">
+              ${isDone ? CHECK_ICON : (i+1)}
+            </div>
+            ${!isLast ? `<div class="wp-connector ${connectorFilled ? 'filled' : ''}"></div>` : ''}
+          </div>
+          <div class="wp-content">
+            <div class="wp-title">${escapeXml(title)}</div>
+            ${isCurrent ? `<div class="wp-hint">you are here</div>` : ''}
+          </div>
+        </div>
       `;
-    });
+    }).join('');
 
     const completeBanner = (done === total) ? `
       <div class="complete-banner">
         <svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.6"><circle cx="12" cy="9" r="6"/><path d="M9 14.5L7 21l5-3 5 3-2-6.5"/></svg>
         <div>
-          <strong>Trail complete — you've earned "${goal.badgeName}"</strong>
+          <strong>Trail complete — you've earned "${escapeXml(goal.badgeName)}"</strong>
           <span>Check your badge collection to see it alongside the rest of your journeys.</span>
         </div>
       </div>
@@ -542,11 +731,11 @@
     return `
       <button class="back-link" data-action="go-home">${BACK_ICON} All trails</button>
       <div class="detail-header">
-        <div class="cat-icon">${ICONS[goal.category]}</div>
+        <div class="cat-icon">${iconFor(goal.category)}</div>
         <div class="detail-title">
-          <span class="cat-tag">${CATS[goal.category].label}</span>
-          <h2>${goal.title}</h2>
-          <p class="detail-blurb">${goal.blurb}</p>
+          <span class="cat-tag">${escapeXml(CATS[goal.category] ? CATS[goal.category].label : goal.category)}</span>
+          <h2>${escapeXml(goal.title)}</h2>
+          <p class="detail-blurb">${escapeXml(goal.blurb)}</p>
         </div>
       </div>
       <div class="detail-progress-summary">
@@ -556,32 +745,123 @@
       </div>
       ${completeBanner}
       <div class="trail-wrap">
-        <svg class="trail-svg" viewBox="0 0 340 ${svgHeight}" xmlns="http://www.w3.org/2000/svg">
-          ${segments}
-          ${waypoints}
-        </svg>
+        ${trailItems}
       </div>
     `;
   }
 
-  function wrapLabel(text, maxChars){
-    const words = text.split(' ');
-    const lines = [];
-    let cur = '';
-    words.forEach(w => {
-      if((cur + ' ' + w).trim().length > maxChars){
-        lines.push(cur.trim());
-        cur = w;
-      } else {
-        cur = (cur + ' ' + w).trim();
-      }
-    });
-    if(cur) lines.push(cur);
-    return lines;
-  }
-
   function escapeXml(s){
     return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  /* ============ RENDER: MANAGE ============ */
+  function renderManage(){
+    if(draft){
+      return renderGoalForm();
+    }
+
+    const rows = GOALS.map(g => {
+      const {done, total} = goalProgress(g);
+      const catLabel = CATS[g.category] ? CATS[g.category].label : g.category;
+      return `
+        <div class="manage-row">
+          <div class="cat-icon manage-row-icon">${iconFor(g.category)}</div>
+          <div class="manage-row-info">
+            <strong>${escapeXml(g.title)}</strong>
+            <span>${escapeXml(catLabel)} · ${total} waypoint${total===1?'':'s'} · ${done}/${total} done</span>
+          </div>
+          <div class="manage-row-actions">
+            <button class="btn-small" data-action="edit-goal" data-goal="${g.id}">Edit</button>
+            <button class="btn-small btn-danger" data-action="delete-goal" data-goal="${g.id}">${TRASH_ICON}</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    return `
+      <button class="back-link" data-action="go-home">${BACK_ICON} All trails</button>
+      <div class="manage-header">
+        <h2>Manage Your Trails</h2>
+        <p>Create your own goals, add waypoints, or edit and reorder anything already here.</p>
+        <button class="pill-btn" data-action="new-goal">${PLUS_ICON} New trail</button>
+      </div>
+      <div class="manage-list">
+        ${rows || `<div class="empty-state">No trails yet. Create your first one.</div>`}
+      </div>
+    `;
+  }
+
+  function renderGoalForm(){
+    const isEditing = !!draft.originalId;
+    const catOptions = Object.keys(CATS).map(id =>
+      `<option value="${id}" ${draft.category===id ? 'selected' : ''}>${escapeXml(CATS[id].label)}</option>`
+    ).join('');
+
+    const subgoalRows = draft.subgoals.map((sg, i) => `
+      <div class="subgoal-edit-row">
+        <span class="subgoal-num">${i+1}</span>
+        <input type="text" class="text-input" data-field="subgoal" data-idx="${i}" value="${escapeXml(sg)}" placeholder="Waypoint ${i+1}" />
+        <div class="subgoal-edit-actions">
+          <button type="button" class="icon-btn" data-action="move-sub-up" data-idx="${i}" ${i===0 ? 'disabled' : ''} aria-label="Move up">${UP_ICON}</button>
+          <button type="button" class="icon-btn" data-action="move-sub-down" data-idx="${i}" ${i===draft.subgoals.length-1 ? 'disabled' : ''} aria-label="Move down">${DOWN_ICON}</button>
+          <button type="button" class="icon-btn" data-action="remove-sub" data-idx="${i}" ${draft.subgoals.length<=1 ? 'disabled' : ''} aria-label="Remove waypoint">${TRASH_ICON}</button>
+        </div>
+      </div>
+    `).join('');
+
+    const newCatPanel = draft.category === '__new__' ? `
+      <div class="new-cat-panel">
+        <label class="form-label">New category name
+          <input type="text" class="text-input" data-field="newCatLabel" value="${escapeXml(draft.newCatLabel)}" placeholder="e.g. Career" />
+        </label>
+        <div class="form-label">Icon</div>
+        <div class="icon-picker">
+          ${ICON_SHAPES.map(s => `
+            <button type="button" class="icon-swatch ${draft.newCatShape===s.key ? 'selected' : ''}" data-action="pick-shape" data-shape="${s.key}" aria-label="${s.label}" title="${s.label}">${ICONS[s.key]}</button>
+          `).join('')}
+        </div>
+      </div>
+    ` : '';
+
+    return `
+      <button class="back-link" data-action="cancel-edit">${BACK_ICON} Back to manage</button>
+      <div class="manage-header">
+        <h2>${isEditing ? 'Edit Trail' : 'New Trail'}</h2>
+        <p>${isEditing ? 'Update the details or waypoints for this trail.' : 'Give your goal a name, a category, and a few waypoints to work toward.'}</p>
+      </div>
+      <div class="goal-form">
+        <label class="form-label">Trail title
+          <input type="text" class="text-input" data-field="title" value="${escapeXml(draft.title)}" placeholder="e.g. Learn Pottery" />
+        </label>
+
+        <label class="form-label">Category
+          <select class="text-input" data-field="category">
+            ${catOptions}
+            <option value="__new__" ${draft.category==='__new__' ? 'selected' : ''}>+ Add new category…</option>
+          </select>
+        </label>
+        ${newCatPanel}
+
+        <label class="form-label">Short description
+          <textarea class="text-input" rows="2" data-field="blurb" placeholder="One sentence about this trail">${escapeXml(draft.blurb)}</textarea>
+        </label>
+
+        <label class="form-label">Badge name <span class="form-hint">(earned when the trail is completed)</span>
+          <input type="text" class="text-input" data-field="badgeName" value="${escapeXml(draft.badgeName)}" placeholder="e.g. The Potter" />
+        </label>
+
+        <div class="form-label">Waypoints</div>
+        <div class="subgoal-edit-list">
+          ${subgoalRows}
+        </div>
+        <button type="button" class="btn-small btn-add" data-action="add-sub">${PLUS_ICON} Add waypoint</button>
+
+        <div class="form-actions">
+          <button type="button" class="pill-btn" data-action="save-goal">Save trail</button>
+          <button type="button" class="back-link" data-action="cancel-edit">Cancel</button>
+        </div>
+      </div>
+    `;
   }
 
   /* ============ RENDER: BADGES ============ */
@@ -596,7 +876,7 @@
         earned,
         name: g.badgeName,
         desc: `Complete the "${g.title}" trail.`,
-        icon: ICONS[g.category]
+        icon: iconFor(g.category)
       };
     });
     const earnedGoalCount = goalBadges.filter(b => b.earned).length;
@@ -616,8 +896,8 @@
     const goalHtml = goalBadges.map(b => `
       <div class="badge ${b.earned ? '' : 'locked'}">
         ${sealHtml(b.icon, !b.earned)}
-        <span class="badge-name">${b.name}</span>
-        <span class="badge-desc">${b.desc}</span>
+        <span class="badge-name">${escapeXml(b.name)}</span>
+        <span class="badge-desc">${escapeXml(b.desc)}</span>
       </div>
     `).join('');
 
@@ -642,6 +922,7 @@
     if(route.view === 'home') body = renderHome();
     else if(route.view === 'detail') body = renderDetail(route.goalId);
     else if(route.view === 'badges') body = renderBadges();
+    else if(route.view === 'manage') body = renderManage();
 
     app.innerHTML = renderHeader() + body;
   }
@@ -654,16 +935,39 @@
   });
   app.addEventListener('keydown', (e) => {
     if(e.key !== 'Enter' && e.key !== ' ') return;
+    if(e.target.matches('input, textarea, select')) return; // let typing behave normally
     const el = e.target.closest('[data-action]');
     if(!el) return;
     e.preventDefault();
     handleAction(el);
   });
 
+  // Text/select/textarea edits update the draft in place without a full re-render,
+  // so the person doesn't lose their cursor position while typing.
+  app.addEventListener('input', (e) => {
+    const el = e.target.closest('[data-field]');
+    if(!el || !draft) return;
+    const field = el.getAttribute('data-field');
+    if(field === 'subgoal'){
+      const idx = parseInt(el.getAttribute('data-idx'), 10);
+      draft.subgoals[idx] = el.value;
+    } else {
+      draft[field] = el.value;
+    }
+  });
+
+  app.addEventListener('change', (e) => {
+    const el = e.target.closest('[data-field="category"]');
+    if(!el || !draft) return;
+    draft.category = el.value;
+    render();
+  });
+
   function handleAction(el){
     const action = el.getAttribute('data-action');
     if(action === 'go-home'){ go({view:'home', goalId:null}); }
     else if(action === 'go-badges'){ go({view:'badges', goalId:null}); }
+    else if(action === 'go-manage'){ go({view:'manage', goalId:null}); }
     else if(action === 'open-goal'){ go({view:'detail', goalId: el.getAttribute('data-goal')}); }
     else if(action === 'filter'){ activeFilter = el.getAttribute('data-cat'); render(); }
     else if(action === 'toggle-sub'){
@@ -673,6 +977,97 @@
       saveState();
       render();
     }
+    else if(action === 'new-goal'){ draft = blankDraft(); render(); }
+    else if(action === 'edit-goal'){
+      const goal = GOALS.find(g => g.id === el.getAttribute('data-goal'));
+      if(goal){ draft = draftFromGoal(goal); render(); }
+    }
+    else if(action === 'cancel-edit'){ draft = null; render(); }
+    else if(action === 'delete-goal'){
+      const goalId = el.getAttribute('data-goal');
+      const goal = GOALS.find(g => g.id === goalId);
+      if(goal && window.confirm(`Delete "${goal.title}"? This can't be undone.`)){
+        GOALS = GOALS.filter(g => g.id !== goalId);
+        delete state.progress[goalId];
+        saveGoals();
+        saveState();
+        render();
+      }
+    }
+    else if(action === 'add-sub'){ draft.subgoals.push(''); render(); }
+    else if(action === 'remove-sub'){
+      const idx = parseInt(el.getAttribute('data-idx'), 10);
+      if(draft.subgoals.length > 1){ draft.subgoals.splice(idx, 1); render(); }
+    }
+    else if(action === 'move-sub-up'){
+      const idx = parseInt(el.getAttribute('data-idx'), 10);
+      if(idx > 0){
+        [draft.subgoals[idx-1], draft.subgoals[idx]] = [draft.subgoals[idx], draft.subgoals[idx-1]];
+        render();
+      }
+    }
+    else if(action === 'move-sub-down'){
+      const idx = parseInt(el.getAttribute('data-idx'), 10);
+      if(idx < draft.subgoals.length - 1){
+        [draft.subgoals[idx+1], draft.subgoals[idx]] = [draft.subgoals[idx], draft.subgoals[idx+1]];
+        render();
+      }
+    }
+    else if(action === 'pick-shape'){ draft.newCatShape = el.getAttribute('data-shape'); render(); }
+    else if(action === 'save-goal'){ saveGoalFromDraft(); }
+  }
+
+  function saveGoalFromDraft(){
+    const title = draft.title.trim();
+    if(!title){ alert('Give this trail a title first.'); return; }
+
+    const cleanedSubgoals = draft.subgoals.map(s => s.trim()).filter(Boolean);
+    if(cleanedSubgoals.length === 0){ alert('Add at least one waypoint.'); return; }
+
+    let category = draft.category;
+    if(category === '__new__'){
+      const label = draft.newCatLabel.trim();
+      if(!label){ alert('Name your new category first.'); return; }
+      const newId = uniqueId(slugify(label), Object.keys(CATS));
+      CATS = {...CATS, [newId]: {label}};
+      customCatShapes = {...customCatShapes, [newId]: draft.newCatShape};
+      saveCats();
+      category = newId;
+    }
+
+    const existingIds = GOALS.map(g => g.id).filter(id => id !== draft.originalId);
+
+    if(draft.originalId){
+      // Editing an existing goal — keep its id, resize progress to match new waypoint count.
+      const idx = GOALS.findIndex(g => g.id === draft.originalId);
+      const oldProgress = state.progress[draft.originalId] || [];
+      const newProgress = cleanedSubgoals.map((_, i) => !!oldProgress[i]);
+      GOALS[idx] = {
+        id: draft.originalId,
+        title,
+        category,
+        badgeName: draft.badgeName.trim() || `The ${title}`,
+        blurb: draft.blurb.trim(),
+        subgoals: cleanedSubgoals
+      };
+      state.progress[draft.originalId] = newProgress;
+    } else {
+      const id = uniqueId(slugify(title), existingIds);
+      GOALS.push({
+        id,
+        title,
+        category,
+        badgeName: draft.badgeName.trim() || `The ${title}`,
+        blurb: draft.blurb.trim(),
+        subgoals: cleanedSubgoals
+      });
+      state.progress[id] = cleanedSubgoals.map(() => false);
+    }
+
+    saveGoals();
+    saveState();
+    draft = null;
+    go({view:'manage', goalId:null});
   }
 
   render();
