@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Junior Year: An Inferno</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Special+Elite&family=Patrick+Hand&display=swap');
+  :root {
+    --ash: #d8cfc0; --dark: #0e0805; --ember: #8b2200; --crimson: #6a1010;
+    --flame: #c85000; --gold: #c8900a; --smoke: #5a5050; --dim: #3a2820;
+    --green: #2d5a2d; --red: #8a1a1a; --notebook: #1a1208; --ruled: #3a2820;
+    --sin-color: #c85000;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #060402; font-family: 'Patrick Hand', cursive; color: var(--ash); min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 24px 16px; }
+
+  #game-wrapper { width: 860px; max-width: 100%; display: flex; flex-direction: column; min-height: 96vh; }
+
+  /* NAV */
+  #nav-bar { background: #0a0604; border: 3px solid var(--smoke); border-bottom: none; padding: 5px 14px; display: flex; align-items: center; justify-content: space-between; }
+  .nav-links { display: flex; gap: 8px; }
+  .nav-btn { background: none; border: 1px solid #4a3830; color: var(--smoke); font-family: 'Special Elite', cursive; font-size: 0.72em; padding: 3px 9px; border-radius: 3px; cursor: pointer; letter-spacing: 1px; transition: all 0.2s; text-decoration: none; display: inline-block; white-space: nowrap; }
+  .nav-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+  /* TITLE */
+  #title-bar { background: var(--dark); border: 3px solid var(--smoke); border-bottom: none; border-top: none; padding: 12px 18px; text-align: center; }
+  #title-bar h1 { font-family: 'Cinzel', serif; color: var(--ash); font-size: 1.3em; letter-spacing: 3px; text-shadow: 0 0 20px rgba(200,80,0,0.4); }
+  #title-bar .subtitle { color: var(--smoke); font-size: 0.78em; font-family: 'Special Elite', cursive; margin-top: 2px; }
+
+  /* STATS */
+  #stats-bar { background: #0a0604; border: 3px solid var(--smoke); border-bottom: none; border-top: none; padding: 8px 14px; display: flex; gap: 8px; flex-wrap: wrap; justify-content: space-between; align-items: center; }
+  .stat { display: flex; flex-direction: column; align-items: center; min-width: 60px; flex: 1; }
+  .stat-label { font-size: 0.67em; color: #a09080; font-family: 'Special Elite', cursive; letter-spacing: 1px; }
+  .stat-bar-outer { width: 100%; height: 8px; background: #050302; border-radius: 4px; border: 1px solid var(--dim); margin: 2px 0; }
+  .stat-bar-inner { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
+  .stat-val { font-size: 0.7em; color: var(--gold); font-weight: bold; }
+  /* Sin meter */
+  #sin-panel { display: flex; flex-direction: column; align-items: center; min-width: 54px; }
+  .sin-label { font-size: 0.67em; color: #c06040; font-family: 'Special Elite', cursive; letter-spacing: 1px; }
+  .sin-bar-outer { width: 100%; height: 8px; background: #050302; border-radius: 4px; border: 1px solid #5a2010; margin: 2px 0; }
+  #bar-sin { height: 100%; border-radius: 4px; background: linear-gradient(to right, #8b2200, #ff6000); transition: width 0.5s ease; width: 0%; }
+  #val-sin { font-size: 0.7em; color: var(--flame); font-weight: bold; }
+  #circle-pill { color: var(--smoke); font-family: 'Special Elite', cursive; font-size: 0.78em; white-space: nowrap; }
+
+  /* LAYOUT with sidebar */
+  #content-wrapper { display: flex; flex: 1; border: 3px solid var(--smoke); border-top: none; overflow: hidden; }
+
+  /* RESUME SIDEBAR */
+  #resume-sidebar { width: 190px; min-width: 190px; background: #0c0906; border-right: 2px solid var(--dim); display: flex; flex-direction: column; overflow: hidden; }
+  #resume-header { background: var(--dim); padding: 8px 10px; font-family: 'Cinzel', serif; font-size: 0.75em; color: var(--gold); letter-spacing: 2px; text-align: center; border-bottom: 1px solid var(--smoke); }
+  #resume-body { flex: 1; padding: 10px; overflow-y: auto; font-family: 'Special Elite', cursive; font-size: 0.72em; color: #c0b090; line-height: 1.6; }
+  #resume-body::-webkit-scrollbar { width: 4px; }
+  #resume-body::-webkit-scrollbar-thumb { background: var(--dim); }
+  .resume-section { color: var(--flame); font-size: 0.85em; letter-spacing: 1px; margin: 8px 0 3px; border-bottom: 1px solid var(--dim); padding-bottom: 2px; }
+  .resume-line { padding: 2px 0; color: #c0b090; }
+  .resume-line.earned { color: #90c880; }
+  .resume-line.struck { color: #5a4030; text-decoration: line-through; font-style: italic; }
+  .resume-line.embellished { color: var(--flame); font-style: italic; }
+
+  /* MAIN PANEL */
+  #main-panel { background: #0e0a06; flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  .panel-top { background: linear-gradient(to bottom, #3a1808, #0e0a06); height: 14px; border-bottom: 1px solid var(--dim); display: flex; align-items: center; justify-content: center; }
+  .panel-top span { font-size: 0.65em; color: #5a3020; letter-spacing: 4px; font-family: 'Special Elite', cursive; }
+  #content-area { flex: 1; padding: 18px 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; }
+
+  /* CIRCLE BANNER */
+  .circle-banner { background: var(--crimson); color: var(--ash); font-family: 'Cinzel', serif; text-align: center; padding: 6px 12px; font-size: 0.95em; letter-spacing: 3px; border: 2px solid var(--ember); margin: -4px -4px 4px; text-shadow: 0 0 10px rgba(200,80,0,0.5); }
+  .circle-num { font-family: 'Special Elite', cursive; color: var(--flame); font-size: 0.85em; letter-spacing: 1px; }
+  .scenario-title { font-family: 'Cinzel', serif; font-size: 1.1em; color: var(--ash); margin: 2px 0 6px; line-height: 1.3; }
+  .dante-quote { background: rgba(139,34,0,0.12); border-left: 4px solid var(--ember); padding: 8px 12px; font-family: 'Special Elite', cursive; font-size: 0.85em; color: #c09060; font-style: italic; margin: 4px 0; }
+  .dante-quote .attr { color: var(--flame); font-style: normal; font-size: 0.85em; }
+  .scenario-text { font-size: 0.97em; line-height: 1.65; color: #c8bfb0; }
+  .sin-tag { display: inline-block; background: var(--crimson); color: #f0c090; font-size: 0.7em; padding: 2px 8px; border-radius: 10px; font-family: 'Special Elite', cursive; letter-spacing: 1px; margin-bottom: 4px; border: 1px solid var(--ember); }
+  .major-tag { display: inline-block; background: #1a2a1a; color: #90c880; font-size: 0.7em; padding: 2px 8px; border-radius: 10px; font-family: 'Special Elite', cursive; letter-spacing: 1px; margin-bottom: 4px; margin-left: 5px; }
+
+  /* VIRGIL */
+  .virgil-note { background: rgba(139,34,0,0.08); border: 1px dashed var(--ember); border-radius: 4px; padding: 9px 12px; font-size: 0.87em; font-style: italic; color: #a07050; margin: 4px 0; }
+  .virgil-note strong { font-style: normal; color: var(--flame); }
+
+  /* CHOICES */
+  #choices { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+  .choice-btn { background: #130c06; color: var(--ash); border: 2px solid var(--dim); padding: 10px 14px; font-family: 'Patrick Hand', cursive; font-size: 0.95em; cursor: pointer; text-align: left; border-radius: 4px; transition: all 0.2s; line-height: 1.4; }
+  .choice-btn:hover:not(:disabled) { background: #2a1408; border-color: var(--flame); transform: translateX(3px); }
+  .choice-btn:disabled { cursor: default; }
+  .choice-btn.sinful { border-color: var(--crimson); }
+  .choice-btn.sinful:hover:not(:disabled) { background: #2a0808; border-color: var(--flame); }
+  .choice-letter { color: var(--gold); font-weight: bold; margin-right: 6px; font-family: 'Cinzel', serif; }
+  .sin-marker { font-size: 0.72em; color: var(--flame); margin-left: 4px; font-family: 'Special Elite', cursive; }
+
+  /* OUTCOME */
+  #outcome-panel { background: rgba(139,34,0,0.07); border: 2px solid var(--dim); border-radius: 4px; padding: 12px 14px; font-size: 0.95em; line-height: 1.6; display: none; }
+  #outcome-panel.show { display: block; }
+  .outcome-good { color: #70b870; font-weight: bold; }
+  .outcome-bad { color: var(--flame); font-weight: bold; }
+  .stat-change { font-family: 'Special Elite', cursive; font-size: 0.85em; margin-top: 6px; color: #8a7060; }
+  .stat-change .plus { color: #70b870; } .stat-change .minus { color: var(--flame); }
+  .sin-change { font-family: 'Special Elite', cursive; font-size: 0.8em; color: var(--flame); margin-top: 3px; }
+  .resume-update { font-family: 'Special Elite', cursive; font-size: 0.8em; color: var(--gold); margin-top: 4px; border-top: 1px solid var(--dim); padding-top: 4px; }
+
+  /* BUTTONS */
+  .big-btn { background: var(--ember); color: var(--ash); border: none; padding: 12px; font-family: 'Cinzel', serif; font-size: 1em; cursor: pointer; border-radius: 4px; width: 100%; margin-top: 8px; letter-spacing: 1px; transition: all 0.2s; }
+  .big-btn:hover { background: var(--flame); transform: scale(1.02); }
+  .start-btn { background: var(--dark); color: var(--gold); border: 3px solid var(--ember); padding: 12px 36px; font-family: 'Cinzel', serif; font-size: 1.1em; cursor: pointer; border-radius: 4px; letter-spacing: 2px; transition: all 0.2s; margin-top: 8px; }
+  .start-btn:hover { background: var(--dim); transform: scale(1.04); }
+
+  /* CARD SELECT */
+  .choice-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
+  .choice-card { background: #130c06; border: 2px solid var(--dim); border-radius: 6px; padding: 12px; cursor: pointer; transition: all 0.2s; color: var(--ash); }
+  .choice-card:hover { background: #2a1408; border-color: var(--flame); transform: translateY(-2px); }
+  .choice-card.selected { border-color: var(--gold); background: #2a1408; box-shadow: 0 0 12px rgba(200,80,0,0.3); }
+  .cc-icon { font-size: 1.8em; margin-bottom: 4px; }
+  .cc-name { font-family: 'Cinzel', serif; font-size: 0.95em; color: var(--gold); margin-bottom: 4px; }
+  .cc-desc { font-size: 0.8em; line-height: 1.4; color: #a09080; }
+  .cc-effect { font-size: 0.75em; font-family: 'Special Elite', cursive; color: #90c880; margin-top: 6px; }
+
+  /* TUTORIAL */
+  .tutorial-card { background: #130c06; border: 2px solid var(--dim); border-radius: 4px; padding: 12px 14px; }
+  .tutorial-concept { font-size: 1em; font-weight: bold; color: var(--ash); margin-bottom: 2px; }
+  .tutorial-body { font-size: 0.9em; color: #c0b090; line-height: 1.5; }
+
+  /* CHRONICLE */
+  .chronicle-para { background: #130c06; border-left: 4px solid var(--ember); padding: 12px 16px; border-radius: 0 4px 4px 0; font-size: 0.92em; line-height: 1.75; color: #c8bfb0; position: relative; font-family: 'Patrick Hand', cursive; }
+  .chronicle-para::before { content: attr(data-label); position: absolute; top: -11px; left: 10px; background: var(--ember); color: var(--ash); font-family: 'Special Elite', cursive; font-size: 0.7em; padding: 1px 8px; border-radius: 3px; }
+  .journal-section { font-family: 'Cinzel', serif; color: var(--flame); font-size: 1em; margin: 8px 0 4px; border-bottom: 1px solid var(--dim); padding-bottom: 4px; }
+
+  /* SUMMARY */
+  .summary-grid { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+  .summary-card { background: rgba(139,34,0,0.1); border: 2px solid var(--dim); border-radius: 4px; padding: 10px 14px; text-align: center; min-width: 82px; }
+  .summary-card .s-label { font-family: 'Special Elite', cursive; font-size: 0.68em; color: #8a7060; }
+  .summary-card .s-val { font-family: 'Cinzel', serif; font-size: 1.2em; color: var(--ash); font-weight: bold; }
+  .end-title { font-family: 'Cinzel', serif; font-size: 1.7em; color: var(--red); text-align: center; }
+  .end-title.win { color: #70b870; }
+  .end-wisdom { font-family: 'Special Elite', cursive; font-size: 0.9em; color: #8a7060; font-style: italic; border-top: 1px solid var(--dim); border-bottom: 1px solid var(--dim); padding: 8px; text-align: center; }
+  .identity-bar { background: rgba(139,34,0,0.08); border: 1px solid var(--dim); border-radius: 4px; padding: 6px 12px; font-family: 'Special Elite', cursive; font-size: 0.78em; color: #8a7060; display: flex; gap: 14px; flex-wrap: wrap; }
+  .identity-bar span { color: var(--ash); }
+
+  /* FINAL RESUME */
+  .final-resume { background: #0e0a06; border: 2px solid var(--ember); border-radius: 4px; padding: 14px 16px; font-family: 'Special Elite', cursive; font-size: 0.82em; color: #c0b090; line-height: 1.8; }
+  .final-resume .r-name { font-family: 'Cinzel', serif; font-size: 1.1em; color: var(--gold); border-bottom: 1px solid var(--ember); padding-bottom: 4px; margin-bottom: 8px; }
+  .final-resume .r-section { color: var(--flame); font-size: 0.85em; letter-spacing: 1px; margin: 10px 0 3px; }
+  .final-resume .r-line { padding: 1px 0; }
+  .final-resume .r-line.good { color: #90c880; }
+  .final-resume .r-line.bad { color: #6a4030; text-decoration: line-through; font-style: italic; }
+  .final-resume .r-line.questionable { color: var(--flame); font-style: italic; }
+
+  #content-area::-webkit-scrollbar { width: 5px; }
+  #content-area::-webkit-scrollbar-track { background: #0e0a06; }
+  #content-area::-webkit-scrollbar-thumb { background: var(--dim); border-radius: 3px; }
+  #resume-body::-webkit-scrollbar { width: 3px; }
+  #resume-body::-webkit-scrollbar-thumb { background: var(--dim); }
+
+  @media (max-width: 600px) {
+    #resume-sidebar { display: none; }
+  }
+</style>
+</head>
+<body>
+<div id="game-wrapper">
+  <div id="nav-bar">
+    <div class="nav-links">
+      <a class="nav-btn" href="index.html">🌳 Burch Tree</a>
+      <a class="nav-btn" href="meditations-on-a-2-8-gpa.html">← Year II</a>
+    </div>
+    <div class="nav-links">
+      <a class="nav-btn" href="the-republic-of-graduation.html">Year IV →</a>
+    </div>
+  </div>
+  <div id="title-bar">
+    <h1>JUNIOR YEAR: AN INFERNO</h1>
+    <div class="subtitle">Dante Alighieri · Nine Circles · One Academic Year</div>
+  </div>
+  <div id="stats-bar" style="display:none;">
+    <div class="stat"><div class="stat-label">📚 GPA</div><div id="gpa-num" style="font-size:1.1em;color:var(--gold);font-family:'Cinzel',serif;font-weight:bold;">3.5</div></div>
+    <div class="stat"><div class="stat-label">⚡ ENERGY</div><div class="stat-bar-outer"><div class="stat-bar-inner" id="bar-energy" style="background:#b08820;width:80%;"></div></div><div class="stat-val" id="val-energy">80</div></div>
+    <div class="stat"><div class="stat-label">🎉 SOCIAL</div><div class="stat-bar-outer"><div class="stat-bar-inner" id="bar-social" style="background:#a04050;width:70%;"></div></div><div class="stat-val" id="val-social">70</div></div>
+    <div class="stat"><div class="stat-label">💰 MONEY</div><div class="stat-bar-outer"><div class="stat-bar-inner" id="bar-money" style="background:#308050;width:55%;"></div></div><div class="stat-val" id="val-money">55</div></div>
+    <div id="sin-panel">
+      <div class="sin-label">🔥 SIN</div>
+      <div class="sin-bar-outer"><div id="bar-sin"></div></div>
+      <div id="val-sin">0</div>
+    </div>
+    <div id="circle-pill"></div>
+  </div>
+  <div id="content-wrapper">
+    <div id="resume-sidebar">
+      <div id="resume-header">📄 RÉSUMÉ</div>
+      <div id="resume-body">
+        <div id="resume-name" style="font-family:'Cinzel',serif;font-size:0.9em;color:var(--gold);margin-bottom:4px;"></div>
+        <div id="resume-major" style="font-size:0.8em;color:#a09080;margin-bottom:8px;"></div>
+        <div class="resume-section">EDUCATION</div>
+        <div class="resume-line">Junior, GPA: <span id="resume-gpa">3.50</span></div>
+        <div class="resume-section">EXPERIENCE</div>
+        <div id="resume-experience"><div class="resume-line" style="color:#5a4030;font-style:italic;">Nothing yet.</div></div>
+        <div class="resume-section">SKILLS</div>
+        <div id="resume-skills"><div class="resume-line" style="color:#5a4030;font-style:italic;">Nothing listed.</div></div>
+        <div class="resume-section">ACTIVITIES</div>
+        <div id="resume-activities"><div class="resume-line" style="color:#5a4030;font-style:italic;">Nothing listed.</div></div>
+      </div>
+    </div>
+    <div id="main-panel">
+      <div class="panel-top"><span>✦ ✦ ✦</span></div>
+      <div id="content-area"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── STATE ─────────────────────────────────────────────────────────────────────
+const S = {
+  phase: 'title',
+  circleIndex: 0,
+  gpa: 3.5, energy: 80, social: 70, money: 55, sin: 0,
+  major: null,
+  abroadPath: false,
+  selectedCard: null,
+  _currentScenario: null,
+  resume: {
+    experience: [],
+    skills: [],
+    activities: [],
+  },
+  // chronicle tracking
+  circleChoices: {},
+};
+
+// ── MAJORS ────────────────────────────────────────────────────────────────────
+const MAJORS = [
+  { id:'business',    icon:'💼', name:'Business',        desc:'Three years in. The blazers are non-ironic now.',              effect:'Money events favorable. GPA moderate. Resume lines come easier.', mods:{ moneyBonus:5, gpaScale:0.1 } },
+  { id:'engineering', icon:'⚙️', name:'Engineering',     desc:'You have seen things in those lab reports.',                   effect:'GPA hardest. Energy costs reduced. Resume is formidable.', mods:{ gpaScale:-0.2, energyDiscount:0.25 } },
+  { id:'liberalarts', icon:'🎭', name:'Liberal Arts',     desc:'The thesis looms. You are pretending it doesn\'t.',           effect:'Social bonuses high. GPA flexible. Resume requires creativity.', mods:{ socialBonus:8 } },
+  { id:'science',     icon:'🔬', name:'Sciences',         desc:'The lab is your home now. You have snacks in the lab.',       effect:'GPA very hard. Energy drains faster. Resume has real substance.', mods:{ gpaScale:-0.2, energyScale:1.2 } },
+  { id:'compsci',     icon:'💻', name:'Computer Science', desc:'Junior year is when it gets genuinely difficult.',            effect:'GPA hard. Money events very favorable. Resume builds fast.', mods:{ gpaScale:-0.1, moneyBonus:10 } },
+];
+
+// ── DANTE QUOTES (one per circle, no repeats) ─────────────────────────────────
+const DANTE_QUOTES = [
+  'Abandon all hope, ye who enter here.',
+  'There is no greater sorrow than to recall happiness in times of misery.',
+  'The path to paradise begins in hell.',
+  'From a little spark may burst a mighty flame.',
+  'Consider your origin; you were not born to live like brutes, but to follow virtue and knowledge.',
+  'I came to a place where no light shone at all.',
+  'In the middle of the journey of our life, I came to myself in a dark wood, for the straight way was lost.',
+  'He listens well who takes notes.',
+  'Beauty awakens the soul to act.',
+];
+
+// ── VIRGIL LINES (between circles) ───────────────────────────────────────────
+const VIRGIL_LINES = [
+  '"Welcome to Circle Two. Dante had a muse waiting at the end. You have a career fair. Keep moving."',
+  '"Circle Three. I lived here for a semester. I still get emails from the clubs I joined."',
+  '"Circle Four. The note-hoarders. I knew one once. He got a 4.0. He has no friends. Weigh this."',
+  '"Circle Five. Group projects. I have nothing funny to say about group projects. Just go."',
+  '"Circle Six. The lies we tell ourselves. I believed I didn\'t need sleep until week eleven. The grade still exists."',
+  '"Circle Seven. The burnout. Everyone hits it. The ones who come back from it are the interesting ones."',
+  '"Circle Eight. The résumé. I once wrote \'fluent in Mandarin.\' I am not fluent in Mandarin. I do not recommend this."',
+  '"Circle Nine. The deepest one. What happens here either ends you or makes you the person who helps the next junior down. Choose."',
+];
+let virgilIdx = 0;
+
+// ── RESUME HELPERS ────────────────────────────────────────────────────────────
+function addResumeLine(section, text, type='earned') {
+  S.resume[section].push({ text, type });
+  renderResume();
+}
+function strikeResumeLine(section, text) {
+  const item = S.resume[section].find(i => i.text === text);
+  if (item) { item.type = 'struck'; renderResume(); }
+}
+function renderResume() {
+  const maj = MAJORS.find(m => m.id === S.major);
+  document.getElementById('resume-name').textContent = 'Junior Scholar';
+  document.getElementById('resume-major').textContent = maj ? `${maj.icon} ${maj.name} Major` : '';
+  document.getElementById('resume-gpa').textContent = gpaStr(S.gpa);
+  ['experience','skills','activities'].forEach(sec => {
+    const el = document.getElementById('resume-'+sec);
+    if (S.resume[sec].length === 0) {
+      el.innerHTML = '<div class="resume-line" style="color:#5a4030;font-style:italic;">Nothing listed.</div>';
+    } else {
+      el.innerHTML = S.resume[sec].map(i =>
+        `<div class="resume-line ${i.type}">${i.text}</div>`
+      ).join('');
+    }
+  });
+}
+
+// ── CIRCLES ───────────────────────────────────────────────────────────────────
+function buildCircles() {
+  const maj = MAJORS.find(m => m.id === S.major);
+  const mn = maj ? maj.name : 'your major';
+  const mi = maj ? maj.icon : '📚';
+
+  return [
+    // ── CIRCLE 1: LIMBO ───────────────────────────────────────────────────────
+    {
+      num: 'I', sin: 'Limbo', title: 'The Declaration',
+      quote: DANTE_QUOTES[0],
+      tag: `The Undeclared · ${mi} ${mn}`,
+      text: buildCircle1Text(maj),
+      virgil: null,
+      choices: buildCircle1Choices(maj),
+      trackKey: 'c1',
+    },
+    // ── CIRCLE 2: LUST ────────────────────────────────────────────────────────
+    {
+      num: 'II', sin: 'Lust', title: 'The Pursuit of the Impossible Thing',
+      quote: DANTE_QUOTES[1],
+      tag: 'The Desire · Choose Your Path',
+      text: buildCircle2Text(maj),
+      virgil: VIRGIL_LINES[0],
+      choices: buildCircle2Choices(maj),
+      trackKey: 'c2',
+      isBranch: true,
+    },
+    // ── CIRCLE 3: GLUTTONY ────────────────────────────────────────────────────
+    {
+      num: 'III', sin: 'Gluttony', title: 'The Overcommitment Spiral',
+      quote: DANTE_QUOTES[2],
+      tag: 'The Excess · Said Yes to Everything',
+      text: buildCircle3Text(maj),
+      virgil: VIRGIL_LINES[1],
+      choices: buildCircle3Choices(maj),
+      trackKey: 'c3',
+    },
+    // ── CIRCLE 4: GREED ───────────────────────────────────────────────────────
+    {
+      num: 'IV', sin: 'Greed', title: 'The Notes Situation',
+      quote: DANTE_QUOTES[3],
+      tag: 'The Hoarding · Knowledge as Currency',
+      text: buildCircle4Text(maj),
+      virgil: VIRGIL_LINES[2],
+      choices: buildCircle4Choices(maj),
+      trackKey: 'c4',
+    },
+    // ── CIRCLE 5: WRATH ───────────────────────────────────────────────────────
+    {
+      num: 'V', sin: 'Wrath', title: 'The Group Project, Again',
+      quote: DANTE_QUOTES[4],
+      tag: 'The Wrath · Marcus Is Back',
+      text: buildCircle5Text(maj),
+      virgil: VIRGIL_LINES[3],
+      choices: buildCircle5Choices(maj),
+      trackKey: 'c5',
+    },
+    // ── CIRCLE 6: HERESY ──────────────────────────────────────────────────────
+    {
+      num: 'VI', sin: 'Heresy', title: 'The Lies We Tell Ourselves',
+      quote: DANTE_QUOTES[5],
+      tag: 'The Heresy · False Beliefs',
+      text: buildCircle6Text(maj),
+      virgil: VIRGIL_LINES[4],
+      choices: buildCircle6Choices(maj),
+      trackKey: 'c6',
+    },
+    // ── CIRCLE 7: VIOLENCE ────────────────────────────────────────────────────
+    {
+      num: 'VII', sin: 'Violence', title: 'The Burnout Arrives',
+      quote: DANTE_QUOTES[6],
+      tag: 'The Violence · Against Oneself',
+      text: buildCircle7Text(maj),
+      virgil: VIRGIL_LINES[5],
+      choices: buildCircle7Choices(maj),
+      trackKey: 'c7',
+    },
+    // ── CIRCLE 8: FRAUD ───────────────────────────────────────────────────────
+    {
+      num: 'VIII', sin: 'Fraud', title: 'The Résumé Reckoning',
+      quote: DANTE_QUOTES[7],
+      tag: 'The Fraud · What the Résumé Says',
+      text: buildCircle8Text(maj),
+      virgil: VIRGIL_LINES[6],
+      choices: buildCircle8Choices(maj),
+      trackKey: 'c8',
+    },
+    // ── CIRCLE 9: TREACHERY ───────────────────────────────────────────────────
+    {
+      num: 'IX', sin: 'Treachery', title: 'The Deepest Circle',
+      quote: DANTE_QUOTES[8],
+      tag: 'The Treachery · Betrayal',
+      text: buildCircle9Text(maj),
+      virgil: VIRGIL_LINES[7],
+      choices: buildCircle9Choices(maj),
+      trackKey: 'c9',
+    },
+  ];
+}
+
+// ── CIRCLE BUILDERS ───────────────────────────────────────────────────────────
+function buildCircle1Text(maj) {
+  const t = {
+    business:    'The advising office is quiet. The form is in front of you. Business Administration, declared officially. No more Undecided. No more "exploring options." The major your parents approved of immediately is now your legal academic identity. Something settles. Something else, smaller, asks a question.',
+    engineering: 'The form sits on the desk. Mechanical Engineering, declared officially. You\'ve survived two years of coursework that made other students switch majors. You\'re still here. The advisor looks at you with the specific respect reserved for people who choose hard things and don\'t leave.',
+    liberalarts: 'The declaration form. Liberal Arts, officially. Your advisor says "excellent choice" with the warmth of someone who genuinely means it and the eyes of someone who knows what Thanksgiving is going to be like for you. You sign it anyway. It feels right. It is right.',
+    science:     'Biology declared. Officially. The lab coat in your closet is no longer aspirational — it\'s a uniform. Your advisor prints your four-year plan. It has seventeen required courses and the phrase "senior thesis" circled in red as if it were a warning.',
+    compsci:     'Computer Science, declared. Your advisor pulls up your projected course schedule for senior year and for one moment you see the full shape of what you\'ve committed to. The algorithms. The systems course. The capstone. You close the laptop and sign the form.',
+  };
+  return t[maj?.id] || 'The declaration form. Your major, official. No more ambiguity. The next two years have a shape now.';
+}
+function buildCircle1Choices(maj) {
+  const resumeLines = {
+    business: 'B.S. Business Administration (in progress)',
+    engineering: 'B.S. Mechanical Engineering (in progress)',
+    liberalarts: 'B.A. Liberal Arts (in progress)',
+    science: 'B.S. Biology (in progress)',
+    compsci: 'B.S. Computer Science (in progress)',
+  };
+  const line = resumeLines[maj?.id] || 'B.A. Undeclared (in progress)';
+  return [
+    { text: 'Sign and feel certain. This is the right call.', outcome: 'Certainty is rare and should be honored. The advisor stamps it. The path clarifies. Something that was grey becomes a direction.', stats: { gpa:+0.1, energy:+5, social:0, money:0, sin:0 }, resumeAction: () => addResumeLine('experience', line, 'earned'), trackVal: 'declared their major with certainty and felt the relief of a path becoming a direction' },
+    { text: 'Sign but ask about a double major while you\'re here.', outcome: 'The advisor says it\'s possible. It will require summer courses. You write "possible double major" on a sticky note and put it somewhere you\'ll never find it.', stats: { gpa:0, energy:-5, social:0, money:0, sin:0 }, resumeAction: () => addResumeLine('experience', line, 'earned'), trackVal: 'declared their major and immediately complicated it by inquiring about a double major' },
+    { text: 'Sign but add a minor as a hedge.', outcome: 'A minor in something adjacent. Practical. The advisor approves. The résumé will have a second line.', stats: { gpa:-0.1, energy:-5, social:0, money:0, sin:0 }, resumeAction: () => { addResumeLine('experience', line, 'earned'); addResumeLine('experience', 'Minor: Interdisciplinary Studies', 'earned'); }, trackVal: 'declared their major and immediately added a minor as an academic insurance policy' },
+    { text: 'Sign quickly before you think about it too hard.', outcome: 'Fast and final. No ceremony. The deed is done. The existential questions will find you later — they always do.', stats: { gpa:0, energy:0, social:0, money:0, sin:5 }, resumeAction: () => addResumeLine('experience', line, 'earned'), trackVal: 'signed the major declaration form before the existential questions could catch up, which bought approximately four days' },
+  ];
+}
+
+function buildCircle2Text(maj) {
+  const t = {
+    business:    'It\'s there in the email: Goldman Sachs Junior Analyst program. Extremely competitive. Requires three years of finance experience. You have zero. There\'s also the study abroad program in London, which your Business professors say is "invaluable." You can\'t do both.',
+    engineering: 'SpaceX has a junior internship. The requirements include skills you technically have and skills you\'ve heard of. There\'s also a semester abroad program with an engineering partner university in Germany, which three of your best professors have attended. You can\'t do both.',
+    liberalarts: 'A prestigious literary magazine is offering editorial internships. The application requires writing samples you have but haven\'t polished. There\'s also a semester in Paris through the literature department, which your thesis advisor calls "transformative." You can\'t do both.',
+    science:     'The NIH has a junior research fellowship. It\'s extremely competitive and requires a faculty nomination you\'re not sure you have. There\'s also a field research semester in Costa Rica, which your ecology professor has attended twice. You can\'t do both.',
+    compsci:     'Google has a junior software engineering internship. The technical requirements are a stretch — but a plausible stretch. There\'s also a semester program at a tech university in Singapore, which the CS department chair calls "a genuine career accelerator." You can\'t do both.',
+  };
+  return (t[maj?.id] || 'A prestigious opportunity you\'re underqualified for. Also: a study abroad program that could change everything. You can\'t do both.') + '\n\nThis is the branch. Choose your path through the Inferno.';
+}
+function buildCircle2Choices(maj) {
+  const intNames = { business:'Goldman Sachs application', engineering:'SpaceX application', liberalarts:'editorial internship application', science:'NIH fellowship application', compsci:'Google internship application' };
+  const intName = intNames[maj?.id] || 'the prestigious internship application';
+  return [
+    { text: `Apply for the internship. Reach for the impossible thing.`, outcome: `You apply. The process is brutal. You get further than you expected and no further than you needed. The rejection arrives with feedback. The feedback is the point.`, stats: { gpa:+0.1, energy:-15, social:0, money:+10, sin:0 }, resumeAction: () => addResumeLine('experience', `${intName.split(' ')[0]} application — advanced to final round`, 'earned'), trackVal: `applied for the impossible internship, advanced further than expected, and learned more from the rejection than from most courses`, isAbroad: false },
+    { text: 'Go abroad. Some things can\'t be learned in a classroom.', outcome: 'You defer the internship market. You go. The semester abroad is exactly as transformative as advertised, which is annoying because it sounds like a brochure but it\'s true.', stats: { gpa:+0.2, energy:+15, social:+20, money:-20, sin:0 }, resumeAction: () => { addResumeLine('activities', 'Study Abroad Program', 'earned'); addResumeLine('skills', 'Cross-cultural communication', 'earned'); }, trackVal: 'chose the semester abroad over the internship application, discovering that some things genuinely cannot be learned in a classroom', isAbroad: true },
+    { text: 'Apply for the internship AND start the abroad application. Figure it out.', outcome: 'You start both. The internship process takes more time than expected. The abroad deadline passes. You\'re rejected from the internship. You have neither. Lust\'s punishment is wanting everything.', stats: { gpa:-0.1, energy:-20, social:-5, money:0, sin:15 }, resumeAction: () => {}, trackVal: 'attempted to pursue both the internship and study abroad simultaneously, achieving neither and learning an expensive lesson about the nature of desire', isAbroad: false },
+    { text: 'Apply for neither. Junior year is already a lot.', outcome: 'A defensible choice. The fear underneath it is real. The circle of Lust does not punish desire — it punishes the inability to commit to what you actually want.', stats: { gpa:+0.1, energy:+10, social:0, money:0, sin:10 }, resumeAction: () => {}, trackVal: 'declined both major opportunities of junior year, a decision that was either wise restraint or fear wearing the mask of wisdom', isAbroad: false },
+  ];
+}
+
+function buildCircle3Text(maj) {
+  const t = {
+    business:    'Two club officer positions. A case competition team. A 15-hour-a-week internship. Three upper-level courses. You said yes to all of it in September when the future felt manageable. It is now week six and the future feels like a calendar that has achieved sentience and is angry at you.',
+    engineering: 'Lab TA position. Research group. Engineering society treasurer. Three brutal upper-level courses. A hackathon in three weeks. You said yes to all of it because Engineering teaches you that problems can be solved with sufficient rigor. Your schedule disagrees.',
+    liberalarts: 'Literary magazine editor. Senior seminar discussion leader. Two creative writing workshops simultaneously. A campus lecture series you agreed to help organize. Three courses. Week six. The thesis is a shadow at the edge of everything.',
+    science:     'Lab research hours. TA for Intro Bio. Science club president. Three upper-level courses with labs. A research symposium presentation you agreed to give in November. Week six. The lab is your entire life and you have forgotten what your dorm room looks like.',
+    compsci:     'Hackathon team lead. CS tutoring center. Two personal projects you\'re building simultaneously. Three brutal upper-level courses. A tech club you somehow became the VP of. Week six. Your GitHub commit history is the only diary you\'re keeping.',
+  };
+  return t[maj?.id] || 'You said yes to everything in September. It is now week six. The calendar has opinions about this.';
+}
+function buildCircle3Choices(maj) {
+  return [
+    { text: 'Audit everything. Drop what doesn\'t matter. Survive with dignity.', outcome: 'You resign from one thing and reduce your hours in another. The world does not end. The relief is immediate and slightly embarrassing in its intensity.', stats: { gpa:+0.2, energy:+20, social:-5, money:0, sin:0 }, resumeAction: () => addResumeLine('activities', 'Selected commitments, sustained with excellence', 'earned'), trackVal: 'performed a mid-semester commitment audit and dropped what didn\'t matter, discovering that the world continued rotating' },
+    { text: 'Push through. Junior year is supposed to be hard.', outcome: 'It is hard. You push through. The grades are acceptable. The energy reserves are not. You arrive at winter break running on fumes and spite.', stats: { gpa:+0.1, energy:-30, social:-10, money:0, sin:5 }, resumeAction: () => addResumeLine('activities', 'Multiple concurrent leadership roles, junior year', 'earned'), trackVal: 'pushed through the overcommitment spiral on spite alone, arriving at winter break technically intact' },
+    { text: 'Do everything at 70%. No one will notice.', outcome: '70% is detectable. Your club notices. Your professor notices. Your GPA notices. The sin meter notices most of all.', stats: { gpa:-0.2, energy:-10, social:-5, money:0, sin:20 }, resumeAction: () => {}, trackVal: 'attempted to fulfill all commitments at 70% effort, discovering that 70% is surprisingly detectable' },
+    { text: 'Drop a course. Your mental health is a resource.', outcome: 'The W on your transcript is visible. It is also a documented act of self-knowledge that employers occasionally find more interesting than you\'d expect.', stats: { gpa:0, energy:+25, social:+5, money:0, sin:0 }, resumeAction: () => addResumeLine('skills', 'Self-awareness under pressure', 'earned'), trackVal: 'dropped a course in the overcommitment spiral, treating the W as an act of self-knowledge rather than failure' },
+  ];
+}
+
+function buildCircle4Text(maj) {
+  const t = {
+    business:    'The Finance 301 midterm is in two days. Someone in your cohort has a full set of past exams — graded, annotated, perfect. They\'re not sharing. Meanwhile, you have a partial set and three people in your study group who are counting on you to have more. The question is what you do with what you have.',
+    engineering: 'Thermo exam in 48 hours. A fourth-year has every past exam for Professor Chen going back six years, complete with solution keys. He sells them for $20 each. You have $40. You also have three lab partners who are struggling. The question is what you do.',
+    liberalarts: 'Your professor has a reputation for reusing essay prompts. A senior has a folder of A-grade essays from the past three years. She\'ll share them — but only with you, not your study group. The question is what you do with access that others don\'t have.',
+    science:     'The organic chemistry test bank is a legend. A student in the year above has it. He\'ll share it with you if you help him with his lab reports. The offer is specific to you. Your study group doesn\'t know it exists.',
+    compsci:     'Someone in the senior class has a private repo with solutions to every problem set from CS 301, going back four years. He\'ll add you as a collaborator. Not your study group. Just you. The question is what you do with access that others don\'t have.',
+  };
+  return t[maj?.id] || 'Someone has an advantage. They\'re offering it to you, specifically, and not to your study group. The question is what you do with that.';
+}
+function buildCircle4Choices(maj) {
+  return [
+    { text: 'Share everything with your study group. All boats rise.', outcome: 'All boats rise. Your group performs well. Two people specifically thank you later. One of them refers you for a job in two years. You don\'t know that yet.', stats: { gpa:+0.2, energy:-5, social:+20, money:0, sin:0 }, resumeAction: () => addResumeLine('skills', 'Collaborative learning and peer mentorship', 'earned'), trackVal: 'shared their academic advantage with the entire study group, an act of generosity whose professional return would not arrive for two years' },
+    { text: 'Use it yourself, share only what\'s already public.', outcome: 'Defensible. The edge is real. The grade improves. The study group does adequately. Something small shifts in the room but nobody names it.', stats: { gpa:+0.3, energy:0, social:-5, money:0, sin:15 }, resumeAction: () => {}, trackVal: 'used the academic advantage privately and shared only what was already public, a transaction the study group sensed without being able to prove' },
+    { text: 'Decline. You\'re not interested in advantages others don\'t have.', outcome: 'Integrity is its own return even when it\'s not immediately visible. You study the normal way. The grade is honest. The circle of Greed does not punish those who decline its fruit.', stats: { gpa:+0.1, energy:-10, social:+10, money:0, sin:0 }, resumeAction: () => addResumeLine('skills', 'Academic integrity under pressure', 'earned'), trackVal: 'declined the private academic advantage entirely, a choice the circle of Greed noted with something approaching respect' },
+    { text: 'Take it and feel vaguely bad about it the whole time.', outcome: 'Effective academically. The vague bad feeling is the sin meter filling. It doesn\'t stop you but it doesn\'t leave either.', stats: { gpa:+0.2, energy:-5, social:-5, money:0, sin:20 }, resumeAction: () => {}, trackVal: 'accepted the academic advantage while feeling vaguely bad about it the entire time, a condition the sin meter accurately recorded' },
+  ];
+}
+
+function buildCircle5Text(maj) {
+  const t = {
+    business:    'Marketing Strategy capstone group project. Four people. Due in three weeks. Marcus — yes, that Marcus, transferred into your section somehow — has already suggested "pivoting the deliverable format" before anyone has opened a document. He is wearing a blazer. You are also wearing a blazer. This is not the point.',
+    engineering: 'Systems Design group project. Four people. Three weeks. Marcus from your sophomore cohort is somehow in this class. He has suggested doing the project in a framework none of you have used. He says it will "look better on the résumé." He has not opened the shared drive.',
+    liberalarts: 'Collaborative research presentation. Four people. Marcus, who you last saw in a sophomore seminar where he did not finish his section, is in your group. He has already suggested "reframing the entire thesis" before the first meeting has officially started. He has opinions. Zero documents.',
+    science:     'Lab research presentation group project. Four people. Marcus appears to have enrolled in your upper-division Biology course despite being, as far as you can tell, a business major. He has suggestions about the presentation format. He has not been to the lab.',
+    compsci:     'Software engineering group project. Four people. Marcus — who you know from a shared elective — is in your group and has already pushed a commit that broke the main branch. He says it was "exploratory." The project is due in three weeks.',
+  };
+  return t[maj?.id] || 'Group project. Three weeks. Marcus is in your group again. He has not changed.';
+}
+function buildCircle5Choices(maj) {
+  return [
+    { text: 'Assign Marcus one contained, unbreakable task. Manage the risk.', outcome: 'He does the task. It is mediocre. It is contained. The project succeeds around it. This is the highest form of group project management.', stats: { gpa:+0.3, energy:-10, social:+5, money:0, sin:0 }, resumeAction: () => addResumeLine('skills', 'Team management and risk mitigation', 'earned'), trackVal: 'assigned Marcus one contained unbreakable task and managed the group project around the risk, achieving a result Dante would describe as "technically paradise"' },
+    { text: 'Let the wrath out. Tell Marcus exactly what\'s happening.', outcome: 'The confrontation is clarifying. Marcus is briefly chastened. He contributes more than expected afterward, though the group atmosphere remains charged. The grade is fine. The circle of Wrath marks the moment.', stats: { gpa:+0.2, energy:-15, social:-10, money:0, sin:20 }, resumeAction: () => {}, trackVal: 'confronted Marcus directly about his group project behavior, achieving temporary improvement at the cost of the ambient social temperature' },
+    { text: 'Do Marcus\'s share yourself. Absorb the loss.', outcome: 'The grade is good. You resent Marcus with the specific intensity of someone who has been here before. Year One. Year Two. Apparently Year Three.', stats: { gpa:+0.4, energy:-25, social:-15, money:0, sin:5 }, resumeAction: () => addResumeLine('experience', 'De facto project lead, group deliverable', 'earned'), trackVal: 'completed Marcus\'s share of the project for the third time in their academic career, developing a resentment of geological depth' },
+    { text: 'Divide, conquer, and don\'t check Marcus\'s section until the night before.', outcome: 'Marcus\'s section is incomplete. You spend the last night completing it in a state of incandescent calm. The grade is adequate. The cycle continues.', stats: { gpa:+0.1, energy:-20, social:-5, money:0, sin:10 }, resumeAction: () => {}, trackVal: 'avoided checking Marcus\'s project section until the night before the deadline, discovering the predictable result' },
+  ];
+}
+
+function buildCircle6Text(maj) {
+  const t = {
+    business:    'November. The semester has compacted into a series of deliverables. You haven\'t slept a full night in eleven days. You\'ve told three people you\'re "doing great" today. You are not doing great. The heresy of junior year is the story you keep telling about how fine everything is.',
+    engineering: 'November. Three problem sets due, a lab report, and a project milestone simultaneously. You have been awake for 22 hours. You told your parents on Sunday that you\'re "managing well." The heresy is the gap between what you\'re saying and what the body is recording.',
+    liberalarts: 'November. The thesis prospectus is due. Two papers this week. A seminar presentation Friday. You\'ve been telling your advisor you\'re "on track." The track, if examined honestly, has some gaps in it. The heresy of junior year is the performance of okayness.',
+    science:     'November. Lab hours, coursework, the research symposium presentation approaching. You haven\'t eaten a meal that wasn\'t from a vending machine in four days. You told your lab partner this morning that you were "good." The body is filing a formal objection.',
+    compsci:     'November. Three deadlines this week. You\'ve been debugging for six hours straight. You told a friend you were "almost done" two hours ago. The code is not almost done. The heresy of junior year is the optimism you present to others while privately knowing the actual state of things.',
+  };
+  return t[maj?.id] || 'November. You\'ve been telling everyone you\'re fine. The sixth circle is the heresy — the false belief that you don\'t need what you need.';
+}
+function buildCircle6Choices(maj) {
+  return [
+    { text: 'Stop performing okayness. Tell someone the real answer.', outcome: 'You tell a friend, or an advisor, or anyone. The relief is physical. The help that follows is real. The heresy, named, loses most of its power.', stats: { gpa:+0.1, energy:+20, social:+15, motivation:+20, sin:0 }, resumeAction: () => addResumeLine('skills', 'Honest self-assessment under pressure', 'earned'), trackVal: 'stopped performing okayness in November and told someone the true state of things, discovering that named heresy loses most of its power' },
+    { text: 'Push through to winter break. The break will fix it.', outcome: 'The break helps. It does not fix the pattern. The same November will arrive next year with the same question.', stats: { gpa:0, energy:-20, social:-5, money:0, sin:15 }, resumeAction: () => {}, trackVal: 'pushed through November on performance alone, deferring the reckoning to winter break, which helped but did not resolve the pattern' },
+    { text: 'Reduce two obligations quietly. Create space.', outcome: 'You email two people with polite reductions in your availability. The world accepts this. The space you create is immediately useful.', stats: { gpa:+0.1, energy:+15, social:0, money:0, sin:0 }, resumeAction: () => addResumeLine('skills', 'Boundary-setting under academic pressure', 'earned'), trackVal: 'quietly reduced two obligations in November, creating space that was immediately and usefully occupied by actual rest' },
+    { text: 'Commit fully to the performance. Become the okayness.', outcome: 'The GPA holds. The energy does not. You arrive at finals week having spent November maintaining a fiction that was expensive to sustain.', stats: { gpa:+0.1, energy:-30, social:-5, money:0, sin:25 }, resumeAction: () => {}, trackVal: 'committed fully to the performance of okayness throughout November, arriving at finals week technically intact and genuinely depleted' },
+  ];
+}
+
+function buildCircle7Text(maj) {
+  const t = {
+    business:    'The burnout arrives not as a dramatic collapse but as a quiet refusal. The case study is open. The cursor is in the document. You have been looking at it for forty minutes and produced nothing. Your body has reached an agreement with itself that your ambitions were not consulted about.',
+    engineering: 'The burnout arrives in the middle of a problem set. Page three of seven. You understand the material. Your hands won\'t move. The calculator is on. You are looking at it from a great distance. Something has gone offline that isn\'t sleep-deprivation — it\'s deeper.',
+    liberalarts: 'The burnout arrives in the thesis draft. Third paragraph, second page. You have been writing it and erasing it for two hours. The words you want exist. They are not available to you. The seventh circle is the one where the violence is entirely internal.',
+    science:     'The burnout arrives at the lab bench. The protocol is in front of you. You know it by memory. Your hands are doing something different — they\'re still. You have been still for eleven minutes according to the lab clock. Something has gone offline.',
+    compsci:     'The burnout arrives mid-function. You know what the code needs to do. Your fingers are on the keyboard. Nothing is happening. You have been looking at line 47 for thirty minutes. The function is nine lines. This is the seventh circle.',
+  };
+  return t[maj?.id] || 'The burnout arrives not as a collapse but as a quiet refusal. The work is in front of you. Nothing is moving.';
+}
+function buildCircle7Choices(maj) {
+  return [
+    { text: 'Stop. Take 48 hours completely off. Return different.', outcome: 'You stop. The 48 hours feel wrong at first, then right, then necessary. You return to the work on the third day and it moves. The seventh circle rewards those who recognize what they\'re in.', stats: { gpa:+0.1, energy:+30, social:+5, money:0, sin:0 }, resumeAction: () => addResumeLine('skills', 'Recovery and resilience under sustained pressure', 'earned'), trackVal: 'stopped entirely for 48 hours when the burnout arrived, returning to find that rest is not the opposite of work but its precondition' },
+    { text: 'Push through. The deadline is real.', outcome: 'You produce something. It is below your standard and above failure. The grade reflects this. The burnout does not end — it simply defers its invoice.', stats: { gpa:-0.1, energy:-25, social:-10, money:0, sin:15 }, resumeAction: () => {}, trackVal: 'pushed through the burnout to meet the deadline, producing below-standard work and deferring the invoice rather than paying it' },
+    { text: 'Ask for an extension. Name what\'s happening.', outcome: 'The extension is granted. The professor says "you should have asked sooner." They\'re right. The work produced in the extra time is substantially better. Name the thing. Ask for the time.', stats: { gpa:+0.2, energy:+15, social:0, money:0, sin:0 }, resumeAction: () => addResumeLine('skills', 'Proactive communication under pressure', 'earned'), trackVal: 'named the burnout and asked for an extension, receiving both the time and the note that asking sooner is always better' },
+    { text: 'Submit what exists. Cut losses, survive the circle.', outcome: 'What exists is submitted. The grade is a C. The circle of Violence records it without judgment — sometimes you survive a circle rather than transcend it. That is also valid.', stats: { gpa:-0.3, energy:+5, social:0, money:0, sin:10 }, resumeAction: () => {}, trackVal: 'submitted what existed during the burnout, surviving the seventh circle rather than transcending it, which Dante considered an acceptable outcome' },
+  ];
+}
+
+function buildCircle8Text(maj) {
+  const t = {
+    business:    'The career fair is in two days. Your résumé has a line that says "Proficient: Excel, PowerPoint, SQL, Tableau." You are proficient in Excel and PowerPoint. SQL you have used twice in a course context. Tableau you watched a YouTube tutorial on in September. The recruiter from Deloitte is going to ask about Tableau.',
+    engineering: 'Your résumé says "Experience with MATLAB, SolidWorks, Python, and AutoCAD." MATLAB and SolidWorks are true. Python is mostly true. AutoCAD you opened once in a required course and have not touched since. The Boeing recruiter is interested in your AutoCAD experience specifically.',
+    liberalarts: 'Your résumé says you "managed social media strategy" for the literary magazine, which is true in the sense that you posted twice and suggested a visual rebrand that was never implemented. The nonprofit interviewing you wants to discuss your social media strategy experience in depth.',
+    science:     'Your résumé says "independent research experience in cellular biology." The research was a course-based lab project supervised at every step by a professor. It was real learning. It was not independent. The research lab interviewing you wants to know about your independent work.',
+    compsci:     'Your résumé says "proficient in React, Node.js, and AWS." React is true. Node.js you\'ve touched. AWS you have a free-tier account and have deployed one thing, once, in October. The startup interviewing you has their entire infrastructure on AWS.',
+  };
+  return t[maj?.id] || 'The career fair approaches. The résumé has a line on it that is optimistic. The recruiter is going to ask about it specifically.';
+}
+function buildCircle8Choices(maj) {
+  const embellishment = {
+    business: 'Tableau proficiency',
+    engineering: 'AutoCAD experience',
+    liberalarts: 'social media strategy management',
+    science: 'independent research',
+    compsci: 'AWS proficiency',
+  };
+  const emb = embellishment[maj?.id] || 'the embellished line';
+  return [
+    { text: 'Remove the embellishment. The résumé says what\'s true.', outcome: 'The line comes off. The résumé is shorter and more honest. Virgil says: the eighth circle has no power over a résumé that doesn\'t lie. He is correct.', stats: { gpa:0, energy:+5, social:0, money:0, sin:0 }, resumeAction: () => addResumeLine('skills', 'Honest credentials, verified and defensible', 'earned'), trackVal: 'removed the embellished résumé line before the career fair, presenting credentials that were shorter and completely defensible' },
+    { text: 'Learn the embellished skill before the interview. Emergency upskilling.', outcome: 'You spend 14 hours learning the basics. At the interview you say you\'re "working with it actively." This is now true. The technical question goes okay. The circle of Fraud grudgingly releases you.', stats: { gpa:-0.1, energy:-20, social:0, money:0, sin:5 }, resumeAction: () => { strikeResumeLine('skills', emb + ' (listed)'); addResumeLine('skills', emb + ' (actively developing)', 'earned'); }, trackVal: 'spent 14 hours emergency-learning the embellished skill before the interview, converting the fraud into a merely aggressive truth' },
+    { text: 'Keep it. Confidently redirect when asked.', outcome: '"I\'m actively building on my foundational knowledge of that tool" is a sentence that works exactly once. It works here. You are in the eighth circle. The meter records this.', stats: { gpa:0, energy:0, social:0, money:+5, sin:30 }, resumeAction: () => addResumeLine('skills', emb + ' ⚠️ (embellished)', 'embellished'), trackVal: 'kept the embellished résumé line and successfully redirected the recruiter\'s question, a maneuver the eighth circle recorded with a specific notation' },
+    { text: 'Disclose it proactively and frame it as a learning goal.', outcome: '"That\'s an area I\'m actively developing — here\'s my plan." The recruiter respects the honesty more than you expect. One says they appreciate it. The eighth circle opens for those who name what they\'re in.', stats: { gpa:0, energy:+10, social:+10, money:0, sin:0 }, resumeAction: () => addResumeLine('skills', emb + ' (disclosed, in development)', 'earned'), trackVal: 'proactively disclosed the résumé embellishment and framed it as a learning goal, discovering that honesty in the eighth circle opens a door' },
+  ];
+}
+
+function buildCircle9Text(maj) {
+  const t = {
+    business:    'Your friend Jordan got the Goldman position. The one you applied for. Jordan is good — genuinely good — and you know this. The question the ninth circle asks is not whether Jordan deserved it. They did. The question is what you do with what you feel, and whether the feeling becomes a wall or a direction.',
+    engineering: 'Your lab partner got the SpaceX position. They\'re brilliant and you\'ve always known it. The ninth circle doesn\'t punish losing to someone better. It asks: does the loss make you smaller, or does it clarify what you\'re building toward? The answer determines whether you stay in the circle.',
+    liberalarts: 'Your writing workshop peer got the editorial internship. Their work is excellent — you\'ve read it, you know. The ninth circle of Treachery is not always about being betrayed. Sometimes it\'s about the moment you feel betrayed by circumstances and have to decide what that feeling does to you.',
+    science:     'Your research partner got the NIH fellowship. They worked for it. You watched them work for it. The ninth circle asks not whether they deserved it — they did — but what you do with the gap between where you are and where you want to be. The answer to that question is the way out.',
+    compsci:     'Your classmate got the Google offer. The one you interviewed for. They\'re talented and you\'ve pair-programmed with them enough to know why. The ninth circle doesn\'t punish failure. It punishes the conversion of failure into resentment. The question is which way this goes.',
+  };
+  return t[maj?.id] || 'Someone you know got the thing you wanted. They deserved it. The ninth circle asks what you do with that.';
+}
+function buildCircle9Choices(maj) {
+  return [
+    { text: 'Congratulate them. Mean it. Use the loss as a map.', outcome: 'You congratulate them and mean it. The loss stays a loss — it doesn\'t become smaller — but it becomes useful. You ask them about the process. You learn something. The ninth circle opens.', stats: { gpa:+0.1, energy:+5, social:+15, money:0, sin:0 }, resumeAction: () => addResumeLine('skills', 'Resilience and professional grace under competitive loss', 'earned'), trackVal: 'congratulated the person who got what they wanted and used the loss as a map, discovering that the ninth circle opens for those who refuse to convert failure into resentment' },
+    { text: 'Process it privately. Take time before responding.', outcome: 'You take three days. You feel what you feel honestly. Then you come out. The nine circles do not demand you perform equanimity — only that you eventually find your way back from the deep cold.', stats: { gpa:0, energy:+5, social:0, money:0, sin:0 }, resumeAction: () => addResumeLine('skills', 'Emotional processing and recovery', 'earned'), trackVal: 'took three days to privately process the loss before responding, which Dante considered a valid and honest path through the ninth circle' },
+    { text: 'Let the resentment in. Just for a little while.', outcome: 'The resentment is warm at first. It becomes cold quickly. The ninth circle is freezing not as punishment but as accurate description. The meter rises. The exit becomes harder to find.', stats: { gpa:-0.1, energy:-15, social:-15, money:0, sin:25 }, resumeAction: () => {}, trackVal: 'let the resentment in for what they intended to be a little while, discovering that the ninth circle\'s cold is self-sustaining' },
+    { text: 'Redirect immediately. Apply to three other things today.', outcome: 'The energy of the loss goes directly into action. Two applications go out the same day. One of them leads somewhere. The ninth circle rewards those who convert betrayal into motion.', stats: { gpa:0, energy:-10, social:0, money:+10, sin:0 }, resumeAction: () => addResumeLine('experience', 'Redirected application strategy, junior year', 'earned'), trackVal: 'redirected the energy of the loss immediately into three new applications, converting betrayal into motion on the same afternoon' },
+  ];
+}
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+function clamp(v,lo,hi){return Math.max(lo,Math.min(hi,v));}
+function gpaStr(v){return v.toFixed(2);}
+function ca(){return document.getElementById('content-area');}
+function clear(){ca().innerHTML='';}
+
+function applyMods(stats) {
+  const d = Object.assign({}, stats);
+  const maj = MAJORS.find(m=>m.id===S.major);
+  if (maj) {
+    if (maj.mods.gpaScale && d.gpa)        d.gpa += d.gpa > 0 ? maj.mods.gpaScale : -Math.abs(maj.mods.gpaScale);
+    if (maj.mods.moneyBonus && d.money)    d.money = (d.money||0) + maj.mods.moneyBonus;
+    if (maj.mods.energyDiscount && d.energy < 0) d.energy = Math.floor(d.energy*(1-maj.mods.energyDiscount));
+    if (maj.mods.energyScale && d.energy < 0)    d.energy = Math.round(d.energy*maj.mods.energyScale);
+    if (maj.mods.socialBonus && d.social > 0)    d.social = (d.social||0)+maj.mods.socialBonus;
+  }
+  return d;
+}
+
+function updateStats() {
+  document.getElementById('stats-bar').style.display = 'flex';
+  document.getElementById('gpa-num').textContent = gpaStr(S.gpa);
+  ['energy','social','money'].forEach(k=>{
+    document.getElementById('bar-'+k).style.width = clamp(S[k],0,100)+'%';
+    document.getElementById('val-'+k).textContent = S[k];
+  });
+  document.getElementById('bar-sin').style.width = clamp(S.sin,0,100)+'%';
+  document.getElementById('val-sin').textContent = S.sin;
+  document.getElementById('circle-pill').textContent = S.circleIndex < 9 ? `Circle ${['I','II','III','IV','V','VI','VII','VIII','IX'][S.circleIndex]}` : '';
+  document.getElementById('resume-gpa').textContent = gpaStr(S.gpa);
+}
+
+function identityBar() {
+  const maj = MAJORS.find(m=>m.id===S.major);
+  if (!maj) return '';
+  return `<div class="identity-bar">${maj.icon} <span>${maj.name}</span> &nbsp;·&nbsp; ${S.abroadPath ? '✈️ <span>Abroad Path</span>' : '🏛️ <span>Campus Path</span>'}</div>`;
+}
+
+// ── SCREENS ───────────────────────────────────────────────────────────────────
+function showTitle() {
+  Object.assign(S, { phase:'title', circleIndex:0, gpa:3.5, energy:80, social:70, money:55, sin:0, major:null, abroadPath:false, selectedCard:null, _currentScenario:null, circleChoices:{}, resume:{ experience:[], skills:[], activities:[] } });
+  document.getElementById('stats-bar').style.display = 'none';
+  document.getElementById('circle-pill').textContent = '';
+  clear(); renderResume();
+  ca().innerHTML = `
+    <div style="display:flex;flex-direction:column;align-items:center;gap:16px;padding:24px;text-align:center;">
+      <div style="font-size:2.2em;">🔥</div>
+      <div style="font-family:'Cinzel',serif;font-size:1.9em;color:var(--ash);line-height:1.2;">JUNIOR YEAR:<br><span style="color:var(--flame);">AN INFERNO</span></div>
+      <div style="width:80%;height:2px;background:linear-gradient(to right,transparent,var(--ember),transparent);"></div>
+      <div style="font-family:'Special Elite',cursive;color:#8a7060;font-size:0.95em;line-height:1.6;max-width:440px;">"In the middle of the journey of our life, I came to myself in a dark wood, for the straight way was lost."<br><em style="font-size:0.85em;color:var(--smoke);">— Dante Alighieri · Also every junior in November</em></div>
+      <div style="font-size:0.9em;color:#a09080;max-width:440px;line-height:1.6;">Junior year is nine circles. You will descend through all of them. A burned-out senior named Virgil will guide you, offering observations that are funny, nihilistic, and occasionally wise. Your résumé will update as you go. Choose well.</div>
+      <button class="start-btn" onclick="showMajorSelect()">🔥 BEGIN THE DESCENT</button>
+    </div>`;
+}
+
+function showMajorSelect() {
+  clear();
+  ca().innerHTML = `
+    <div class="circle-banner">BEFORE THE DESCENT</div>
+    <div style="font-size:0.95em;line-height:1.6;color:#c0b090;margin-bottom:4px;">Junior year begins with one question. What are you, officially and irrevocably, studying?</div>
+    <div class="choice-cards">${MAJORS.map(m=>`
+      <div class="choice-card" id="cc-${m.id}" onclick="selectMajor('${m.id}')">
+        <div class="cc-icon">${m.icon}</div>
+        <div class="cc-name">${m.name}</div>
+        <div class="cc-desc">${m.desc}</div>
+        <div class="cc-effect">${m.effect}</div>
+      </div>`).join('')}
+    </div>
+    <button class="big-btn" id="confirm-btn" style="display:none;" onclick="confirmMajor()">DESCEND →</button>`;
+}
+
+function selectMajor(id) {
+  document.querySelectorAll('.choice-card').forEach(c=>c.classList.remove('selected'));
+  document.getElementById('cc-'+id).classList.add('selected');
+  S.selectedCard = id;
+  document.getElementById('confirm-btn').style.display = 'block';
+}
+
+function confirmMajor() {
+  S.major = S.selectedCard; S.selectedCard = null;
+  const maj = MAJORS.find(m=>m.id===S.major);
+  document.getElementById('resume-name').textContent = 'Junior Scholar';
+  document.getElementById('resume-major').textContent = `${maj.icon} ${maj.name} Major`;
+  S.phase = 'game';
+  updateStats();
+  showCircle();
+}
+
+// ── CIRCLE ENGINE ─────────────────────────────────────────────────────────────
+let CIRCLES = null;
+
+function showCircle() {
+  if (!CIRCLES) CIRCLES = buildCircles();
+  if (S.circleIndex >= CIRCLES.length) { showWin(); return; }
+  const sc = CIRCLES[S.circleIndex];
+  S._currentScenario = sc;
+  const letters = ['A','B','C','D'];
+  const maj = MAJORS.find(m=>m.id===S.major);
+  clear();
+  const virgilHTML = sc.virgil ? `<div class="virgil-note"><strong>Virgil:</strong> ${sc.virgil}</div>` : '';
+  ca().innerHTML = `
+    ${identityBar()}
+    <div class="circle-num">CIRCLE ${sc.num} · ${sc.sin.toUpperCase()}</div>
+    <div class="sin-tag">⚠ ${sc.sin}</div>${maj ? `<div class="major-tag">${maj.icon} ${maj.name}</div>` : ''}
+    <div class="scenario-title">${sc.title}</div>
+    <div class="dante-quote">"${sc.quote}" <span class="attr">— Dante Alighieri, Inferno</span></div>
+    ${virgilHTML}
+    <div class="scenario-text" style="white-space:pre-line;">${sc.text}</div>
+    <div id="choices">${sc.choices.map((ch,i)=>`
+      <button class="choice-btn${ch.sin>0?' sinful':''}" onclick="resolveCircle(${i})" id="ch${i}">
+        <span class="choice-letter">${letters[i]}.</span>${ch.text}${ch.sin>0?`<span class="sin-marker">🔥 +${ch.sin} sin</span>`:''}
+      </button>`).join('')}
+    </div>
+    <div id="outcome-panel"></div>
+    <button class="big-btn" id="next-btn" style="display:none;" onclick="advanceCircle()">DESCEND FURTHER →</button>`;
+}
+
+function resolveCircle(idx) {
+  const sc = S._currentScenario;
+  const ch = sc.choices[idx];
+  document.querySelectorAll('.choice-btn').forEach((b,i)=>{b.disabled=true;b.style.opacity=i===idx?'1':'0.4';});
+  document.getElementById('ch'+idx).style.borderColor = '#c85000';
+
+  if (sc.trackKey) S.circleChoices[sc.trackKey] = ch.trackVal || '';
+  if (sc.isBranch && ch.isAbroad !== undefined) S.abroadPath = ch.isAbroad;
+  if (ch.resumeAction) ch.resumeAction();
+
+  let d = applyMods(ch.stats);
+  S.gpa    = clamp(S.gpa    + (d.gpa||0),    0, 4.0);
+  S.energy = clamp(S.energy + (d.energy||0),  0, 100);
+  S.social = clamp(S.social + (d.social||0),  0, 100);
+  S.money  = clamp(S.money  + (d.money||0),   0, 100);
+  S.sin    = clamp(S.sin    + (d.sin||0),      0, 100);
+  updateStats();
+  renderResume();
+
+  const tone = (d.gpa||0) >= 0 && (d.energy||0) >= -10 ? 'outcome-good' : 'outcome-bad';
+  const changes = [];
+  if (d.gpa)    changes.push(`GPA <span class="${d.gpa>0?'plus':'minus'}">${d.gpa>0?'+':''}${d.gpa.toFixed(1)}</span>`);
+  if (d.energy) changes.push(`Energy <span class="${d.energy>0?'plus':'minus'}">${d.energy>0?'+':''}${d.energy}</span>`);
+  if (d.social) changes.push(`Social <span class="${d.social>0?'plus':'minus'}">${d.social>0?'+':''}${d.social}</span>`);
+  if (d.money)  changes.push(`Money <span class="${d.money>0?'plus':'minus'}">${d.money>0?'+':''}${d.money}</span>`);
+  if (d.sin)    changes.push(`Sin 🔥 <span class="minus">+${d.sin}</span>`);
+
+  const resumeNote = ch.resumeAction ? `<div class="resume-update">📄 Résumé updated — check sidebar</div>` : '';
+  const op = document.getElementById('outcome-panel');
+  op.innerHTML = `<span class="${tone}">${ch.outcome}</span><div class="stat-change">${changes.join(' &nbsp;·&nbsp; ')}</div>${resumeNote}`;
+  op.classList.add('show');
+  const nextLabel = S.circleIndex >= 8 ? 'EMERGE FROM THE INFERNO →' : 'DESCEND FURTHER →';
+  const nb = document.getElementById('next-btn');
+  nb.textContent = nextLabel; nb.style.display = 'block';
+  op.scrollIntoView({ behavior:'smooth', block:'nearest' });
+
+  if (S.gpa < 2.0 || S.energy <= 0 || S.social <= 0 || S.money <= 0) setTimeout(showGameOver, 1400);
+}
+
+function advanceCircle() {
+  S.circleIndex++;
+  if (S.gpa < 2.0 || S.energy <= 0 || S.social <= 0 || S.money <= 0) { showGameOver(); return; }
+  if (S.circleIndex >= 9) { showWin(); return; }
+  showCircle();
+}
+
+// ── CHRONICLE ─────────────────────────────────────────────────────────────────
+function buildChronicle() {
+  const maj = MAJORS.find(m=>m.id===S.major);
+  const mn = maj ? maj.name : 'undeclared';
+  const path = S.abroadPath ? 'a semester abroad that was genuinely transformative, which is annoying because it sounds like a brochure' : 'the internship application circuit, which was brutal and educational in ways no classroom could replicate';
+  const c3 = S.circleChoices.c3 || 'navigated the overcommitment spiral through methods the historians are still debating';
+  const c5 = S.circleChoices.c5 || 'survived another encounter with Marcus in a group project context';
+  const c8 = S.circleChoices.c8 || 'faced the résumé reckoning with results that varied by line item';
+  const c9 = S.circleChoices.c9 || 'descended through the ninth circle and emerged with their identity approximately intact';
+  const sinWord = S.sin >= 60 ? 'considerable' : S.sin >= 30 ? 'moderate' : 'admirably low';
+  const tier = S.gpa >= 3.3 ? 'triumph' : S.gpa >= 2.6 ? 'middling' : 'disaster';
+
+  const STORIES = {
+    triumph: [
+      `Thus opens the account of a ${mn} junior who descended into the academic Inferno with a résumé, a sin meter, and a guide named Virgil who had seen everything and found most of it darkly amusing. The declaration of major in the first circle landed with the satisfying finality of a door closing behind you — not trapping, but clarifying. The second circle offered the great choice of junior year, and our hero chose ${path}. The descent had begun in earnest.`,
+      `The middle circles were the hardest, as the middle always is. Our scholar ${c3}, which Virgil noted with the specific approval he reserved for people who don\'t learn the hard way twice. The fifth circle brought Marcus back — Marcus, eternal and unchanged — and our hero ${c5}. The sin meter read ${sinWord} by the time the eighth circle arrived and the résumé faced its reckoning. They ${c8}. Dante himself, reviewing the record, made a note.`,
+      `The ninth circle is the deepest and the coldest, and it is where junior year makes its final demand. Our scholar ${c9}. They emerged from the Inferno with a GPA of ${gpaStr(S.gpa)}, a résumé that told a story, and the specific knowledge that comes only from having been underground for a year and come back. "Beauty awakens the soul to act," Dante wrote. The soul, after junior year, was awake. — The Scorched Historians of the College, Year Three.`,
+    ],
+    middling: [
+      `The record of a ${mn} junior's descent into the academic Inferno is, like most records of the middle circles, a story of adequate navigation under difficult conditions. The major was declared in Circle One with the energy of someone who had made peace with the decision, if not with its implications. The second circle offered the great choice, and our hero chose ${path} — a decision that was either strategic or instinctive, and which the historians are unable to conclusively categorize.`,
+      `The descent continued. The overcommitment spiral of Circle Three found our scholar: they ${c3}. Virgil observed this from a middle distance and said something that was technically helpful. Marcus returned in the fifth circle with the punctuality of a bad habit, and our hero ${c5}. The sin meter reached ${sinWord} levels. The eighth circle's résumé reckoning arrived: they ${c8}. The circle did not fully release them but it did not hold them fast.`,
+      `The ninth circle is where junior year makes its quietest and most important demand, and here our scholar ${c9}. They emerged with a GPA of ${gpaStr(S.gpa)} and a résumé that reflected the year honestly, which is its own form of achievement. Virgil said, at the exit: "Most people make it out. The interesting question is what they carry." Our hero carried something real. — The Moderately Impressed Historians of the College, Year Three.`,
+    ],
+    disaster: [
+      `The infernal record of a ${mn} junior's descent begins with the declaration of major in Circle One — a moment of commitment that the subsequent eight circles would test with what can only be described as thoroughness. The second circle offered the great fork, and our hero chose ${path}, which was the right call or the wrong one depending on which historian you ask, and the historians remain divided. The sin meter was activated. The descent acquired momentum.`,
+      `The middle circles were where the record becomes difficult to read without the specific pity Dante reserved for those who suffer their own natures. The overcommitment spiral found our scholar: they ${c3}. Virgil, who had seen this particular shape of disaster before, made his comment and moved on. Marcus appeared in the fifth circle. Our hero ${c5}. The sin meter climbed. The résumé, in the eighth circle, faced a reckoning that produced results best described as ${S.sin > 50 ? '"creative"' : '"honest"'}.`,
+      `The ninth circle. Cold. Our scholar ${c9}. They emerged — and emergence itself, the historians wish to emphasize, is not nothing. A GPA of ${gpaStr(S.gpa)} exits the Inferno alongside a résumé that tells a story, and a sin total of ${S.sin} that Dante would recognize as the record of someone who was genuinely tempted by genuinely difficult circles. "In the middle of the journey of our life," Dante wrote, "I came to myself in a dark wood." The coming-to-oneself part is the point. It happened. Eventually. — The Grimly Hopeful Historians of the College, Year Three.`,
+    ],
+  };
+  return STORIES[tier].map((p,i)=>
+    `<div class="chronicle-para" data-label="${['The Upper Circles','The Deep Descent','The Exit'][i]}">${p}</div>`
+  ).join('');
+}
+
+function buildFinalResume() {
+  const maj = MAJORS.find(m=>m.id===S.major);
+  const toHTML = (items) => items.length === 0
+    ? '<div class="r-line" style="color:#4a3020;font-style:italic;">Nothing listed.</div>'
+    : items.map(i=>`<div class="r-line ${i.type==='earned'?'good':i.type==='struck'?'bad':'questionable'}">${i.text}</div>`).join('');
+  return `
+    <div class="final-resume">
+      <div class="r-name">Junior Scholar ${maj?'· '+maj.icon+' '+maj.name:''} · GPA: ${gpaStr(S.gpa)}</div>
+      <div class="r-section">EDUCATION</div>
+      <div class="r-line good">Junior year, GPA ${gpaStr(S.gpa)} · ${S.abroadPath?'Includes semester abroad':''}</div>
+      <div class="r-section">EXPERIENCE</div>
+      ${toHTML(S.resume.experience)}
+      <div class="r-section">SKILLS</div>
+      ${toHTML(S.resume.skills)}
+      <div class="r-section">ACTIVITIES</div>
+      ${toHTML(S.resume.activities)}
+    </div>`;
+}
+
+// ── END SCREENS ───────────────────────────────────────────────────────────────
+function showWin() {
+  clear();
+  document.getElementById('stats-bar').style.display = 'none';
+  let rank, wisdom;
+  const sinRank = S.sin >= 60 ? 'Sinfully Pragmatic' : S.sin >= 30 ? 'Moderately Tarnished' : 'Remarkably Principled';
+  if (S.gpa >= 3.4)      { rank='Emerged'; wisdom='"Beauty awakens the soul to act." Yours is awake.'; }
+  else if (S.gpa >= 2.8) { rank='Survived'; wisdom:'"The path to paradise begins in hell." You\'re not at paradise yet. But you\'re out of hell.'; }
+  else if (S.gpa >= 2.3) { rank='Climbed Out'; wisdom='"From a little spark may burst a mighty flame." The spark is still there.'; }
+  else                   { rank='Escaped Barely'; wisdom='"In the middle of the journey of our life, I came to myself." You came to yourself. Eventually. It counts.'; }
+
+  ca().innerHTML = `
+    <div style="text-align:center;padding:8px 0 4px;">
+      <div style="font-size:2em;">🔥</div>
+      <div class="end-title win">JUNIOR YEAR COMPLETE</div>
+      <div style="font-family:'Cinzel',serif;color:var(--gold);font-size:1em;margin:4px 0;">Status: ${rank} · ${sinRank}</div>
+    </div>
+    <div class="summary-grid">
+      <div class="summary-card"><div class="s-label">📚 FINAL GPA</div><div class="s-val">${gpaStr(S.gpa)}</div></div>
+      <div class="summary-card"><div class="s-label">⚡ ENERGY</div><div class="s-val">${S.energy}</div></div>
+      <div class="summary-card"><div class="s-label">🎉 SOCIAL</div><div class="s-val">${S.social}</div></div>
+      <div class="summary-card"><div class="s-label">💰 MONEY</div><div class="s-val">${S.money}</div></div>
+      <div class="summary-card"><div class="s-label">🔥 SIN</div><div class="s-val">${S.sin}</div></div>
+    </div>
+    <div class="end-wisdom">"${wisdom}"<br><em style="font-size:0.85em;color:var(--smoke);">— Dante Alighieri, Inferno</em></div>
+    <div class="journal-section">🔥 The Chronicle of Junior Year</div>
+    <div style="font-family:'Special Elite',cursive;font-size:0.82em;color:#8a7060;margin-bottom:10px;font-style:italic;">As transcribed by the Scorched Historians of the College</div>
+    <div style="display:flex;flex-direction:column;gap:14px;">${buildChronicle()}</div>
+    <div class="journal-section" style="margin-top:14px;">📄 Final Résumé</div>
+    <div style="font-family:'Special Elite',cursive;font-size:0.82em;color:#8a7060;margin-bottom:8px;font-style:italic;">What the year built</div>
+    ${buildFinalResume()}
+    <div style="margin-top:14px;background:rgba(139,34,0,0.08);border:2px solid var(--dim);border-radius:4px;padding:12px;text-align:center;">
+      <div style="font-family:'Cinzel',serif;color:var(--flame);font-size:0.9em;margin-bottom:6px;">THE SERIES CONTINUES</div>
+      <div style="font-size:0.85em;color:#8a7060;margin-bottom:10px;font-style:italic;">Continue the story in The Republic of Graduation</div>
+      <a class="nav-btn" href="meditations-on-a-2-8-gpa.html" style="font-size:0.85em;padding:6px 14px;">← Play Year II</a>
+    </div>
+    <button class="big-btn" style="margin-top:8px;" onclick="resetAndPlay()">↩ PLAY AGAIN</button>`;
+}
+
+function showGameOver() {
+  clear();
+  document.getElementById('stats-bar').style.display = 'none';
+  let reason = 'Your GPA collapsed below 2.0. Academic probation. Dante did not include an academic probation circle but he would have.';
+  if (S.energy <= 0) reason = 'Energy hit zero. The burnout was not managed — it won. The seventh circle claims those who refuse to rest.';
+  else if (S.social <= 0) reason = 'Social life collapsed entirely. The ninth circle is cold, but total isolation is colder.';
+  else if (S.money <= 0) reason = 'Funds fully depleted. The supply lines failed. Even Dante had Beatrice funding the expedition.';
+  ca().innerHTML = `
+    <div style="display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;padding:16px;">
+      <div style="font-size:2em;">🔥💀</div>
+      <div class="end-title">CONSUMED BY THE INFERNO</div>
+      <div style="font-size:0.95em;line-height:1.6;max-width:460px;color:#c0b090;">${reason}<br><br>Virgil, surveying the wreckage, says: "This is one of the more common outcomes. It doesn't make it less yours."</div>
+      <div class="end-wisdom">"Abandon all hope, ye who enter here."<br><em style="font-size:0.85em;color:var(--smoke);">— Dante · He was talking about the gate · He was also talking about this</em></div>
+      <button class="start-btn" onclick="resetAndPlay()">↩ TRY AGAIN</button>
+    </div>`;
+}
+
+function resetAndPlay() { CIRCLES = null; showTitle(); }
+showTitle();
+</script>
+</body>
+</html>
