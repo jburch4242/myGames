@@ -9,19 +9,20 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,600&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --forest:#2c3a2a;
-    --forest-deep:#212c20;
-    --moss:#6f8a5a;
-    --moss-dim:#8fa87c;
-    --clay:#a85a36;
-    --clay-bright:#c06a3f;
-    --sand:#e8ddc2;
-    --parchment:#f2ead6;
-    --bark:#3c332a;
-    --bark-soft:#6b6052;
+    --forest:#1f4d3d;
+    --forest-deep:#132e24;
+    --moss:#4f8f6a;
+    --moss-dim:#8bc0a0;
+    --clay:#1f6f8b;
+    --clay-bright:#2e93b8;
+    --sand:#dbe8e2;
+    --parchment:#eef4ef;
+    --bark:#1f2e29;
+    --bark-soft:#59716a;
     --gold:#bd9430;
-    --line:rgba(60,51,42,0.18);
-    --shadow: 0 4px 14px rgba(44,58,42,0.14);
+    --danger:#a8453d;
+    --line:rgba(19,46,36,0.16);
+    --shadow: 0 4px 14px rgba(15,40,32,0.16);
     --radius: 4px;
   }
 
@@ -37,8 +38,8 @@
     margin:0;
     min-height:100vh;
     background:
-      radial-gradient(ellipse at top left, rgba(111,138,90,0.10), transparent 55%),
-      radial-gradient(ellipse at bottom right, rgba(168,90,54,0.08), transparent 50%),
+      radial-gradient(ellipse at top left, rgba(79,143,106,0.12), transparent 55%),
+      radial-gradient(ellipse at bottom right, rgba(46,147,184,0.10), transparent 50%),
       var(--parchment);
     background-attachment:fixed;
     color:var(--bark);
@@ -54,8 +55,8 @@
     pointer-events:none;
     opacity:0.5;
     background-image:
-      repeating-radial-gradient(circle at 12% 18%, transparent 0, transparent 38px, rgba(60,51,42,0.035) 39px, transparent 40px, transparent 78px),
-      repeating-radial-gradient(circle at 85% 72%, transparent 0, transparent 46px, rgba(60,51,42,0.03) 47px, transparent 48px, transparent 92px);
+      repeating-radial-gradient(circle at 12% 18%, transparent 0, transparent 38px, rgba(19,46,36,0.035) 39px, transparent 40px, transparent 78px),
+      repeating-radial-gradient(circle at 85% 72%, transparent 0, transparent 46px, rgba(19,46,36,0.03) 47px, transparent 48px, transparent 92px);
     z-index:0;
   }
 
@@ -147,12 +148,9 @@
   .goal-card .top-row{display:flex; align-items:flex-start; justify-content:space-between; gap:10px;}
   .cat-icon{
     width:34px; height:34px; flex-shrink:0;
-    border-radius:50%;
     display:flex; align-items:center; justify-content:center;
-    background:var(--sand);
-    border:1px solid var(--line);
   }
-  .cat-icon svg{width:18px; height:18px; stroke:var(--forest-deep);}
+  .cat-icon svg{width:100%; height:100%; display:block; filter:drop-shadow(0 2px 3px rgba(15,40,32,0.25));}
 
   .goal-card h3{font-size:1.12rem; font-weight:600; line-height:1.25;}
   .goal-card .cat-tag{
@@ -170,6 +168,64 @@
     padding:40px 20px; text-align:center; color:var(--bark-soft); border:1px dashed var(--line); border-radius:var(--radius); grid-column:1/-1;
   }
 
+  /* ---------- Category tiles (home) ---------- */
+  .category-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(230px, 1fr));
+    gap:22px 18px;
+    margin-top:22px;
+  }
+  .category-tile{
+    background:rgba(255,255,255,0.55);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:24px 18px 20px;
+    cursor:pointer;
+    display:flex; flex-direction:column; align-items:center; gap:10px;
+    text-align:center;
+    transition:transform .2s ease, box-shadow .2s ease, background .2s ease;
+  }
+  .category-tile:nth-child(4n+1){ transform:rotate(-0.6deg); }
+  .category-tile:nth-child(4n+2){ transform:rotate(0.5deg); }
+  .category-tile:nth-child(4n+3){ transform:rotate(-0.4deg); }
+  .category-tile:hover{ box-shadow:var(--shadow); background:rgba(255,255,255,0.78); transform:translateY(-3px) rotate(0deg); }
+  .category-tile .cat-icon{width:92px; height:92px; margin-bottom:2px; transition:transform .25s ease;}
+  .category-tile .cat-icon svg{width:100%; height:100%;}
+  .category-tile:hover .cat-icon{transform:scale(1.05) rotate(-3deg);}
+  .category-tile h3{font-size:1.2rem; font-weight:600;}
+  .category-tile p{font-size:0.82rem; color:var(--bark-soft); line-height:1.4;}
+  .category-tile .progress-track, .category-tile .progress-label{width:100%;}
+  .category-tile.saved-tile .cat-icon{
+    border-radius:50%;
+    background:linear-gradient(135deg, var(--moss), var(--clay-bright));
+    border:1.6px solid var(--forest-deep);
+    box-shadow:0 3px 8px rgba(15,40,32,0.25), inset 0 2px 3px rgba(255,255,255,0.28);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .category-tile.saved-tile .cat-icon svg{width:44%; height:44%; stroke:#f5efdc; fill:#f5efdc; filter:none;}
+
+  /* ---------- Subcategory sections within a category page ---------- */
+  .subcategory-block{margin-top:34px;}
+  .subcategory-heading{display:flex; align-items:center; gap:12px; margin-bottom:14px;}
+  .cat-icon-sm{width:34px; height:34px;}
+  .cat-icon-sm svg{width:100%; height:100%;}
+  .subcategory-heading h3{font-size:1.15rem; font-weight:600;}
+
+  /* ---------- Save button ---------- */
+  .save-btn{
+    width:32px; height:32px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    border:1px solid var(--line); border-radius:50%;
+    background:rgba(255,255,255,0.6); color:var(--bark-soft); cursor:pointer;
+    transition:background .16s ease, color .16s ease, border-color .16s ease;
+  }
+  .save-btn svg{width:15px; height:15px;}
+  .save-btn:hover{background:var(--sand); color:var(--clay);}
+  .save-btn.saved{background:var(--clay-bright); border-color:var(--clay-bright); color:#fff;}
+  .save-btn.saved:hover{background:var(--clay);}
+  .detail-title{flex-grow:1; min-width:200px;}
+  .detail-save-btn{margin-left:auto;}
+
   /* ---------- Detail view ---------- */
   .back-link{
     display:inline-flex; align-items:center; gap:6px;
@@ -183,8 +239,8 @@
   .detail-header{
     display:flex; gap:18px; align-items:flex-start; margin-bottom:8px; flex-wrap:wrap;
   }
-  .detail-header .cat-icon{width:52px; height:52px;}
-  .detail-header .cat-icon svg{width:26px; height:26px;}
+  .detail-header .cat-icon{width:58px; height:58px;}
+  .detail-header .cat-icon svg{width:100%; height:100%;}
   .detail-title h2{font-size:1.9rem; font-weight:600;}
   .detail-title .cat-tag{font-size:0.72rem; letter-spacing:0.12em; text-transform:uppercase; font-weight:700; color:var(--clay); display:block; margin-bottom:6px;}
   .detail-blurb{color:var(--bark-soft); max-width:560px; line-height:1.55; margin-top:10px;}
@@ -205,7 +261,7 @@
     font-family:'Fraunces', serif; font-weight:700; font-size:0.85rem; color:var(--bark-soft);
     transition:background .18s ease, border-color .18s ease, transform .18s ease;
   }
-  .wp-marker svg{width:16px; height:16px; stroke:#3c332a;}
+  .wp-marker svg{width:16px; height:16px; stroke:#1f2e29;}
   .wp-marker.done{background:var(--gold); border-color:var(--gold);}
   .wp-marker.current{border-color:var(--clay-bright); border-width:2.2px; color:var(--clay-bright);}
   .wp-connector{width:2px; flex-grow:1; min-height:22px; background:var(--line); margin:2px 0;}
@@ -225,7 +281,7 @@
 
   .complete-banner{
     margin-top:26px; padding:20px 22px; border-radius:var(--radius);
-    background:linear-gradient(120deg, rgba(189,148,48,0.16), rgba(111,138,90,0.14));
+    background:linear-gradient(120deg, rgba(189,148,48,0.16), rgba(79,143,106,0.14));
     border:1px solid rgba(189,148,48,0.4);
     display:flex; align-items:center; gap:16px; flex-wrap:wrap;
   }
@@ -287,8 +343,8 @@
     border-radius:var(--radius);
     padding:12px 16px;
   }
-  .manage-row-icon{width:38px; height:38px; flex-shrink:0;}
-  .manage-row-icon svg{width:18px; height:18px;}
+  .manage-row-icon{width:40px; height:40px; flex-shrink:0;}
+  .manage-row-icon svg{width:100%; height:100%;}
   .manage-row-info{display:flex; flex-direction:column; gap:2px; flex-grow:1; min-width:0;}
   .manage-row-info strong{font-family:'Fraunces', serif; font-size:1rem; font-weight:600;}
   .manage-row-info span{font-size:0.78rem; color:var(--bark-soft);}
@@ -302,8 +358,8 @@
   }
   .btn-small:hover{background:var(--sand); border-color:var(--bark-soft);}
   .btn-small svg{width:14px; height:14px;}
-  .btn-danger{color:var(--clay);}
-  .btn-danger:hover{background:rgba(168,90,54,0.12); border-color:var(--clay);}
+  .btn-danger{color:var(--danger);}
+  .btn-danger:hover{background:rgba(168,69,61,0.12); border-color:var(--danger);}
   .btn-add{margin-top:10px;}
 
   .goal-form{
@@ -330,17 +386,18 @@
   .new-cat-panel{
     display:flex; flex-direction:column; gap:10px;
     padding:14px; border:1px dashed var(--line); border-radius:6px;
-    background:rgba(232,221,194,0.35); margin-top:-6px;
+    background:rgba(219,232,226,0.45); margin-top:-6px;
   }
-  .icon-picker{display:flex; gap:8px; flex-wrap:wrap;}
+  .icon-picker{display:flex; gap:10px; flex-wrap:wrap;}
   .icon-swatch{
-    width:38px; height:38px; border-radius:50%;
+    width:44px; height:44px; border-radius:50%;
     display:flex; align-items:center; justify-content:center;
-    background:var(--sand); border:1.6px solid var(--line); cursor:pointer;
-    transition:border-color .15s ease, background .15s ease;
+    background:none; border:none; padding:0; cursor:pointer;
+    transition:transform .15s ease, box-shadow .15s ease;
   }
-  .icon-swatch svg{width:18px; height:18px; stroke:var(--forest-deep);}
-  .icon-swatch.selected{border-color:var(--clay-bright); background:#fff; border-width:2.2px;}
+  .icon-swatch svg{width:100%; height:100%; display:block;}
+  .icon-swatch:hover{transform:translateY(-2px);}
+  .icon-swatch.selected{box-shadow:0 0 0 3px var(--clay-bright); border-radius:50%;}
 
   .subgoal-edit-list{display:flex; flex-direction:column; gap:8px;}
   .subgoal-edit-row{display:flex; align-items:center; gap:8px;}
@@ -376,14 +433,138 @@
 <script>
 (function(){
 
-  /* ============ ICONS (category line-icons, hand-simplified) ============ */
+  /* ============ ICONS (round adventure badges, one per category) ============ */
+  // Every category renders as a self-contained circular badge: an embossed
+  // green-to-blue disc with a stitched inner ring, holding a simple cream
+  // pictogram that signifies the category. Accent colors (sun gold, etc.)
+  // are used sparingly on top.
+  function makeBadge(id, glyph){
+    return `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="grad-${id}" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#4f8f6a"/>
+          <stop offset="1" stop-color="#1f6f8b"/>
+        </linearGradient>
+      </defs>
+      <circle cx="32" cy="32" r="30" fill="url(#grad-${id})" stroke="#132e24" stroke-width="1.6"/>
+      <circle cx="32" cy="32" r="25.3" fill="none" stroke="rgba(255,255,255,0.32)" stroke-width="1" stroke-dasharray="1.6 3.6"/>
+      <g stroke="#f5efdc" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" fill="none">
+        ${glyph}
+      </g>
+    </svg>`;
+  }
+
   const ICONS = {
-    creative: `<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20L14 10M14 10L20 4C20.5 6 19 8.5 17.5 10C16 11.5 13.5 13 12 13.5" /><path d="M12 13.5C10.5 14 8 14.5 6.5 14C7 15.5 8 16 10 16.5" /><circle cx="14" cy="10" r="0.6" fill="currentColor"/></svg>`,
-    physical: `<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="9" cy="7" rx="1.6" ry="2"/><ellipse cx="15.5" cy="12.5" rx="1.5" ry="2.1"/><path d="M9 9c-1 2-1.2 4-2 5.5-.6 1.2-1.5 2-1.5 3.5" /><path d="M15.5 14.5c.6 2 .3 3.5-.3 4.7-.5 1-1.7 1.3-2.7 1.3" /></svg>`,
-    mental: `<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5L13 13l-4.5 2.5L11 11l4.5-2.5z"/></svg>`,
-    endurance: `<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18L8 9l3 4 3-6 3 5 1 6" /><path d="M3 18h18"/></svg>`,
-    craft: `<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 6.5l3 3L8 19l-4 1 1-4z"/><path d="M13 8l3-3 3 3-3 3"/></svg>`,
-    mindfulness: `<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c-4-1-6-4-6-7 2 1 3 0 3-2-1 0-2-1-1.5-3 1.5.5 2.5 2 2.5 4 1-2 .5-4-1-6 2 0 4 2 4 5 0-3 1.5-4.5 3.5-5-1 2-1 4 0 5.5 1-1 1-2.5 0-3.5.8 1.7.8 3.3 0 5 1.2-.2 1.7-1 1.5-2.3.8 1.7.3 3.6-2 4.8-1 .5-2.5.8-4 .5z"/></svg>`
+    // Mountains, sun and a rolling shoreline
+    travel: makeBadge('travel', `
+      <circle cx="32" cy="18" r="3.2" fill="#f2c14e" stroke="none"/>
+      <path d="M13 42L21 27L27 35L35 20L47 42"/>
+      <path d="M11 47c3.5-2.5 7-2.5 10.5 0s7 2.5 10.5 0 7-2.5 10.5 0"/>
+    `),
+    // A pennant flag planted on a pole
+    'united-states': makeBadge('united-states', `
+      <path d="M23 46V16"/>
+      <path d="M16 46h14"/>
+      <path d="M23 17l17 6.5-17 6z" fill="#f5efdc" stroke="none"/>
+    `),
+    // A globe with meridians
+    international: makeBadge('international', `
+      <circle cx="32" cy="32" r="13"/>
+      <ellipse cx="32" cy="32" rx="5.6" ry="13"/>
+      <path d="M19.3 27.5h25.4"/>
+      <path d="M19.3 36.5h25.4"/>
+    `),
+    // Paintbrush stroke and a music note
+    creative: makeBadge('creative', `
+      <path d="M18 46L30 22"/>
+      <path d="M30 22c1-3.2 3.2-5.4 6.4-7-.4 2.5-1.8 5-3.7 6.9-1.6 1.6-3.8 2.9-6 3.5"/>
+      <circle cx="44" cy="42" r="3" fill="#f5efdc" stroke="none"/>
+      <path d="M47 42V25.5l5-1.7v16.2"/>
+    `),
+    // Hammer and wrench crossed
+    craft: makeBadge('craft', `
+      <path d="M19 45l11-11"/>
+      <path d="M27 33l6-6 4 4-6 6z" fill="#f5efdc" stroke="none"/>
+      <path d="M45 45L35 35"/>
+      <path d="M40 27c-1.7 1.7-1.7 4.3 0 6s4.3 1.7 6 0c1-1 1.4-2.4 1.1-3.7l-2.7 2.7-2.4-2.4 2.7-2.7c-1.3-.3-2.7.1-3.7 1.1z"/>
+    `),
+    // Lotus petals rising from a still line
+    mindfulness: makeBadge('mindfulness', `
+      <path d="M20 41h24"/>
+      <path d="M32 41c-3-9-3-15.5 0-22 3 6.5 3 13 0 22z"/>
+      <path d="M32 41c-6.4-6-10.4-10.3-16.6-12.4 1 7.2 5.4 12.4 12.4 15.4z"/>
+      <path d="M32 41c6.4-6 10.4-10.3 16.6-12.4-1 7.2-5.4 12.4-12.4 15.4z"/>
+    `),
+    // A gear with a small badge-star sparkle
+    skills: makeBadge('skills', `
+      <path d="M32 24v-3M40 26.3l2.1-2.1M43.3 32H46M40 37.7l2.1 2.1M32 40v3M23.9 37.7l-2.1 2.1M20.7 32H18M23.9 26.3l-2.1-2.1"/>
+      <circle cx="32" cy="32" r="8"/>
+      <circle cx="32" cy="32" r="2.4" fill="#f5efdc" stroke="none"/>
+      <path d="M46 16v6M43 19h6" stroke="#f2c14e"/>
+    `),
+    // A runner mid-stride
+    physical: makeBadge('physical', `
+      <circle cx="39" cy="17" r="3" fill="#f5efdc" stroke="none"/>
+      <path d="M37 20l-4.5 8 6.5 4-2 10"/>
+      <path d="M33 28l-9.5 3"/>
+      <path d="M39 24l7-2 4.5 6"/>
+    `),
+    // A single peak with a summit flag
+    endurance: makeBadge('endurance', `
+      <path d="M16 46L32 18L48 46Z"/>
+      <path d="M32 18v-7"/>
+      <path d="M32 11l6.5 2.3-6.5 2.3z" fill="#f5efdc" stroke="none"/>
+      <path d="M23 46c2.5-6 2-10.5 5.5-14.5" stroke-dasharray="1.8 3.4"/>
+    `),
+    // A dumbbell
+    strength: makeBadge('strength', `
+      <path d="M22 32h20"/>
+      <rect x="13" y="25" width="6" height="14" rx="1.6"/>
+      <rect x="19" y="27.5" width="4" height="9" rx="1"/>
+      <rect x="45" y="25" width="6" height="14" rx="1.6"/>
+      <rect x="41" y="27.5" width="4" height="9" rx="1"/>
+    `),
+    // A figure mid star-jump
+    calisthenics: makeBadge('calisthenics', `
+      <circle cx="32" cy="17.5" r="3.2" fill="#f5efdc" stroke="none"/>
+      <path d="M32 20.7v10"/>
+      <path d="M32 24.5l-9-6M32 24.5l9-6"/>
+      <path d="M32 30.7l-8 10M32 30.7l8 10"/>
+    `),
+    // A stylized torso/physique silhouette
+    aesthetics: makeBadge('aesthetics', `
+      <path d="M24 21c0-2.2 3.6-4 8-4s8 1.8 8 4v2.6c0 1.9-1.3 3.3-2.9 3.9 1.9.9 2.9 2.8 2.9 5V37c0 2.8-2.2 5-5 5h-6c-2.8 0-5-2.2-5-5v-4.5c0-2.2 1-4.1 2.9-5-1.6-.6-2.9-2-2.9-3.9z"/>
+      <path d="M27.5 30.5h9M27.5 34h9"/>
+    `),
+    // A seamed ball
+    sports: makeBadge('sports', `
+      <circle cx="32" cy="32" r="13"/>
+      <path d="M19.3 32c4.3-6 22.4-6 26.7 0"/>
+      <path d="M19.3 32c4.3 6 22.4 6 26.7 0"/>
+      <path d="M32 19v26"/>
+    `),
+    // A page with a quill
+    writing: makeBadge('writing', `
+      <rect x="20" y="17" width="17" height="22" rx="1.6"/>
+      <path d="M24.5 24.5h9M24.5 29.5h9M24.5 34.5h6"/>
+      <path d="M44 15c-2.5 4.4-13 15.4-17.4 19"/>
+      <path d="M44 15c1.8-.8 3.6-.6 4.6.7"/>
+    `),
+    // A palette with paint dots
+    art: makeBadge('art', `
+      <path d="M19.5 33.7c-1-8.7 5.7-16.7 14.5-16.7 7.8 0 14.5 4.9 14.5 11.8 0 4.9-3.9 7.8-8.7 7.8h-2.9c-1.9 0-2.9 1.5-2.9 3.2 0 1 .6 1.8.6 2.7 0 2.3-2.2 3.8-4.8 3.8-6.8 0-9.8-4.8-10.3-12.6z"/>
+      <ellipse cx="23.5" cy="32.8" rx="2.4" ry="3.1"/>
+      <circle cx="30" cy="24" r="1.7" fill="#f2c14e" stroke="none"/>
+      <circle cx="37" cy="26" r="1.7" fill="#f5efdc" stroke="none"/>
+      <circle cx="39" cy="33" r="1.7" fill="#2e93b8" stroke="none"/>
+    `),
+    // A brain silhouette with a center divide and folds
+    mental: makeBadge('mental', `
+      <path d="M23 24.4c-3 0-5.1 2.6-4.7 5.7-2.1 1.4-2.1 4.7 0 6.1-.6 2.9 1.7 5.5 4.5 5.5.6 1.9 2.5 3.1 4.7 3.1h8c2.2 0 4.1-1.2 4.7-3.1 2.8 0 5.1-2.6 4.5-5.5 2.1-1.4 2.1-4.7 0-6.1.4-3.1-1.7-5.7-4.7-5.7-1.4-1.7-3.7-2.7-6-2.7s-4.6.9-6 2.6c-1-.7-2.3-1-3.7-1-.9 0-1.7.1-2.6.6z"/>
+      <path d="M32 22.3v20.5"/>
+      <path d="M26 27.3c1.6 1 1.6 3.2 0 4.2"/>
+      <path d="M38 27.3c-1.6 1-1.6 3.2 0 4.2"/>
+    `)
   };
 
   const CHECK_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>`;
@@ -394,6 +575,8 @@
   const TRASH_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4.5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1V7M18 7l-.8 12.4a2 2 0 0 1-2 1.6H8.8a2 2 0 0 1-2-1.6L6 7"/></svg>`;
   const UP_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg>`;
   const DOWN_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>`;
+  const BOOKMARK_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"/></svg>`;
+  const BOOKMARK_FILLED_ICON = `<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"/></svg>`;
 
   /* ============ DATA ============ */
   const DEFAULT_CATS = {
@@ -402,7 +585,17 @@
     mental:{label:'Mental'},
     endurance:{label:'Endurance'},
     craft:{label:'Craft'},
-    mindfulness:{label:'Mindfulness'}
+    mindfulness:{label:'Mindfulness'},
+    travel:{label:'Travel'},
+    strength:{label:'Strength'},
+    calisthenics:{label:'Calisthenics'},
+    aesthetics:{label:'Aesthetics'},
+    sports:{label:'Sports'},
+    writing:{label:'Writing'},
+    art:{label:'Art'},
+    skills:{label:'Skills'},
+    'united-states':{label:'United States'},
+    international:{label:'International'}
   };
 
   // Shapes available for custom categories (reuses the hand-drawn icon set)
@@ -412,7 +605,17 @@
     {key:'mental', label:'Compass'},
     {key:'endurance', label:'Peaks'},
     {key:'craft', label:'Tools'},
-    {key:'mindfulness', label:'Leaf'}
+    {key:'mindfulness', label:'Leaf'},
+    {key:'travel', label:'Globe'},
+    {key:'strength', label:'Dumbbell'},
+    {key:'calisthenics', label:'Gymnast'},
+    {key:'aesthetics', label:'Physique'},
+    {key:'sports', label:'Ball'},
+    {key:'writing', label:'Page'},
+    {key:'art', label:'Palette'},
+    {key:'skills', label:'Gear'},
+    {key:'united-states', label:'Flag'},
+    {key:'international', label:'Globe'}
   ];
 
   function iconFor(catId){
@@ -423,12 +626,30 @@
   }
 
   const DEFAULT_GOALS = [
-    {id:'novel', title:'Write a Novel', category:'creative', badgeName:'The Novelist',
+    {id:'novel', title:'Write a Novel', category:'writing', badgeName:'The Novelist',
      blurb:'Turn a spark of an idea into a finished manuscript, one chapter at a time.',
      subgoals:['Choose a story idea and genre','Outline the plot and main characters','Write the first chapter','Reach 10,000 words','Reach the halfway point','Finish the first full draft','Complete one full revision pass','Share it with a beta reader']},
-    {id:'handstand', title:'Learn to Handstand', category:'physical', badgeName:'The Balanced',
+    {id:'handstand', title:'Learn to Handstand', category:'calisthenics', badgeName:'The Balanced',
      blurb:'Build the strength and balance to stand on your hands, unsupported.',
      subgoals:['Build wrist and shoulder mobility','Hold a wall plank for 30 seconds','Practice wall walks','Hold chest-to-wall for 30 seconds','Attempt freestanding kick-ups','Hold freestanding for 5 seconds','Hold freestanding for 30 seconds','Press into a handstand from standing']},
+    {id:'muscle-up', title:'Do a Muscle-Up', category:'calisthenics', badgeName:'The Transition',
+     blurb:'Link a strict pull-up straight into a dip on top of the bar.',
+     subgoals:['Do 10 strict pull-ups in a row','Do 15 strict dips in a row','Do 5 explosive chest-to-bar pull-ups in a row','Hold a false grip on the bar for 20 seconds','Do 1 kipping muscle-up','Do 1 strict muscle-up','Do 3 strict muscle-ups in a row']},
+    {id:'pullups-20', title:'Do 20 Pull-Ups in a Row', category:'calisthenics', badgeName:'The Iron Grip',
+     blurb:'Build your pull-up count from your very first rep to 20 unbroken.',
+     subgoals:['Do 1 strict pull-up','Do 5 strict pull-ups in a row','Do 8 strict pull-ups in a row','Do 12 strict pull-ups in a row','Do 15 strict pull-ups in a row','Do 18 strict pull-ups in a row','Do 20 strict pull-ups in a row']},
+    {id:'pushups-50', title:'Do 50 Push-Ups in a Row', category:'calisthenics', badgeName:'The Steady Engine',
+     blurb:'Take your push-up count from a handful to 50 unbroken reps.',
+     subgoals:['Do 10 push-ups in a row','Do 20 push-ups in a row','Do 30 push-ups in a row','Do 35 push-ups in a row','Do 40 push-ups in a row','Do 45 push-ups in a row','Do 50 push-ups in a row']},
+    {id:'headstand', title:'Hold a Headstand', category:'calisthenics', badgeName:'The Inverted',
+     blurb:'Build the balance and neck strength to hold a headstand unsupported.',
+     subgoals:['Hold a headstand against a wall for 10 seconds','Hold a headstand against a wall for 30 seconds','Hold a headstand against a wall for 60 seconds','Practice 10 tripod headstand entries','Hold a freestanding headstand for 5 seconds','Hold a freestanding headstand for 15 seconds','Hold a freestanding headstand for 30 seconds']},
+    {id:'backflip', title:'Land a Backflip', category:'calisthenics', badgeName:'The Aerialist',
+     blurb:'Progress from basic jump mechanics to landing a backflip on your feet.',
+     subgoals:['Practice a standing vertical jump with a full arm swing 10 times','Practice a backward roll from standing 10 times','Land a backflip on a trampoline','Land a backflip into a foam pit','Land a backflip on a mat with a spotter','Land a backflip on a mat unassisted','Land a backflip on flat ground unassisted']},
+    {id:'l-sit', title:'Hold an L-Sit for 10 Seconds', category:'calisthenics', badgeName:'The Steel Core',
+     blurb:'Build the core and shoulder strength to hold your legs straight out for a full 10 seconds.',
+     subgoals:['Hold a tucked L-sit for 5 seconds','Hold a tucked L-sit for 15 seconds','Hold a one-leg-extended L-sit for 10 seconds','Hold a full L-sit for 3 seconds','Hold a full L-sit for 5 seconds','Hold a full L-sit for 8 seconds','Hold a full L-sit for 10 seconds']},
     {id:'instrument', title:'Learn an Instrument', category:'creative', badgeName:'The Musician',
      blurb:'From first note to first real performance.',
      subgoals:['Pick an instrument and get one','Learn basic posture and hold','Learn your first five notes or chords','Play a scale cleanly','Learn one full song','Play along with a recording','Play a song from memory','Perform for someone else']},
@@ -438,10 +659,22 @@
     {id:'ultra', title:'Run an Ultramarathon', category:'endurance', badgeName:'The Ultrarunner',
      blurb:'Build from your first steady run to distances most people never attempt.',
      subgoals:['Run a continuous 5K','Run a continuous 10K','Complete a half marathon','Complete a full marathon','Run back-to-back long training days','Practice running on trail terrain','Complete a 50K','Complete your target ultra distance']},
-    {id:'code', title:'Learn to Code', category:'craft', badgeName:'The Builder',
+    {id:'run-5k', title:'Run a 5K', category:'endurance', badgeName:'The 5K Finisher',
+     blurb:'Go from your first jog to crossing a 5K finish line.',
+     subgoals:['Run continuously for 10 minutes','Run continuously for 20 minutes','Run 2 miles continuously','Run 3 miles continuously','Run the full 5K distance (3.1 miles) in training','Complete an official or timed 5K']},
+    {id:'run-10k', title:'Run a 10K', category:'endurance', badgeName:'The 10K Finisher',
+     blurb:'Build your distance from a 5K up to a full 10K.',
+     subgoals:['Run a continuous 5K','Run 4 miles continuously','Run 5 miles continuously','Run 6 miles continuously','Run the full 10K distance (6.2 miles) in training','Complete an official or timed 10K']},
+    {id:'run-half', title:'Run a Half Marathon', category:'endurance', badgeName:'The Half Marathoner',
+     blurb:'Extend your long runs from a 10K to 13.1 miles.',
+     subgoals:['Run 7 miles continuously','Run 9 miles continuously','Run 11 miles continuously','Run 13 miles continuously','Complete a long training run of 13.1 miles','Complete an official half marathon']},
+    {id:'run-marathon', title:'Run a Marathon', category:'endurance', badgeName:'The Marathoner',
+     blurb:'Build from a half marathon up to the full 26.2 miles.',
+     subgoals:['Run 15 miles continuously','Run 18 miles continuously','Run 20 miles continuously','Complete a 22-mile long training run','Taper and rest in the final two weeks before race day','Complete an official marathon (26.2 miles)']},
+    {id:'code', title:'Learn to Code', category:'skills', badgeName:'The Builder',
      blurb:'Go from your first script to something someone else can actually use.',
      subgoals:['Write your first "hello world"','Learn variables and loops','Write a small script that solves a real task','Learn functions and basic structure','Build a small project end-to-end','Learn to read someone else\u2019s code','Contribute to or share a project','Build something for someone else to use']},
-    {id:'draw', title:'Learn to Draw', category:'creative', badgeName:'The Illustrator',
+    {id:'draw', title:'Learn to Draw', category:'art', badgeName:'The Illustrator',
      blurb:'Train your eye and hand from basic shapes to a body of work.',
      subgoals:['Draw simple shapes and lines daily','Learn basic perspective','Draw from observation, like a still life','Study light and shadow','Draw a full figure or portrait','Develop a personal style','Complete a small series of works','Share your work publicly']},
     {id:'meditation', title:'Build a Meditation Practice', category:'mindfulness', badgeName:'The Still Mind',
@@ -450,12 +683,27 @@
     {id:'speaking', title:'Get Comfortable Public Speaking', category:'mental', badgeName:'The Orator',
      blurb:'Move from nervous rehearsal to speaking with real confidence.',
      subgoals:['Practice speaking in front of a mirror','Record yourself speaking','Speak in front of one friend','Give a short talk to a small group','Field a question you didn\u2019t expect','Speak without notes','Give a talk to a larger audience','Speak live on a topic you\u2019re passionate about']},
-    {id:'cook', title:'Cook Like a Chef', category:'craft', badgeName:'The Chef',
+    {id:'cook', title:'Cook Like a Chef', category:'skills', badgeName:'The Chef',
      blurb:'Build real kitchen instincts, from knife skills to your own recipes.',
      subgoals:['Learn basic knife skills','Cook five staple recipes well','Learn to season by taste','Cook a full meal without a recipe','Master one cuisine\u2019s fundamentals','Host a dinner for others','Develop an original recipe','Cook a full multi-course meal']},
-    {id:'swim', title:'Learn to Swim Confidently', category:'physical', badgeName:'The Swimmer',
+    {id:'rubiks-cube', title:'Solve a Rubik\u2019s Cube', category:'skills', badgeName:'The Cuber',
+     blurb:'Go from a scrambled mess to solving it without thinking twice.',
+     subgoals:['Learn to solve the first layer','Learn to solve the middle layer','Learn to solve the last layer cross','Solve the whole cube untimed','Learn the beginner\u2019s method fully','Solve consistently in under 2 minutes','Learn a few speedcubing tricks','Solve it in under 60 seconds']},
+    {id:'swim', title:'Learn to Swim Confidently', category:'sports', badgeName:'The Swimmer',
      blurb:'From floating comfortably to swimming real distances.',
      subgoals:['Get comfortable floating in water','Learn to breathe rhythmically','Swim one length of freestyle','Swim continuously for 5 minutes','Learn a second stroke','Swim 500m continuously','Try swimming in open water','Complete a swim event or distance goal']},
+    {id:'squat', title:'Squat 315', category:'strength', badgeName:'The Foundation',
+     blurb:'Build your squat from an empty bar to a true three-plate milestone.',
+     subgoals:['Squat the bar (45 lb) for 5 reps','Squat 95 lb for 5 reps','Squat 135 lb for 5 reps','Squat 185 lb for 5 reps','Squat 225 lb for 5 reps','Squat 275 lb for 3 reps','Squat 315 lb for 1 rep']},
+    {id:'bench-press', title:'Bench 315', category:'strength', badgeName:'The Iron Press',
+     blurb:'Take your bench press from the bar to a serious number.',
+     subgoals:['Bench the bar (45 lb) for 5 reps','Bench 95 lb for 5 reps','Bench 135 lb for 5 reps','Bench 185 lb for 5 reps','Bench 225 lb for 3 reps','Bench 275 lb for 1 rep','Bench 315 lb for 1 rep']},
+    {id:'deadlift', title:'Deadlift 405', category:'strength', badgeName:'The Ground Breaker',
+     blurb:'Pull your deadlift up from the bar to a four-plate milestone.',
+     subgoals:['Deadlift the bar (45 lb) for 5 reps','Deadlift 135 lb for 5 reps','Deadlift 225 lb for 5 reps','Deadlift 275 lb for 3 reps','Deadlift 315 lb for 1 rep','Deadlift 365 lb for 1 rep','Deadlift 405 lb for 1 rep']},
+    {id:'physique', title:'Build the Physique You Want', category:'aesthetics', badgeName:'The Sculpted',
+     blurb:'Build a training and nutrition routine you can actually stick with long-term.',
+     subgoals:['Set a clear, realistic vision for your goal','Build a consistent training routine','Learn the basics of nutrition that fit your goal','Track your progress with photos or measurements','Push through a plateau','Adjust your plan based on what you learn','Hit a visible milestone that matters to you','Maintain your results for three months']},
     {id:'garden', title:'Grow a Garden', category:'craft', badgeName:'The Grower',
      blurb:'From a single seed to a harvest you can share.',
      subgoals:['Choose what you want to grow','Prepare the soil and plant','Care for it through first sprouts','Manage a pest or problem','Harvest your first crop','Grow something from seed to seed','Expand into a second growing season','Grow enough to share or preserve']},
@@ -464,7 +712,23 @@
      subgoals:['Learn how each piece moves','Play your first full game','Learn a few basic openings','Learn to spot simple tactics','Beat someone who used to beat you','Learn one endgame technique well','Study one of your own games','Reach a rating or skill milestone that matters to you']},
     {id:'climb', title:'Climb a Mountain', category:'endurance', badgeName:'The Summiteer',
      blurb:'Train up from a local trail to a real summit attempt.',
-     subgoals:['Hike a local trail','Hike a route with real elevation gain','Learn basic gear and layering','Do a longer training hike','Learn basic navigation and route reading','Attempt a moderate peak','Push through a weather or fatigue setback','Summit your target mountain']}
+     subgoals:['Hike a local trail','Hike a route with real elevation gain','Learn basic gear and layering','Do a longer training hike','Learn basic navigation and route reading','Attempt a moderate peak','Push through a weather or fatigue setback','Summit your target mountain']},
+
+    {id:'wonders', title:'See the 7 Wonders of the World', category:'international', badgeName:'The Globetrotter',
+     blurb:'Visit each of the New7Wonders, one continent at a time.',
+     subgoals:['Visit the Great Wall of China','Visit Petra, Jordan','Visit Christ the Redeemer, Brazil','Visit Machu Picchu, Peru','Visit Chichén Itzá, Mexico','Visit the Colosseum, Italy','Visit the Taj Mahal, India']},
+
+    {id:'fifty-states', title:'Travel to All 50 States', category:'united-states', badgeName:'The Fifty-Stater',
+     blurb:'Set foot in every state in the union, region by region.',
+     subgoals:['Visit all of New England (CT, ME, MA, NH, RI, VT)','Visit the Mid-Atlantic (NY, NJ, PA, DE, MD)','Visit the Southeast (VA, WV, NC, SC, GA, FL)','Visit the Midwest (OH, MI, IN, IL, WI, MN, IA, MO)','Visit the South Central states (KY, TN, AL, MS, AR, LA, OK, TX)','Visit the Great Plains & Mountain West (KS, NE, SD, ND, MT, WY, CO, NM, UT, ID)','Visit the Southwest & Pacific coast (AZ, NV, CA, OR, WA)','Visit Alaska and Hawaii']},
+
+    {id:'national-parks', title:'Visit Every National Park', category:'united-states', badgeName:'The Park Ranger',
+     blurb:'See all of America\u2019s national parks, one ecosystem at a time.',
+     subgoals:['Visit the Pacific Coast parks (CA, OR, WA)','Visit the Rocky Mountain parks (CO, WY, MT, UT)','Visit the Southwest desert parks (AZ, NM, TX, NV)','Visit the Midwest & Great Lakes parks (MI, MN, SD, ND)','Visit the Southeast parks (FL, KY, TN, NC)','Visit the Northeast parks (ME, VA, WV)','Visit the Alaska parks','Visit the parks in Hawaii and the U.S. territories']},
+
+    {id:'baseball-parks', title:'Visit Every MLB Ballpark', category:'united-states', badgeName:'The Groundskeeper',
+     blurb:'Catch a game at all 30 Major League Baseball stadiums.',
+     subgoals:['Visit all AL East ballparks (Yankees, Red Sox, Blue Jays, Orioles, Rays)','Visit all AL Central ballparks (White Sox, Guardians, Tigers, Royals, Twins)','Visit all AL West ballparks (Astros, Angels, Athletics, Mariners, Rangers)','Visit all NL East ballparks (Braves, Marlins, Mets, Phillies, Nationals)','Visit all NL Central ballparks (Cubs, Reds, Brewers, Pirates, Cardinals)','Visit all NL West ballparks (Diamondbacks, Rockies, Dodgers, Padres, Giants)']}
   ];
 
   /* ============ CUSTOM GOALS / CATEGORIES STORAGE ============ */
@@ -533,7 +797,7 @@
     }catch(e){ /* ignore corrupt state */ }
     const progress = {};
     GOALS.forEach(g => progress[g.id] = new Array(g.subgoals.length).fill(false));
-    return {progress};
+    return {progress, saved: {}};
   }
 
   let state = loadState();
@@ -541,10 +805,47 @@
   GOALS.forEach(g => {
     if(!state.progress[g.id]) state.progress[g.id] = new Array(g.subgoals.length).fill(false);
   });
+  if(!state.saved) state.saved = {};
 
   function saveState(){
     try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
     catch(e){ /* storage unavailable, continue silently */ }
+  }
+
+  // Some categories nest under a parent for browsing purposes.
+  const CATEGORY_PARENT = {
+    strength: 'physical',
+    endurance: 'physical',
+    calisthenics: 'physical',
+    aesthetics: 'physical',
+    sports: 'physical',
+    craft: 'creative',
+    writing: 'creative',
+    art: 'creative',
+    'united-states': 'travel',
+    international: 'travel'
+  };
+
+  function topCategoryOf(catId){
+    return CATEGORY_PARENT[catId] || catId;
+  }
+  function topLevelCatIds(){
+    return Object.keys(CATS).filter(id => !CATEGORY_PARENT[id]);
+  }
+  function childCatIds(parentId){
+    return Object.keys(CATEGORY_PARENT).filter(id => CATEGORY_PARENT[id] === parentId && CATS[id]);
+  }
+  function goalsForCategory(catId){
+    return GOALS.filter(g => g.category === catId || topCategoryOf(g.category) === catId);
+  }
+  function categoryStats(catId){
+    const goals = goalsForCategory(catId);
+    let done = 0, total = 0;
+    goals.forEach(g => {
+      const p = goalProgress(g);
+      done += p.done; total += p.total;
+    });
+    return {goalCount: goals.length, done, total, pct: total ? Math.round((done/total)*100) : 0};
   }
 
   function goalProgress(goal){
@@ -560,7 +861,7 @@
       const {done, total} = goalProgress(g);
       totalCompleted += done;
       if(done > 0) startedGoals++;
-      if(done === total){ completedGoals++; catsCompleted.add(g.category); }
+      if(done === total){ completedGoals++; catsCompleted.add(topCategoryOf(g.category)); }
     });
     return {totalCompleted, startedGoals, completedGoals, categoriesCompleted: catsCompleted.size};
   }
@@ -572,7 +873,6 @@
 
   /* ============ ROUTING ============ */
   let route = {view:'home', goalId:null};
-  let activeFilter = 'all';
   let draft = null; // goal currently being created/edited in the Manage view
 
   const app = document.getElementById('app');
@@ -617,9 +917,16 @@
       <header class="site-header">
         <button class="brand" data-action="go-home" aria-label="Go to trail gallery">
           <svg class="brand-mark" viewBox="0 0 40 40" fill="none">
-            <circle cx="20" cy="20" r="18.5" stroke="#3c332a" stroke-width="1.3" fill="#e8ddc2"/>
-            <path d="M8 24L15 12L20 20L25 9L32 24" stroke="#6f8a5a" stroke-width="1.8" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
-            <circle cx="20" cy="20" r="1.6" fill="#a85a36"/>
+            <defs>
+              <linearGradient id="brandGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#4f8f6a"/>
+                <stop offset="1" stop-color="#1f6f8b"/>
+              </linearGradient>
+            </defs>
+            <circle cx="20" cy="20" r="18.5" stroke="#132e24" stroke-width="1.3" fill="url(#brandGrad)"/>
+            <path d="M6 25.5c3-2 6-2 9 0s6 2 9 0 6-2 9 0" stroke="#eef4ef" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+            <path d="M8 23L15 11L20 19L25 8L32 23" stroke="#eef4ef" stroke-width="1.8" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+            <circle cx="20" cy="19" r="1.6" fill="#bd9430"/>
           </svg>
           <span class="brand-text">
             <span class="title">Goal Quest</span>
@@ -646,42 +953,127 @@
 
   /* ============ RENDER: HOME ============ */
   function renderHome(){
-    const cats = ['all', ...Object.keys(CATS)];
-    const filtered = activeFilter === 'all' ? GOALS : GOALS.filter(g => g.category === activeFilter);
-
-    const cards = filtered.map(g => {
-      const {done, total, pct} = goalProgress(g);
+    const tiles = topLevelCatIds().map(id => {
+      const cat = CATS[id];
+      const stats = categoryStats(id);
       return `
-        <div class="goal-card" tabindex="0" role="button" data-action="open-goal" data-goal="${g.id}" aria-label="Open trail: ${escapeXml(g.title)}, ${pct} percent complete">
-          <div class="top-row">
-            <div class="cat-icon">${iconFor(g.category)}</div>
+        <div class="category-tile" tabindex="0" role="button" data-action="open-category" data-cat="${id}" aria-label="Open ${escapeXml(cat.label)} category">
+          <div class="cat-icon">${iconFor(id)}</div>
+          <h3>${escapeXml(cat.label)}</h3>
+          <p>${stats.goalCount} trail${stats.goalCount===1?'':'s'}</p>
+          <div class="progress-track"><div class="progress-fill" style="width:${stats.pct}%"></div></div>
+          <div class="progress-label"><span>${stats.done}/${stats.total} waypoints</span><span>${stats.pct}%</span></div>
+        </div>
+      `;
+    }).join('');
+
+    const savedCount = GOALS.filter(g => state.saved[g.id]).length;
+    const savedTile = `
+      <div class="category-tile saved-tile" tabindex="0" role="button" data-action="open-saved" aria-label="Open Saved Goals">
+        <div class="cat-icon">${BOOKMARK_FILLED_ICON}</div>
+        <h3>Saved Goals</h3>
+        <p>${savedCount ? `${savedCount} trail${savedCount===1?'':'s'} saved` : 'Nothing saved yet'}</p>
+      </div>
+    `;
+
+    return `
+      <div class="gallery-intro">
+        <span class="eyebrow">Trailhead</span>
+        <h2>Pick a category. Then pick a trail.</h2>
+        <p>Every big goal is really a path of smaller waypoints. Browse by category, bookmark the ones you want to come back to, and mark off what you've already covered.</p>
+      </div>
+      <div class="category-grid">
+        ${savedTile}
+        ${tiles}
+      </div>
+      <footer class="note">Your progress is saved right in this browser — no account needed.</footer>
+    `;
+  }
+
+  /* ============ RENDER: CATEGORY ============ */
+  function renderCategory(catId){
+    const cat = CATS[catId];
+    if(!cat){ go({view:'home', goalId:null}); return ''; }
+
+    const directGoals = GOALS.filter(g => g.category === catId);
+    const kids = childCatIds(catId);
+    const fromRoute = {view:'category', categoryId: catId};
+
+    const directCards = directGoals.map(g => renderGoalCard(g, fromRoute)).join('');
+
+    const childSections = kids.map(childId => {
+      const childGoals = GOALS.filter(g => g.category === childId);
+      if(!childGoals.length) return '';
+      return `
+        <div class="subcategory-block">
+          <div class="subcategory-heading">
+            <div class="cat-icon cat-icon-sm">${iconFor(childId)}</div>
+            <h3>${escapeXml(CATS[childId].label)}</h3>
           </div>
-          <div>
-            <span class="cat-tag">${escapeXml(CATS[g.category] ? CATS[g.category].label : g.category)}</span>
-            <h3>${escapeXml(g.title)}</h3>
-          </div>
-          <p class="blurb">${escapeXml(g.blurb)}</p>
-          <div>
-            <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
-            <div class="progress-label"><span>${done}/${total} waypoints</span><span>${pct}%</span></div>
+          <div class="goal-grid">
+            ${childGoals.map(g => renderGoalCard(g, fromRoute)).join('')}
           </div>
         </div>
       `;
     }).join('');
 
+    const nothingAtAll = !directGoals.length && !kids.some(childId => GOALS.some(g => g.category === childId));
+
     return `
+      <button class="back-link" data-action="go-home">${BACK_ICON} All categories</button>
       <div class="gallery-intro">
-        <span class="eyebrow">Trailhead</span>
-        <h2>Pick a trail. Start wherever you already are.</h2>
-        <p>Every big goal is really a path of smaller waypoints. Browse the trails below, jump in at whatever point fits you, and mark off what you've already covered.</p>
+        <span class="eyebrow">${escapeXml(cat.label)}</span>
+        <h2>${escapeXml(cat.label)} trails</h2>
+        <p>Every big goal is really a path of smaller waypoints. Jump in at whatever point fits you.</p>
       </div>
-      <div class="filter-row">
-        ${cats.map(c => `<button class="filter-chip ${activeFilter===c?'active':''}" data-action="filter" data-cat="${c}">${c==='all' ? 'All trails' : CATS[c].label}</button>`).join('')}
+      ${nothingAtAll ? `<div class="empty-state">No trails in this category yet.</div>` : `
+        <div class="goal-grid">${directCards}</div>
+        ${childSections}
+      `}
+    `;
+  }
+
+  /* ============ RENDER: SAVED ============ */
+  function renderSaved(){
+    const savedGoals = GOALS.filter(g => state.saved[g.id]);
+    const cards = savedGoals.map(g => renderGoalCard(g, {view:'saved'})).join('');
+
+    return `
+      <button class="back-link" data-action="go-home">${BACK_ICON} All categories</button>
+      <div class="gallery-intro">
+        <span class="eyebrow">Saved Goals</span>
+        <h2>Your saved trails</h2>
+        <p>Bookmark a trail from any category page and it'll show up here for quick access.</p>
       </div>
       <div class="goal-grid">
-        ${filtered.length ? cards : `<div class="empty-state">No trails in this category yet.</div>`}
+        ${savedGoals.length ? cards : `<div class="empty-state">You haven't saved any trails yet. Open a category and tap the bookmark icon on a trail to save it here.</div>`}
       </div>
-      <footer class="note">Your progress is saved right in this browser — no account needed.</footer>
+    `;
+  }
+
+  /* ============ SHARED: GOAL CARD ============ */
+  function renderGoalCard(g, fromRoute){
+    const {done, total, pct} = goalProgress(g);
+    const saved = !!state.saved[g.id];
+    const fromAttr = fromRoute ? ` data-from='${escapeXml(JSON.stringify(fromRoute))}'` : '';
+    return `
+      <div class="goal-card" tabindex="0" role="button" data-action="open-goal" data-goal="${g.id}"${fromAttr} aria-label="Open trail: ${escapeXml(g.title)}, ${pct} percent complete">
+        <div class="top-row">
+          <div class="cat-icon">${iconFor(g.category)}</div>
+          <button type="button" class="save-btn ${saved ? 'saved' : ''}" data-action="toggle-save" data-goal="${g.id}" aria-pressed="${saved}" aria-label="${saved ? 'Remove from Saved Goals' : 'Save this goal'}">
+            ${saved ? BOOKMARK_FILLED_ICON : BOOKMARK_ICON}
+          </button>
+        </div>
+        <div>
+          <span class="cat-tag">${escapeXml(CATS[g.category] ? CATS[g.category].label : g.category)}</span>
+          <h3>${escapeXml(g.title)}</h3>
+        </div>
+        <p class="blurb">${escapeXml(g.blurb)}</p>
+        <div>
+          <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+          <div class="progress-label"><span>${done}/${total} waypoints</span><span>${pct}%</span></div>
+        </div>
+      </div>
     `;
   }
 
@@ -691,6 +1083,19 @@
     if(!goal) { go({view:'home', goalId:null}); return ''; }
     const {done, total, pct} = goalProgress(goal);
     const arr = state.progress[goal.id];
+    const saved = !!state.saved[goal.id];
+
+    let backLabel = 'All categories';
+    let backAttrs = 'data-action="go-home"';
+    if(route.from){
+      if(route.from.view === 'category' && CATS[route.from.categoryId]){
+        backLabel = CATS[route.from.categoryId].label;
+        backAttrs = `data-action="open-category" data-cat="${route.from.categoryId}"`;
+      } else if(route.from.view === 'saved'){
+        backLabel = 'Saved Goals';
+        backAttrs = 'data-action="open-saved"';
+      }
+    }
 
     const lastDoneIdx = arr.reduce((acc, v, i) => v ? i : acc, -1);
 
@@ -729,7 +1134,7 @@
     ` : '';
 
     return `
-      <button class="back-link" data-action="go-home">${BACK_ICON} All trails</button>
+      <button class="back-link" ${backAttrs}>${BACK_ICON} ${escapeXml(backLabel)}</button>
       <div class="detail-header">
         <div class="cat-icon">${iconFor(goal.category)}</div>
         <div class="detail-title">
@@ -737,6 +1142,9 @@
           <h2>${escapeXml(goal.title)}</h2>
           <p class="detail-blurb">${escapeXml(goal.blurb)}</p>
         </div>
+        <button type="button" class="save-btn detail-save-btn ${saved ? 'saved' : ''}" data-action="toggle-save" data-goal="${goal.id}" aria-pressed="${saved}" aria-label="${saved ? 'Remove from Saved Goals' : 'Save this goal'}">
+          ${saved ? BOOKMARK_FILLED_ICON : BOOKMARK_ICON}
+        </button>
       </div>
       <div class="detail-progress-summary">
         <span>${done}/${total} waypoints</span>
@@ -920,6 +1328,8 @@
   function render(){
     let body = '';
     if(route.view === 'home') body = renderHome();
+    else if(route.view === 'category') body = renderCategory(route.categoryId);
+    else if(route.view === 'saved') body = renderSaved();
     else if(route.view === 'detail') body = renderDetail(route.goalId);
     else if(route.view === 'badges') body = renderBadges();
     else if(route.view === 'manage') body = renderManage();
@@ -968,8 +1378,21 @@
     if(action === 'go-home'){ go({view:'home', goalId:null}); }
     else if(action === 'go-badges'){ go({view:'badges', goalId:null}); }
     else if(action === 'go-manage'){ go({view:'manage', goalId:null}); }
-    else if(action === 'open-goal'){ go({view:'detail', goalId: el.getAttribute('data-goal')}); }
-    else if(action === 'filter'){ activeFilter = el.getAttribute('data-cat'); render(); }
+    else if(action === 'open-category'){ go({view:'category', categoryId: el.getAttribute('data-cat')}); }
+    else if(action === 'open-saved'){ go({view:'saved', goalId:null}); }
+    else if(action === 'open-goal'){
+      const fromRaw = el.getAttribute('data-from');
+      let from = null;
+      if(fromRaw){ try{ from = JSON.parse(fromRaw); }catch(e){ from = null; } }
+      go({view:'detail', goalId: el.getAttribute('data-goal'), from});
+    }
+    else if(action === 'toggle-save'){
+      const goalId = el.getAttribute('data-goal');
+      if(state.saved[goalId]) delete state.saved[goalId];
+      else state.saved[goalId] = true;
+      saveState();
+      render();
+    }
     else if(action === 'toggle-sub'){
       const goalId = el.getAttribute('data-goal');
       const idx = parseInt(el.getAttribute('data-idx'), 10);
