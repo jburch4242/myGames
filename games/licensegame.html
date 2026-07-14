@@ -1,0 +1,1841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The License Game &mdash; A Road Trip Through History</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Special+Elite&family=Permanent+Marker&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --asphalt:#2b2b2e;
+  --asphalt-dark:#1a1a1c;
+  --asphalt-light:#3d3d40;
+  --road-line:#f2c14e;
+  --paper:#f2e8d3;
+  --paper-dark:#e6d8b8;
+  --paper-shadow:#c9b98f;
+  --rust:#b8452f;
+  --rust-dark:#8f3423;
+  --teal:#2f6f76;
+  --teal-dark:#204d52;
+  --ink:#2a231c;
+  --ink-soft:#5c5245;
+  --chrome:#d8d8d4;
+  --chrome-dark:#9a9a94;
+  --cream-white:#faf5e8;
+  --good:#3d7a4e;
+  --bad:#b8452f;
+  --manila:#cbab6f;
+  --manila-dark:#a9895a;
+  --font-display:'Oswald',sans-serif;
+  --font-type:'Special Elite',cursive;
+  --font-mono:'Courier Prime',monospace;
+  --font-script:'Permanent Marker',cursive;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:0.001ms !important;animation-iteration-count:1 !important;transition-duration:0.001ms !important;}
+}
+
+html,body{
+  height:100%;
+  background:var(--asphalt);
+  font-family:var(--font-type);
+  color:var(--paper);
+  overflow-x:hidden;
+}
+
+/* ---------- Road backdrop ---------- */
+.road-bg{
+  position:fixed;
+  inset:0;
+  z-index:0;
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.03) 0 2px, transparent 2px 60px),
+    linear-gradient(180deg, var(--asphalt-dark), var(--asphalt) 40%, var(--asphalt-dark));
+  overflow:hidden;
+}
+.road-bg::before{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:-20%;
+  width:14px;
+  height:140%;
+  transform:translateX(-50%);
+  background:repeating-linear-gradient(180deg, var(--road-line) 0 60px, transparent 60px 120px);
+  opacity:0.5;
+  animation:roadmove 2.2s linear infinite;
+}
+@keyframes roadmove{
+  from{transform:translateX(-50%) translateY(0);}
+  to{transform:translateX(-50%) translateY(120px);}
+}
+.shoulder{
+  position:fixed;
+  left:0;right:0;
+  height:10px;
+  background:repeating-linear-gradient(90deg, var(--road-line) 0 40px, transparent 40px 70px);
+  opacity:0.35;
+  z-index:0;
+}
+.shoulder.top{top:0;}
+.shoulder.bottom{bottom:0;}
+
+/* ---------- App shell ---------- */
+#app{
+  position:relative;
+  z-index:1;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:24px 16px;
+}
+
+.screen{
+  width:100%;
+  max-width:680px;
+  animation:fadein 0.5s ease both;
+}
+@keyframes fadein{
+  from{opacity:0;transform:translateY(12px);}
+  to{opacity:1;transform:translateY(0);}
+}
+.hidden{display:none !important;}
+
+/* ---------- Title screen ---------- */
+.title-wrap{
+  text-align:center;
+}
+.postcard-stamp{
+  display:inline-block;
+  border:3px double var(--rust);
+  color:var(--rust);
+  font-family:var(--font-script);
+  font-size:14px;
+  padding:6px 14px;
+  transform:rotate(-4deg);
+  margin-bottom:18px;
+  background:rgba(184,69,47,0.06);
+  letter-spacing:1px;
+}
+.title-main{
+  font-family:var(--font-display);
+  font-weight:700;
+  text-transform:uppercase;
+  font-size:clamp(2.4rem,9vw,4.6rem);
+  letter-spacing:2px;
+  color:var(--road-line);
+  text-shadow:3px 3px 0 var(--rust-dark), 6px 6px 0 rgba(0,0,0,0.35);
+  line-height:0.95;
+}
+.title-sub{
+  font-family:var(--font-type);
+  color:var(--paper-dark);
+  font-size:clamp(0.85rem,2.6vw,1.05rem);
+  margin-top:14px;
+  letter-spacing:0.5px;
+}
+
+.mode-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(170px,1fr));
+  gap:16px;
+  margin-top:36px;
+}
+@media (max-width:640px){
+  .mode-grid{grid-template-columns:1fr;}
+}
+
+.mode-card{
+  cursor:pointer;
+  border:none;
+  background:var(--paper);
+  color:var(--ink);
+  border-radius:10px;
+  padding:20px 15px;
+  font-family:var(--font-display);
+  text-align:left;
+  position:relative;
+  box-shadow:0 6px 0 var(--paper-shadow), 0 10px 18px rgba(0,0,0,0.4);
+  transform:rotate(-1deg);
+  transition:transform 0.15s ease, box-shadow 0.15s ease;
+}
+.mode-card:nth-child(2){transform:rotate(1deg);}
+.mode-card:nth-child(3){transform:rotate(-0.6deg);}
+.mode-card:hover, .mode-card:focus-visible{
+  transform:rotate(0deg) translateY(-4px);
+  box-shadow:0 10px 0 var(--paper-shadow), 0 16px 24px rgba(0,0,0,0.45);
+  outline:none;
+}
+.mode-card:focus-visible{outline:3px solid var(--road-line);outline-offset:3px;}
+.mode-card .eyebrow{
+  font-family:var(--font-mono);
+  font-size:11px;
+  letter-spacing:1.5px;
+  color:var(--teal-dark);
+  text-transform:uppercase;
+}
+.mode-card h3{
+  font-size:1.3rem;
+  text-transform:uppercase;
+  margin:6px 0 8px;
+  letter-spacing:0.5px;
+}
+.mode-card p{
+  font-family:var(--font-type);
+  font-size:0.78rem;
+  color:var(--ink-soft);
+  line-height:1.5;
+}
+.mode-card .icon{
+  position:absolute;
+  top:14px;right:14px;
+  font-size:1.5rem;
+  opacity:0.65;
+}
+.mode-card .progress-note{
+  margin-top:10px;
+  font-family:var(--font-mono);
+  font-size:0.65rem;
+  color:var(--teal-dark);
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+}
+
+.howto-link{
+  display:inline-block;
+  margin-top:28px;
+  background:none;
+  border:none;
+  color:var(--paper-dark);
+  font-family:var(--font-type);
+  text-decoration:underline;
+  text-underline-offset:4px;
+  cursor:pointer;
+  font-size:0.85rem;
+}
+.howto-link:hover{color:var(--road-line);}
+
+/* ---------- Glovebox / How to play ---------- */
+.glovebox-overlay{
+  position:fixed;inset:0;
+  background:rgba(10,10,10,0.72);
+  z-index:20;
+  display:flex;align-items:center;justify-content:center;
+  padding:20px;
+}
+.glovebox-paper{
+  background:var(--paper);
+  color:var(--ink);
+  max-width:520px;
+  width:100%;
+  padding:28px 26px;
+  border-radius:4px;
+  font-family:var(--font-type);
+  box-shadow:0 20px 50px rgba(0,0,0,0.5);
+  transform:rotate(-0.6deg);
+  max-height:85vh;
+  overflow-y:auto;
+}
+.glovebox-paper h2{
+  font-family:var(--font-display);
+  text-transform:uppercase;
+  color:var(--rust);
+  border-bottom:2px dashed var(--paper-shadow);
+  padding-bottom:10px;
+  margin-bottom:14px;
+  letter-spacing:0.5px;
+}
+.glovebox-paper ul{
+  margin:0 0 16px 20px;
+  font-size:0.88rem;
+  line-height:1.7;
+  color:var(--ink-soft);
+}
+.glovebox-paper .close-btn{
+  margin-top:6px;
+}
+
+/* ---------- Buttons (shared) ---------- */
+.btn{
+  font-family:var(--font-display);
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+  font-size:0.9rem;
+  border:none;
+  border-radius:6px;
+  padding:11px 20px;
+  cursor:pointer;
+  transition:transform 0.1s ease, box-shadow 0.1s ease, filter 0.1s ease;
+}
+.btn:active{transform:translateY(2px);}
+.btn:focus-visible{outline:3px solid var(--road-line);outline-offset:2px;}
+.btn-primary{
+  background:var(--rust);
+  color:var(--cream-white);
+  box-shadow:0 4px 0 var(--rust-dark);
+}
+.btn-primary:hover{filter:brightness(1.08);}
+.btn-secondary{
+  background:var(--teal);
+  color:var(--cream-white);
+  box-shadow:0 4px 0 var(--teal-dark);
+}
+.btn-ghost{
+  background:transparent;
+  color:var(--paper-dark);
+  border:2px solid var(--paper-dark);
+  box-shadow:none;
+}
+.btn:disabled{opacity:0.45;cursor:not-allowed;}
+
+/* ---------- Level select screen ---------- */
+.level-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:6px;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.level-title{
+  font-family:var(--font-display);
+  text-transform:uppercase;
+  font-size:1.3rem;
+  color:var(--road-line);
+  letter-spacing:0.5px;
+}
+.level-score{
+  font-family:var(--font-mono);
+  font-size:0.8rem;
+  color:var(--paper-dark);
+}
+.level-grid{
+  display:grid;
+  grid-template-columns:repeat(5, 1fr);
+  gap:12px 8px;
+  margin-top:16px;
+  padding:6px 2px 10px;
+}
+.level-node{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:4px;
+  background:none;
+  border:none;
+  cursor:pointer;
+  font-family:var(--font-display);
+  color:var(--paper);
+  padding:2px 0;
+  width:100%;
+}
+.level-node:focus-visible .badge{outline:3px solid var(--road-line);outline-offset:2px;}
+.level-node .badge{
+  width:44px;height:44px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:0.95rem;
+  font-weight:700;
+  position:relative;
+  box-shadow:0 3px 0 rgba(0,0,0,0.35), 0 5px 8px rgba(0,0,0,0.4);
+  transition:transform 0.12s ease;
+  border:3px solid var(--chrome-dark);
+  background:var(--asphalt-light);
+  color:var(--paper-dark);
+  margin:0 auto;
+}
+.level-node:hover .badge{transform:translateY(-2px);}
+.level-node.completed .badge{background:var(--good);border-color:#2c5c39;color:#fff;}
+.level-node.playable .badge{background:var(--road-line);border-color:var(--rust-dark);color:var(--ink);box-shadow:0 3px 0 var(--rust-dark), 0 0 0 5px rgba(242,193,78,0.2);}
+.level-node.locked{cursor:not-allowed;}
+.level-node.locked .badge{background:var(--asphalt-light);color:var(--chrome-dark);opacity:0.7;font-size:0.8rem;}
+.level-node .lbl{
+  font-size:0.52rem;
+  text-transform:uppercase;
+  letter-spacing:0.3px;
+  color:var(--paper-dark);
+  text-align:center;
+}
+.level-node.locked .lbl{opacity:0.5;}
+@media (max-width:480px){
+  .level-grid{gap:8px 5px;}
+  .level-node .badge{width:38px;height:38px;font-size:0.8rem;}
+  .level-node .lbl{font-size:0.46rem;}
+}
+
+/* ---------- Game header / route strip ---------- */
+.game-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:14px;
+  flex-wrap:wrap;
+}
+.stat-pill{
+  font-family:var(--font-mono);
+  background:var(--asphalt-light);
+  border:1px solid var(--chrome-dark);
+  border-radius:20px;
+  padding:6px 12px;
+  font-size:0.78rem;
+  color:var(--paper);
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.lives-wrap{display:flex;gap:4px;}
+.mile-marker{
+  font-family:var(--font-display);
+  color:var(--road-line);
+  font-size:0.95rem;
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+}
+.back-btn{
+  font-family:var(--font-mono);
+  background:none;
+  border:1px solid var(--chrome-dark);
+  color:var(--paper-dark);
+  border-radius:6px;
+  padding:6px 10px;
+  font-size:0.75rem;
+  cursor:pointer;
+}
+.back-btn:hover{color:var(--road-line);border-color:var(--road-line);}
+
+/* ---------- Card stage ---------- */
+.stage{
+  perspective:1000px;
+  margin:18px auto 10px;
+  display:flex;
+  justify-content:center;
+}
+.card-slot{
+  position:relative;
+  width:100%;
+  max-width:460px;
+}
+
+/* Driver's license card */
+.license-card{
+  background:linear-gradient(155deg, var(--paper), var(--paper-dark) 85%);
+  border-radius:16px;
+  padding:20px;
+  color:var(--ink);
+  position:relative;
+  box-shadow:0 14px 0 rgba(0,0,0,0.25), 0 20px 40px rgba(0,0,0,0.5);
+  transform:rotateX(0deg) rotateY(0deg);
+  transition:transform 0.15s ease;
+  overflow:hidden;
+  border:1px solid rgba(0,0,0,0.15);
+}
+.license-card::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:repeating-linear-gradient(115deg, rgba(0,0,0,0.02) 0 2px, transparent 2px 5px);
+  pointer-events:none;
+}
+.card-topline{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  border-bottom:2px solid var(--rust);
+  padding-bottom:8px;
+  margin-bottom:12px;
+}
+.card-topline .state-name{
+  font-family:var(--font-display);
+  font-weight:700;
+  text-transform:uppercase;
+  font-size:1.05rem;
+  color:var(--rust);
+  letter-spacing:0.5px;
+}
+.card-topline .doc-type{
+  font-family:var(--font-mono);
+  font-size:0.62rem;
+  color:var(--ink-soft);
+  text-transform:uppercase;
+  letter-spacing:1px;
+}
+.card-topline .serial{
+  font-family:var(--font-mono);
+  font-size:0.62rem;
+  color:var(--ink-soft);
+  text-align:right;
+}
+
+.card-body{
+  display:flex;
+  gap:16px;
+}
+.avatar-box{
+  width:88px;
+  flex-shrink:0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:6px;
+}
+.avatar-silhouette{
+  width:82px;
+  height:100px;
+  background:var(--chrome);
+  border:1px solid var(--chrome-dark);
+  border-radius:4px;
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  overflow:hidden;
+  position:relative;
+}
+.avatar-silhouette svg{width:70%;fill:#8b8378;}
+.hologram{
+  position:absolute;
+  inset:0;
+  background:conic-gradient(from var(--holo-angle,0deg), rgba(255,0,150,0.18), rgba(0,200,255,0.18), rgba(255,230,0,0.18), rgba(255,0,150,0.18));
+  mix-blend-mode:overlay;
+  pointer-events:none;
+}
+.sig-line{
+  font-family:var(--font-script);
+  font-size:0.7rem;
+  color:var(--ink-soft);
+  border-top:1px solid var(--ink-soft);
+  padding-top:2px;
+  width:100%;
+  text-align:center;
+}
+
+.fields{
+  flex:1;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px 12px;
+  font-family:var(--font-mono);
+}
+.field{
+  display:flex;
+  flex-direction:column;
+}
+.field.full{grid-column:1 / -1;}
+.field .flabel{
+  font-size:0.58rem;
+  color:var(--teal-dark);
+  text-transform:uppercase;
+  letter-spacing:0.8px;
+  font-weight:700;
+}
+.field .fval{
+  font-size:0.86rem;
+  color:var(--ink);
+  letter-spacing:0.2px;
+}
+.field .fval.redacted{
+  background:repeating-linear-gradient(45deg, var(--ink) 0 4px, #4a3f31 4px 8px);
+  color:transparent;
+  border-radius:2px;
+  padding:1px 4px;
+  user-select:none;
+}
+
+.barcode{
+  margin-top:14px;
+  height:24px;
+  background:repeating-linear-gradient(90deg, var(--ink) 0 2px, transparent 2px 5px, var(--ink) 7px 8px, transparent 8px 12px);
+  opacity:0.75;
+}
+
+/* License plate card */
+.plate-frame{
+  background:linear-gradient(180deg,#3a3a3a,#232323);
+  border-radius:14px;
+  padding:14px;
+  box-shadow:0 14px 0 rgba(0,0,0,0.25), 0 20px 40px rgba(0,0,0,0.5);
+}
+.plate-face{
+  background:linear-gradient(180deg, var(--chrome), #b9b9b3);
+  border-radius:8px;
+  padding:16px 18px 20px;
+  position:relative;
+  border:3px solid #7d7d76;
+  color:var(--ink);
+  text-align:center;
+}
+.plate-bolt{
+  position:absolute;
+  width:10px;height:10px;
+  background:#6f6f68;
+  border-radius:50%;
+  box-shadow:inset 0 1px 2px rgba(0,0,0,0.5);
+}
+.plate-bolt.tl{top:8px;left:8px;}
+.plate-bolt.tr{top:8px;right:8px;}
+.plate-bolt.bl{bottom:8px;left:8px;}
+.plate-bolt.br{bottom:8px;right:8px;}
+.plate-state{
+  font-family:var(--font-display);
+  font-weight:700;
+  text-transform:uppercase;
+  font-size:1rem;
+  letter-spacing:2px;
+  color:var(--rust-dark);
+}
+.plate-combo{
+  font-family:var(--font-mono);
+  font-weight:700;
+  font-size:clamp(2rem,9vw,2.7rem);
+  letter-spacing:4px;
+  margin:10px 0 6px;
+  color:var(--ink);
+  text-shadow:1px 1px 0 rgba(255,255,255,0.3);
+}
+.plate-tag{
+  font-family:var(--font-type);
+  font-size:0.65rem;
+  color:var(--ink-soft);
+  text-transform:uppercase;
+  letter-spacing:1px;
+}
+.plate-year{
+  font-family:var(--font-mono);
+  font-size:0.9rem;
+  margin-top:8px;
+  color:var(--teal-dark);
+}
+.plate-year .redacted{
+  background:repeating-linear-gradient(45deg, var(--ink) 0 4px, #4a3f31 4px 8px);
+  color:transparent;
+  border-radius:2px;
+  padding:0 6px;
+}
+
+/* Detective case file card */
+.case-file{
+  background:linear-gradient(160deg, var(--manila), var(--manila-dark) 90%);
+  border-radius:4px 12px 12px 4px;
+  padding:22px 20px 20px 20px;
+  color:var(--ink);
+  position:relative;
+  box-shadow:0 14px 0 rgba(0,0,0,0.28), 0 20px 40px rgba(0,0,0,0.55);
+  border:1px solid rgba(0,0,0,0.2);
+  overflow:hidden;
+}
+.case-file::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:repeating-linear-gradient(100deg, rgba(0,0,0,0.03) 0 2px, transparent 2px 6px);
+  pointer-events:none;
+}
+.case-tab{
+  position:absolute;
+  top:-2px;left:18px;
+  background:var(--manila-dark);
+  color:var(--ink);
+  font-family:var(--font-mono);
+  font-size:0.6rem;
+  letter-spacing:1px;
+  padding:3px 10px 5px;
+  border-radius:0 0 6px 6px;
+  text-transform:uppercase;
+}
+.case-stamp{
+  position:absolute;
+  top:14px;right:-6px;
+  color:var(--bad);
+  border:3px solid var(--bad);
+  font-family:var(--font-display);
+  font-weight:700;
+  font-size:0.72rem;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  padding:4px 10px;
+  transform:rotate(9deg);
+  opacity:0.75;
+  border-radius:4px;
+  pointer-events:none;
+}
+.case-topline{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  border-bottom:2px dashed var(--ink-soft);
+  padding-bottom:8px;
+  margin:14px 0 12px;
+}
+.case-topline .case-name{
+  font-family:var(--font-display);
+  font-weight:700;
+  text-transform:uppercase;
+  font-size:1rem;
+  color:var(--rust-dark);
+  letter-spacing:0.5px;
+}
+.case-topline .case-meta{
+  font-family:var(--font-mono);
+  font-size:0.6rem;
+  color:var(--ink-soft);
+  text-align:right;
+}
+.case-body{
+  display:flex;
+  gap:14px;
+}
+.case-photo-box{
+  width:88px;
+  flex-shrink:0;
+  position:relative;
+}
+.case-photo{
+  width:88px;
+  height:104px;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(0,0,0,0.06) 0 2px, transparent 3px) 0 0/12px 12px,
+    var(--chrome);
+  border:2px solid var(--ink-soft);
+  border-radius:2px;
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  overflow:hidden;
+}
+.case-photo svg{width:68%;fill:#8b8378;}
+.paperclip{
+  position:absolute;
+  top:-14px;left:-10px;
+  width:34px;
+  height:50px;
+  transform:rotate(-8deg);
+  pointer-events:none;
+}
+.case-fields{
+  flex:1;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px 12px;
+  font-family:var(--font-mono);
+}
+.case-fields .field.full{grid-column:1 / -1;}
+.case-notes{
+  margin-top:14px;
+  border-top:2px dashed var(--ink-soft);
+  padding-top:8px;
+}
+.case-notes .flabel{
+  font-size:0.58rem;
+  color:var(--teal-dark);
+  text-transform:uppercase;
+  letter-spacing:0.8px;
+  font-weight:700;
+}
+.case-notes .fval{
+  font-family:var(--font-type);
+  font-size:0.78rem;
+  color:var(--ink-soft);
+  display:block;
+  margin-top:3px;
+}
+
+/* Stamp feedback */
+.stamp-overlay{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  pointer-events:none;
+  z-index:5;
+}
+.stamp{
+  font-family:var(--font-display);
+  font-weight:700;
+  text-transform:uppercase;
+  font-size:clamp(1.6rem,6vw,2.2rem);
+  padding:10px 22px;
+  border:5px solid currentColor;
+  border-radius:8px;
+  transform:rotate(-10deg) scale(0);
+  opacity:0;
+  letter-spacing:2px;
+}
+.stamp.correct{color:var(--good);}
+.stamp.wrong{color:var(--bad);}
+.stamp.show{
+  animation:stampdown 0.45s cubic-bezier(.2,1.6,.4,1) forwards;
+}
+@keyframes stampdown{
+  0%{transform:rotate(-10deg) scale(2.4);opacity:0;}
+  60%{transform:rotate(-8deg) scale(0.94);opacity:1;}
+  100%{transform:rotate(-8deg) scale(1);opacity:1;}
+}
+
+/* ---------- Answer area ---------- */
+.answer-wrap{
+  margin-top:20px;
+}
+.reveal-clue{
+  font-family:var(--font-type);
+  font-size:0.85rem;
+  color:var(--paper-dark);
+  text-align:center;
+  min-height:1.4em;
+  margin-bottom:10px;
+}
+.answer-row{
+  display:flex;
+  gap:8px;
+}
+.answer-row input{
+  flex:1;
+  font-family:var(--font-mono);
+  font-size:0.95rem;
+  padding:12px 14px;
+  border-radius:8px;
+  border:2px solid var(--chrome-dark);
+  background:var(--cream-white);
+  color:var(--ink);
+}
+.answer-row input:focus-visible{outline:3px solid var(--road-line);outline-offset:1px;}
+.controls-row{
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  margin-top:12px;
+  flex-wrap:wrap;
+}
+
+/* ---------- Overlays: level complete / game over / victory ---------- */
+.center-overlay{
+  text-align:center;
+  padding:34px 20px;
+  background:var(--paper);
+  color:var(--ink);
+  border-radius:12px;
+  box-shadow:0 20px 50px rgba(0,0,0,0.5);
+  max-width:440px;
+  margin:0 auto;
+}
+.center-overlay h2{
+  font-family:var(--font-display);
+  text-transform:uppercase;
+  font-size:1.8rem;
+  color:var(--rust);
+  margin-bottom:10px;
+}
+.center-overlay p{
+  font-family:var(--font-type);
+  color:var(--ink-soft);
+  font-size:0.9rem;
+  margin-bottom:6px;
+  line-height:1.6;
+}
+.center-overlay .answer-reveal{
+  font-family:var(--font-display);
+  font-size:1.15rem;
+  color:var(--teal-dark);
+  margin:10px 0 16px;
+}
+.center-overlay .btn{margin-top:8px;margin-left:4px;margin-right:4px;}
+
+/* footer credit tiny */
+.foot-note{
+  text-align:center;
+  margin-top:20px;
+  font-family:var(--font-mono);
+  font-size:0.65rem;
+  color:var(--asphalt-light);
+}
+</style>
+</head>
+<body>
+
+<div class="shoulder top"></div>
+<div class="shoulder bottom"></div>
+<div class="road-bg"></div>
+
+<div id="app">
+
+  <!-- TITLE SCREEN -->
+  <div class="screen" id="screen-title">
+    <div class="title-wrap">
+      <div class="postcard-stamp">EST. SOMEWHERE ON ROUTE 1 &middot; HISTORY DIVISION</div>
+      <h1 class="title-main">The<br>License<br>Game</h1>
+      <p class="title-sub">Check the ID. Read the plate. Crack the case.</p>
+
+      <div class="mode-grid">
+        <button class="mode-card" id="btn-mode-driver">
+          <span class="icon">🪪</span>
+          <div class="eyebrow">Mode 01</div>
+          <h3>Driver's License</h3>
+          <p>Height, hair, eyes, hometown, date of birth. Figure out who's behind the wheel.</p>
+          <div class="progress-note" id="progress-driver"></div>
+        </button>
+        <button class="mode-card" id="btn-mode-plate">
+          <span class="icon">🚙</span>
+          <div class="eyebrow">Mode 02</div>
+          <h3>License Plate</h3>
+          <p>A location and a cryptic combo. Decode the plate, name the moment in history.</p>
+          <div class="progress-note" id="progress-plate"></div>
+        </button>
+        <button class="mode-card" id="btn-mode-detective">
+          <span class="icon">🕵️</span>
+          <div class="eyebrow">Mode 03</div>
+          <h3>Case File</h3>
+          <p>A full dossier: occupation, era, associates, distinguishing marks. Crack the case.</p>
+          <div class="progress-note" id="progress-detective"></div>
+        </button>
+      </div>
+
+      <button class="howto-link" id="btn-howto">How do I play this thing?</button>
+    </div>
+  </div>
+
+  <!-- LEVEL SELECT SCREEN -->
+  <div class="screen hidden" id="screen-levels">
+    <div class="level-header">
+      <button class="back-btn" id="btn-levels-back">&larr; Back</button>
+      <span class="level-title" id="level-title">Choose Your Stop</span>
+      <span class="level-score" id="level-total-score">0 PTS</span>
+    </div>
+    <div class="level-grid" id="level-path"></div>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div class="screen hidden" id="screen-game">
+    <div class="game-header">
+      <button class="back-btn" id="btn-back">&larr; Back to Map</button>
+      <span class="mile-marker" id="mile-marker">LEVEL 1</span>
+      <div class="stat-pill"><span id="score-val">0</span>&nbsp;PTS</div>
+      <div class="stat-pill lives-wrap" id="lives-wrap"></div>
+    </div>
+
+    <div class="stage">
+      <div class="card-slot" id="card-slot"></div>
+    </div>
+
+    <div class="answer-wrap">
+      <div class="reveal-clue" id="reveal-clue"></div>
+      <div class="answer-row">
+        <input type="text" id="answer-input" autocomplete="off" spellcheck="false" placeholder="Type your answer..." aria-label="Your answer">
+        <button class="btn btn-primary" id="btn-submit">Check</button>
+      </div>
+      <div class="controls-row">
+        <button class="btn btn-secondary" id="btn-hint">💡 Hint (<span id="hint-count">1</span>)</button>
+        <button class="btn btn-ghost" id="btn-skip">Give Up</button>
+      </div>
+    </div>
+    <div class="foot-note">Tip: last names, close spellings, and nicknames all count.</div>
+  </div>
+
+  <!-- LEVEL COMPLETE -->
+  <div class="screen hidden" id="screen-complete">
+    <div class="center-overlay">
+      <h2 id="complete-title">Case Closed!</h2>
+      <p id="complete-sub">You correctly identified:</p>
+      <div class="answer-reveal" id="complete-answer"></div>
+      <p id="complete-detail"></p>
+      <button class="btn btn-primary" id="btn-next">Next Level &rarr;</button>
+      <button class="btn btn-ghost" id="btn-complete-menu">Back to Map</button>
+    </div>
+  </div>
+
+  <!-- GAME OVER -->
+  <div class="screen hidden" id="screen-over">
+    <div class="center-overlay">
+      <h2 style="color:var(--bad);">Out of Gas</h2>
+      <p>You ran out of lives on this level.</p>
+      <p id="over-answer-wrap">The answer was: <strong id="over-answer"></strong></p>
+      <button class="btn btn-primary" id="btn-retry">Retry Level</button>
+      <button class="btn btn-ghost" id="btn-over-menu">Back to Map</button>
+    </div>
+  </div>
+
+  <!-- GAVE UP -->
+  <div class="screen hidden" id="screen-gaveup">
+    <div class="center-overlay">
+      <h2 style="color:var(--ink-soft);">The Answer Was...</h2>
+      <div class="answer-reveal" id="gaveup-answer"></div>
+      <p id="gaveup-detail"></p>
+      <button class="btn btn-primary" id="btn-gaveup-retry">Try Again</button>
+      <button class="btn btn-ghost" id="btn-gaveup-menu">Back to Map</button>
+    </div>
+  </div>
+
+  <!-- ROUTE COMPLETE (all levels in a mode done) -->
+  <div class="screen hidden" id="screen-win">
+    <div class="center-overlay">
+      <h2 style="color:var(--good);">Destination Reached!</h2>
+      <p>You've cleared every stop on this route.</p>
+      <p>Total score: <strong id="win-score">0</strong></p>
+      <button class="btn btn-primary" id="btn-win-menu">Back to Map</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- GLOVEBOX / HOW TO PLAY -->
+<div class="glovebox-overlay hidden" id="glovebox">
+  <div class="glovebox-paper">
+    <h2>How To Play</h2>
+    <ul>
+      <li><strong>Driver's License mode:</strong> Location, sex, height, hair &amp; eye color, date of birth. Type the historical figure's name.</li>
+      <li><strong>License Plate mode:</strong> A location and a coded plate combo hinting at a historical event. Type the event.</li>
+      <li><strong>Case File mode:</strong> A full detective's dossier on the same cast of historical figures &mdash; occupation, era, alias, associates, distinguishing marks, and more. Same objective: name the figure, using far more clues.</li>
+      <li>Each mode has 50 levels laid out in a grid &mdash; beat one to unlock the next, tracked separately per mode.</li>
+      <li>Harder levels redact more fields &mdash; use a <strong>hint</strong> to reveal one, at the cost of some points.</li>
+      <li>You've got 3 lives per level attempt. Run out and you'll need to retry that level.</li>
+      <li>Close spellings, last names, and common nicknames are all accepted.</li>
+    </ul>
+    <button class="btn btn-primary close-btn" id="btn-close-glovebox">Got it, let's drive</button>
+  </div>
+</div>
+
+<script>
+(function(){
+
+/* ============================ DATA ============================ */
+
+const FIGURES = [
+  // ---- tier 1 (easy) ----
+  {id:'lincoln', name:"Abraham Lincoln", aliases:['lincoln','abe lincoln','abraham lincoln'], tier:1,
+    location:"Hodgenville, Kentucky, USA", sex:"M", height:"6'4\" (193 cm)", hair:"Black", eyes:"Grey", dob:"Feb 12, 1809", clue:"Led a nation through its bloodiest war.",
+    occupation:"Lawyer and politician, 16th head of state", era:"19th century", alias:"Honest Abe",
+    distinguishingMark:"Stovepipe hat, deep-set eyes, thick beard grown late in life",
+    associates:"Cabinet rival turned ally: Edwin Stanton", lastSeen:"Assassinated at a theater in the capital"},
+  {id:'einstein', name:"Albert Einstein", aliases:['einstein','albert einstein'], tier:1,
+    location:"Ulm, Germany", sex:"M", height:"5'9\" (175 cm)", hair:"Brown/Grey", eyes:"Brown", dob:"Mar 14, 1879", clue:"E=mc squared was not just a bumper sticker to him.",
+    occupation:"Theoretical physicist", era:"Late 19th to 20th century", alias:"The Genius (informal nickname)",
+    distinguishingMark:"Wild uncombed hair, bushy mustache",
+    associates:"Collaborator who helped formalize his field equations", lastSeen:"Spent final decades at a research institute in New Jersey"},
+  {id:'cleopatra', name:"Cleopatra", aliases:['cleopatra','cleopatra vii'], tier:1,
+    location:"Alexandria, Egypt", sex:"F", height:"5'0\" (152 cm)", hair:"Black", eyes:"Brown", dob:"c. 69 BC", clue:"Last active ruler of the Ptolemaic Kingdom.",
+    occupation:"Monarch", era:"1st century BC", alias:"Cleopatra the Seventh",
+    distinguishingMark:"No reliable record; coin portraits show a strong nose and jaw",
+    associates:"Allied with two prominent Roman generals", lastSeen:"Died in her palace after her kingdom fell to Rome"},
+  {id:'napoleon', name:"Napoleon Bonaparte", aliases:['napoleon','napoleon bonaparte','bonaparte'], tier:1,
+    location:"Ajaccio, Corsica, France", sex:"M", height:"5'6\" (168 cm)", hair:"Brown", eyes:"Brown", dob:"Aug 15, 1769", clue:"Crowned himself Emperor of the French.",
+    occupation:"Military general and Emperor", era:"Late 18th to early 19th century", alias:"The Little Corporal",
+    distinguishingMark:"Habitually posed with one hand tucked into his coat",
+    associates:"Rival: a British duke who defeated him in his final battle", lastSeen:"Exiled to a remote South Atlantic island"},
+  {id:'taylorswift', name:"Taylor Swift", aliases:['taylor swift','swift'], tier:1,
+    location:"West Reading, Pennsylvania, USA", sex:"F", height:"5'10\" (178 cm)", hair:"Blonde", eyes:"Blue-Green", dob:"Dec 13, 1989", clue:"Has an Eras worth of driving playlists named after her.",
+    occupation:"Musician and songwriter", era:"21st century", alias:"Performs under distinct stage personas for each musical era",
+    distinguishingMark:"Signature red lipstick, known for autobiographical lyrics",
+    associates:"Frequent collaborators across country and pop music scenes", lastSeen:"Regularly seen on international stadium tours"},
+  {id:'gandhi', name:"Mahatma Gandhi", aliases:['gandhi','mahatma gandhi','mohandas gandhi'], tier:1,
+    location:"Porbandar, India", sex:"M", height:"5'5\" (165 cm)", hair:"Black/Grey", eyes:"Brown", dob:"Oct 2, 1869", clue:"Led a movement of nonviolent resistance.",
+    occupation:"Lawyer and political leader", era:"Late 19th to 20th century", alias:"Mahatma, meaning Great Soul",
+    distinguishingMark:"Round wire-rimmed glasses, simple handspun cloth garments",
+    associates:"Close political ally who became the first head of state of independent India", lastSeen:"Assassinated at a prayer meeting"},
+  {id:'shakespeare', name:"William Shakespeare", aliases:['shakespeare','william shakespeare','the bard'], tier:1,
+    location:"Stratford-upon-Avon, England", sex:"M", height:"5'6\" (168 cm, uncertain)", hair:"Brown", eyes:"Hazel", dob:"c. Apr 1564", clue:"Wrote of star-crossed lovers in fair Verona.",
+    occupation:"Playwright and poet", era:"16th to 17th century", alias:"The Bard of Avon",
+    distinguishingMark:"No confirmed portrait made during his lifetime",
+    associates:"Actor and business partner in a London theater company", lastSeen:"Retired to his hometown, where he died"},
+  {id:'mlkjr', name:"Martin Luther King Jr.", aliases:['martin luther king','martin luther king jr','mlk'], tier:1,
+    location:"Atlanta, Georgia, USA", sex:"M", height:"5'7\" (170 cm)", hair:"Black", eyes:"Brown", dob:"Jan 15, 1929", clue:"Delivered a dream from the steps of a national memorial.",
+    occupation:"Baptist minister and civil rights leader", era:"20th century", alias:"MLK",
+    distinguishingMark:"Deep resonant speaking voice",
+    associates:"Fellow organizer of a landmark march on the capital", lastSeen:"Assassinated on a motel balcony in Memphis"},
+  {id:'washington', name:"George Washington", aliases:['george washington','washington'], tier:1,
+    location:"Westmoreland County, Virginia, USA", sex:"M", height:"6'2\" (188 cm)", hair:"Reddish-brown (later grey)", eyes:"Blue-Grey", dob:"Feb 22, 1732", clue:"Never actually chopped down a cherry tree, most historians agree.",
+    occupation:"General and statesman, first head of state", era:"18th century", alias:"Father of his Country",
+    distinguishingMark:"Wore dentures made of various materials, not wood as legend claims",
+    associates:"First Vice President who succeeded him in office", lastSeen:"Died at his Virginia estate"},
+  {id:'monroe', name:"Marilyn Monroe", aliases:['marilyn monroe','marilyn'], tier:1,
+    location:"Los Angeles, California, USA", sex:"F", height:"5'5\" (166 cm)", hair:"Blonde (dyed)", eyes:"Blue", dob:"Jun 1, 1926", clue:"Sang happy birthday to a sitting president in a famously breathy voice.",
+    occupation:"Actress and model", era:"20th century", alias:"Born Norma Jeane Mortenson",
+    distinguishingMark:"Signature beauty mark, platinum blonde hair",
+    associates:"Married to a famous playwright and, earlier, a baseball star", lastSeen:"Found dead at her Los Angeles home"},
+  {id:'mjackson', name:"Michael Jackson", aliases:['michael jackson','mj'], tier:1,
+    location:"Gary, Indiana, USA", sex:"M", height:"5'9\" (175 cm)", hair:"Black", eyes:"Dark Brown", dob:"Aug 29, 1958", clue:"Popularized a moonwalking dance move on television.",
+    occupation:"Musician and dancer", era:"20th to 21st century", alias:"King of Pop",
+    distinguishingMark:"Single sequined glove, signature moonwalk",
+    associates:"Sisters and brothers who performed together as a family group", lastSeen:"Died at his rented home in Los Angeles"},
+  {id:'picasso', name:"Pablo Picasso", aliases:['picasso','pablo picasso'], tier:1,
+    location:"Málaga, Spain", sex:"M", height:"5'4\" (163 cm)", hair:"Black", eyes:"Dark Brown", dob:"Oct 25, 1881", clue:"Co-founded a fractured, angular art movement with a fellow painter.",
+    occupation:"Painter and sculptor", era:"20th century", alias:"Full baptismal name reportedly has over 20 words",
+    distinguishingMark:"Intense dark eyes often noted by contemporaries",
+    associates:"Co-founder of Cubism alongside a French painter", lastSeen:"Died at his home in southern France"},
+  {id:'disney', name:"Walt Disney", aliases:['walt disney','disney'], tier:1,
+    location:"Chicago, Illinois, USA", sex:"M", height:"5'10\" (178 cm)", hair:"Brown", eyes:"Blue", dob:"Dec 5, 1901", clue:"Gave voice to a famous mouse in the studio's early cartoons.",
+    occupation:"Animator, film producer, and entrepreneur", era:"20th century", alias:"No widely used alias",
+    distinguishingMark:"Signature thin mustache",
+    associates:"Brother and longtime business partner who ran the studio's finances", lastSeen:"Died in Burbank, California, during production on a Florida theme park"},
+  {id:'elvis', name:"Elvis Presley", aliases:['elvis presley','elvis'], tier:1,
+    location:"Tupelo, Mississippi, USA", sex:"M", height:"6'0\" (183 cm)", hair:"Black (dyed)", eyes:"Blue-Grey", dob:"Jan 8, 1935", clue:"Nicknamed for his hip-swiveling stage moves.",
+    occupation:"Musician and actor", era:"20th century", alias:"The King of Rock and Roll",
+    distinguishingMark:"Signature pompadour hairstyle and curled lip",
+    associates:"Longtime manager known only by a colonel's title", lastSeen:"Died at his Memphis mansion"},
+  {id:'annefrank', name:"Anne Frank", aliases:['anne frank'], tier:1,
+    location:"Frankfurt, Germany", sex:"F", height:"5'1\" (155 cm)", hair:"Dark Brown", eyes:"Brown", dob:"Jun 12, 1929", clue:"Kept a diary while hiding in an Amsterdam annex.",
+    occupation:"Diarist", era:"20th century", alias:"No widely used alias",
+    distinguishingMark:"No reliable record",
+    associates:"Hid alongside her family and another family in a concealed annex", lastSeen:"Died in a concentration camp shortly before its liberation"},
+  {id:'victoria', name:"Queen Victoria", aliases:['queen victoria','victoria'], tier:1,
+    location:"Kensington Palace, London, England", sex:"F", height:"5'0\" (152 cm)", hair:"Brown", eyes:"Blue", dob:"May 24, 1819", clue:"An entire era of strict social norms was named after her.",
+    occupation:"Monarch", era:"19th century", alias:"No widely used alias",
+    distinguishingMark:"Wore black mourning clothes for decades after her husband's death",
+    associates:"Married to a German prince who became her closest advisor", lastSeen:"Died at her residence on the Isle of Wight"},
+  {id:'columbus', name:"Christopher Columbus", aliases:['christopher columbus','columbus'], tier:1,
+    location:"Genoa, Republic of Genoa (Italy)", sex:"M", height:"5'10\" (178 cm, uncertain)", hair:"Reddish (turned grey early)", eyes:"Unknown, often depicted light", dob:"c. 1451", clue:"Sailed west hoping to reach Asia and hit the Caribbean instead.",
+    occupation:"Navigator and explorer", era:"15th century", alias:"Sailed under the flag of Spain despite being Italian-born",
+    distinguishingMark:"No confirmed authentic portrait exists",
+    associates:"Backed financially by the Spanish monarchy", lastSeen:"Died in Spain still believing he had reached Asia"},
+
+  // ---- tier 2 (medium) ----
+  {id:'genghis', name:"Genghis Khan", aliases:['genghis khan','temujin','chinggis khan'], tier:2,
+    location:"Khentii Province, Mongolia", sex:"M", height:"~5'8\" (173 cm)", hair:"Black", eyes:"Brown", dob:"c. 1162", clue:"Founded the largest contiguous land empire in history.",
+    occupation:"Military and political leader", era:"12th to 13th century", alias:"Born Temujin",
+    distinguishingMark:"No confirmed portraits made in his lifetime",
+    associates:"United rival Mongol and Turkic tribes under his rule", lastSeen:"Died during a military campaign, burial site still unknown"},
+  {id:'vangogh', name:"Vincent van Gogh", aliases:['van gogh','vincent van gogh','vincent'], tier:2,
+    location:"Zundert, Netherlands", sex:"M", height:"5'7\" (170 cm)", hair:"Red", eyes:"Green", dob:"Mar 30, 1853", clue:"Sold almost nothing while alive; famous for starry nights.",
+    occupation:"Painter", era:"19th century", alias:"Signed his works simply Vincent",
+    distinguishingMark:"Famously missing part of an ear",
+    associates:"Close friend and fellow painter he briefly lived with in southern France", lastSeen:"Died in a small French village shortly after completing his final works"},
+  {id:'frida', name:"Frida Kahlo", aliases:['frida kahlo','frida'], tier:2,
+    location:"Coyoacán, Mexico City, Mexico", sex:"F", height:"5'3\" (160 cm)", hair:"Black", eyes:"Brown", dob:"Jul 6, 1907", clue:"Famous for vivid self-portraits and a unibrow she never hid.",
+    occupation:"Painter", era:"20th century", alias:"Known simply as Frida",
+    distinguishingMark:"Prominent unibrow, traditional Mexican dress and floral headpieces",
+    associates:"Married to a famous muralist", lastSeen:"Spent her final years largely at her family home in Mexico City"},
+  {id:'elizabeth1', name:"Elizabeth I", aliases:['elizabeth i','queen elizabeth i','elizabeth tudor'], tier:2,
+    location:"Greenwich, England", sex:"F", height:"5'3\" (160 cm)", hair:"Red", eyes:"Hazel", dob:"Sep 7, 1533", clue:"The Virgin Queen who never married.",
+    occupation:"Monarch", era:"16th century", alias:"The Virgin Queen",
+    distinguishingMark:"Pale white lead makeup, elaborate red wigs",
+    associates:"Chief advisor throughout most of her reign", lastSeen:"Died at her royal residence after ruling more than four decades"},
+  {id:'earhart', name:"Amelia Earhart", aliases:['amelia earhart','earhart'], tier:2,
+    location:"Atchison, Kansas, USA", sex:"F", height:"5'8\" (173 cm)", hair:"Blonde", eyes:"Grey", dob:"Jul 24, 1897", clue:"Vanished over the Pacific in 1937.",
+    occupation:"Aviator", era:"Early 20th century", alias:"Lady Lindy",
+    distinguishingMark:"Short tousled hair, leather flight jacket",
+    associates:"Navigator who disappeared alongside her", lastSeen:"Last radio contact reported near a tiny Pacific island"},
+  {id:'beethoven', name:"Ludwig van Beethoven", aliases:['beethoven','ludwig van beethoven'], tier:2,
+    location:"Bonn, Germany", sex:"M", height:"5'4\" (163 cm)", hair:"Dark Brown", eyes:"Blue-Grey", dob:"Dec 16, 1770", clue:"Kept composing symphonies after losing his hearing.",
+    occupation:"Composer", era:"Late 18th to early 19th century", alias:"No widely used alias",
+    distinguishingMark:"Notoriously unruly hair, increasingly withdrawn as his hearing failed",
+    associates:"Patron: an Austrian archduke", lastSeen:"Died in Vienna during a thunderstorm, according to legend"},
+  {id:'darwin', name:"Charles Darwin", aliases:['charles darwin','darwin'], tier:2,
+    location:"Shrewsbury, England", sex:"M", height:"5'10\" (178 cm)", hair:"Brown", eyes:"Blue-Grey", dob:"Feb 12, 1809", clue:"A five-year voyage aboard a survey ship reshaped his thinking on species.",
+    occupation:"Naturalist", era:"19th century", alias:"No widely used alias",
+    distinguishingMark:"Grew a long white beard later in life",
+    associates:"Corresponded for years with a fellow naturalist who reached similar conclusions independently", lastSeen:"Died at his home in the English countryside"},
+  {id:'newton', name:"Isaac Newton", aliases:['isaac newton','newton'], tier:2,
+    location:"Woolsthorpe, England", sex:"M", height:"5'6\" (168 cm)", hair:"Grey (wore a wig later in life)", eyes:"Unknown", dob:"Dec 25, 1642 (Old Style)", clue:"Reportedly inspired by a falling apple in an orchard.",
+    occupation:"Physicist and mathematician", era:"17th to 18th century", alias:"No widely used alias",
+    distinguishingMark:"Rarely laughed, according to contemporaries",
+    associates:"Bitter rival with a German mathematician over calculus's invention", lastSeen:"Died in London and was buried in a national landmark abbey"},
+  {id:'curie', name:"Marie Curie", aliases:['marie curie','curie'], tier:2,
+    location:"Warsaw, Poland (Russian Empire)", sex:"F", height:"5'0\" (152 cm)", hair:"Brown", eyes:"Grey", dob:"Nov 7, 1867", clue:"First person to win Nobel Prizes in two different sciences.",
+    occupation:"Physicist and chemist", era:"Late 19th to early 20th century", alias:"Born Maria Sklodowska",
+    distinguishingMark:"Carried radioactive samples in her pockets, unaware of the danger",
+    associates:"Worked closely with her physicist husband on early radioactivity research", lastSeen:"Died from illness linked to prolonged radiation exposure"},
+  {id:'mandela', name:"Nelson Mandela", aliases:['nelson mandela','mandela'], tier:2,
+    location:"Mvezo, South Africa", sex:"M", height:"6'1\" (185 cm)", hair:"Black (later grey)", eyes:"Brown", dob:"Jul 18, 1918", clue:"Spent 27 years imprisoned before leading his country as its first democratically elected head of state.",
+    occupation:"Lawyer, activist, and statesman", era:"20th to 21st century", alias:"Madiba",
+    distinguishingMark:"Known for colorful printed shirts in later public life",
+    associates:"Shared a Nobel Peace Prize with the president who released him from prison", lastSeen:"Died at his home in Johannesburg"},
+  {id:'churchill', name:"Winston Churchill", aliases:['winston churchill','churchill'], tier:2,
+    location:"Woodstock, England", sex:"M", height:"5'6\" (168 cm)", hair:"Reddish (balding)", eyes:"Blue-Grey", dob:"Nov 30, 1874", clue:"Led his country through its darkest hour with a famous V sign.",
+    occupation:"Statesman and writer", era:"20th century", alias:"No widely used alias",
+    distinguishingMark:"Rarely seen without a cigar",
+    associates:"Formed a wartime alliance with an American president and a Soviet premier", lastSeen:"Died in London after a long post-war political career"},
+  {id:'alexander', name:"Alexander the Great", aliases:['alexander the great','alexander iii of macedon'], tier:2,
+    location:"Pella, Macedon (Greece)", sex:"M", height:"~5'5\" (165 cm)", hair:"Blonde/Light Brown", eyes:"Reportedly one blue, one brown", dob:"356 BC", clue:"Built one of the largest empires of the ancient world before turning 30.",
+    occupation:"King and military commander", era:"4th century BC", alias:"No widely used alias",
+    distinguishingMark:"Reportedly tilted his head to one side, per ancient sculptures",
+    associates:"Tutored as a boy by a famous Greek philosopher", lastSeen:"Died suddenly in Babylon, cause still debated"},
+  {id:'lovelace', name:"Ada Lovelace", aliases:['ada lovelace','lovelace'], tier:2,
+    location:"London, England", sex:"F", height:"Unknown", hair:"Dark Brown", eyes:"Unknown", dob:"Dec 10, 1815", clue:"Wrote notes on a mechanical computing engine now considered the first algorithm.",
+    occupation:"Mathematician and writer", era:"19th century", alias:"Daughter of a famous Romantic poet",
+    distinguishingMark:"No reliable record",
+    associates:"Collaborated closely with an inventor on his mechanical calculating engine", lastSeen:"Died young in London from illness"},
+  {id:'franklin', name:"Benjamin Franklin", aliases:['benjamin franklin','ben franklin','franklin'], tier:2,
+    location:"Boston, Massachusetts, USA", sex:"M", height:"5'9\" (175 cm)", hair:"Balding, grey", eyes:"Grey", dob:"Jan 17, 1706", clue:"Flew a kite in a thunderstorm to study electricity, according to legend.",
+    occupation:"Writer, scientist, and statesman", era:"18th century", alias:"No widely used alias",
+    distinguishingMark:"Famous bifocal glasses of his own design",
+    associates:"One of several founders who helped draft a new nation's founding documents", lastSeen:"Died in Philadelphia after decades of public service"},
+  {id:'parks', name:"Rosa Parks", aliases:['rosa parks'], tier:2,
+    location:"Tuskegee, Alabama, USA", sex:"F", height:"5'3\" (160 cm)", hair:"Black", eyes:"Brown", dob:"Feb 4, 1913", clue:"Refused to give up her seat on a segregated bus.",
+    occupation:"Civil rights activist and seamstress", era:"20th century", alias:"Mother of the Civil Rights Movement",
+    distinguishingMark:"No reliable record",
+    associates:"Her arrest sparked a lengthy citywide bus boycott led by a young minister", lastSeen:"Died in Detroit in her old age"},
+  {id:'galileo', name:"Galileo Galilei", aliases:['galileo galilei','galileo'], tier:2,
+    location:"Pisa, Italy", sex:"M", height:"Unknown", hair:"Reddish (later grey)", eyes:"Unknown", dob:"Feb 15, 1564", clue:"Improved a new optical instrument and pointed it at the night sky.",
+    occupation:"Astronomer and physicist", era:"16th to 17th century", alias:"No widely used alias",
+    distinguishingMark:"No reliable record",
+    associates:"Tried before a religious court over his support of a sun-centered model", lastSeen:"Died under house arrest near Florence"},
+  {id:'catherinegreat', name:"Catherine the Great", aliases:['catherine the great','catherine ii'], tier:2,
+    location:"Stettin, Prussia (Germany)", sex:"F", height:"Unknown", hair:"Brown", eyes:"Blue", dob:"May 2, 1729", clue:"A German-born princess who came to rule a vast eastern empire for over three decades.",
+    occupation:"Empress", era:"18th century", alias:"Born Sophie of Anhalt-Zerbst",
+    distinguishingMark:"No reliable record",
+    associates:"Rose to power after a palace coup against her own husband", lastSeen:"Died at her palace after a long reign"},
+
+  // ---- tier 3 (hard) ----
+  {id:'tesla', name:"Nikola Tesla", aliases:['nikola tesla','tesla'], tier:3,
+    location:"Smiljan, Austrian Empire (Croatia)", sex:"M", height:"6'2\" (188 cm)", hair:"Dark Brown", eyes:"Blue", dob:"Jul 10, 1856", clue:"Pioneered alternating current, then lost the current war on paper.",
+    occupation:"Inventor and electrical engineer", era:"Late 19th to early 20th century", alias:"No widely used alias",
+    distinguishingMark:"Tall, immaculately dressed, known for eccentric habits",
+    associates:"Former employer turned bitter rival, a fellow inventor", lastSeen:"Died alone in a New York hotel room"},
+  {id:'tubman', name:"Harriet Tubman", aliases:['harriet tubman','tubman'], tier:3,
+    location:"Dorchester County, Maryland, USA", sex:"F", height:"5'0\" (152 cm)", hair:"Black", eyes:"Brown", dob:"c. Mar 1822", clue:"Made repeat trips south on the Underground Railroad.",
+    occupation:"Abolitionist and rescue network conductor", era:"19th century", alias:"Moses",
+    distinguishingMark:"Scar and chronic seizures from a childhood head injury",
+    associates:"Worked closely with abolitionist networks across northern states", lastSeen:"Spent later years running a home for the elderly she founded"},
+  {id:'mozart', name:"Wolfgang Amadeus Mozart", aliases:['mozart','wolfgang amadeus mozart','wolfgang mozart'], tier:3,
+    location:"Salzburg, Austria", sex:"M", height:"5'4\" (163 cm)", hair:"Light Brown", eyes:"Blue-Grey", dob:"Jan 27, 1756", clue:"Composing symphonies before he'd lost his baby teeth.",
+    occupation:"Composer", era:"18th century", alias:"No widely used alias",
+    distinguishingMark:"No reliable record; began composing and performing as a small child",
+    associates:"Complicated rivalry rumored with a contemporary Italian composer", lastSeen:"Died young in Vienna, buried in an unmarked common grave"},
+  {id:'davinci', name:"Leonardo da Vinci", aliases:['leonardo da vinci','da vinci','leonardo'], tier:3,
+    location:"Vinci, Republic of Florence (Italy)", sex:"M", height:"~5'8\" (173 cm)", hair:"Brown", eyes:"Hazel", dob:"Apr 15, 1452", clue:"Painted a famously enigmatic smile.",
+    occupation:"Painter, inventor, and engineer", era:"15th to 16th century", alias:"Leonardo",
+    distinguishingMark:"Wrote notes in mirror image handwriting",
+    associates:"Patron: a powerful Florentine ruling family", lastSeen:"Died in France under the patronage of a French king"},
+  {id:'joanofarc', name:"Joan of Arc", aliases:['joan of arc','jeanne d\'arc','joan'], tier:3,
+    location:"Domrémy, Kingdom of France", sex:"F", height:"5'1\" (155 cm)", hair:"Dark Brown", eyes:"Brown", dob:"c. 1412", clue:"Claimed visions led her to the battlefield at seventeen.",
+    occupation:"Military leader", era:"15th century", alias:"The Maid of Orleans",
+    distinguishingMark:"Wore armor and cropped her hair short, unusual for the era",
+    associates:"Crowned the French king she helped put on the throne", lastSeen:"Captured and executed in a French town square"},
+  {id:'caesar', name:"Julius Caesar", aliases:['julius caesar','caesar'], tier:3,
+    location:"Rome, Roman Republic", sex:"M", height:"5'11\" (180 cm)", hair:"Dark Brown", eyes:"Dark Brown", dob:"Jul 12, 100 BC", clue:"Crossed a small river and started a civil war.",
+    occupation:"General and statesman", era:"1st century BC", alias:"No widely used alias",
+    distinguishingMark:"Known for a receding hairline he reportedly tried to conceal",
+    associates:"Betrayed by a group including a close ally", lastSeen:"Assassinated at a Senate meeting"},
+  {id:'suntzu', name:"Sun Tzu", aliases:['sun tzu','sunzi'], tier:3,
+    location:"State of Qi or Wu, ancient China", sex:"M", height:"Unknown", hair:"Unknown", eyes:"Unknown", dob:"c. 544 BC", clue:"Wrote a treatise on strategy still studied by military and business leaders.",
+    occupation:"Military strategist and general", era:"6th century BC", alias:"Author of an ancient treatise on strategy",
+    distinguishingMark:"Little verified biographical detail survives",
+    associates:"Reportedly served a king of an ancient Chinese state", lastSeen:"Historical record of his later life is scarce and disputed"},
+  {id:'confucius', name:"Confucius", aliases:['confucius','kong fuzi'], tier:3,
+    location:"State of Lu, ancient China", sex:"M", height:"Unknown", hair:"Unknown", eyes:"Unknown", dob:"c. 551 BC", clue:"His sayings on ethics and society were compiled by his students.",
+    occupation:"Philosopher and teacher", era:"6th to 5th century BC", alias:"Kong Fuzi",
+    distinguishingMark:"Traditionally depicted with a long beard",
+    associates:"Taught a large following of students who preserved his teachings", lastSeen:"Died in his home state after years of teaching and travel"},
+  {id:'copernicus', name:"Nicolaus Copernicus", aliases:['nicolaus copernicus','copernicus'], tier:3,
+    location:"Toruń, Poland", sex:"M", height:"Unknown", hair:"Unknown", eyes:"Unknown", dob:"Feb 19, 1473", clue:"Proposed that the sun, not the earth, sat at the center of things.",
+    occupation:"Astronomer and mathematician", era:"15th to 16th century", alias:"No widely used alias",
+    distinguishingMark:"No reliable record",
+    associates:"His major work was published only as he lay dying", lastSeen:"Died in Poland shortly after his life's work was printed"},
+  {id:'gutenberg', name:"Johannes Gutenberg", aliases:['johannes gutenberg','gutenberg'], tier:3,
+    location:"Mainz, Holy Roman Empire (Germany)", sex:"M", height:"Unknown", hair:"Unknown", eyes:"Unknown", dob:"c. 1400", clue:"Built a movable-type press that mass-produced a famous Bible.",
+    occupation:"Inventor and printer", era:"15th century", alias:"No widely used alias",
+    distinguishingMark:"No reliable record",
+    associates:"Financed by a business partner who later seized his workshop over debts", lastSeen:"Died in Mainz after his invention had already begun spreading across Europe"},
+  {id:'ivanterrible', name:"Ivan the Terrible", aliases:['ivan the terrible','ivan iv'], tier:3,
+    location:"Moscow, Grand Duchy of Moscow (Russia)", sex:"M", height:"Unknown", hair:"Reddish-Brown", eyes:"Unknown", dob:"Aug 25, 1530", clue:"Became the first ruler to be crowned with a new imperial title for his realm.",
+    occupation:"Monarch", era:"16th century", alias:"No widely used alias",
+    distinguishingMark:"Prone to violent rages in his later reign",
+    associates:"Founded a secret police-like force to enforce his rule", lastSeen:"Died in Moscow after an increasingly paranoid final decade"},
+  {id:'hannibal', name:"Hannibal Barca", aliases:['hannibal barca','hannibal'], tier:3,
+    location:"Carthage (modern Tunisia)", sex:"M", height:"Unknown", hair:"Unknown", eyes:"Unknown", dob:"247 BC", clue:"Marched war elephants across a famous mountain range to invade Rome.",
+    occupation:"Military general", era:"3rd century BC", alias:"No widely used alias",
+    distinguishingMark:"Reportedly lost an eye during a difficult campaign",
+    associates:"Longtime rival of a Roman general who eventually defeated him", lastSeen:"Died by poison rather than be captured by Rome"},
+  {id:'mansamusa', name:"Mansa Musa", aliases:['mansa musa'], tier:3,
+    location:"Mali Empire, West Africa", sex:"M", height:"Unknown", hair:"Unknown", eyes:"Unknown", dob:"c. 1280", clue:"A pilgrimage to Mecca with so much gold that he reportedly disrupted regional economies for years.",
+    occupation:"Emperor", era:"14th century", alias:"Often called the richest person in history",
+    distinguishingMark:"No reliable record",
+    associates:"Ruled one of the wealthiest empires of his era, built on gold and salt trade", lastSeen:"Died in his empire after returning from his famous pilgrimage"},
+  {id:'douglass', name:"Frederick Douglass", aliases:['frederick douglass','douglass'], tier:3,
+    location:"Talbot County, Maryland, USA", sex:"M", height:"6'0\" (183 cm)", hair:"Black/Grey", eyes:"Brown", dob:"c. Feb 1818", clue:"Escaped slavery and became a leading voice for abolition through his writing and speeches.",
+    occupation:"Abolitionist, writer, and statesman", era:"19th century", alias:"Born Frederick Augustus Washington Bailey",
+    distinguishingMark:"Widely recognized for his distinctive mane of hair in later portraits",
+    associates:"Advised a wartime president on issues of emancipation", lastSeen:"Died at his home in Washington, D.C."},
+  {id:'anthony', name:"Susan B. Anthony", aliases:['susan b anthony','susan anthony'], tier:3,
+    location:"Adams, Massachusetts, USA", sex:"F", height:"5'5\" (166 cm)", hair:"Brown", eyes:"Grey", dob:"Feb 15, 1820", clue:"Was arrested for casting a vote decades before women legally could.",
+    occupation:"Activist and reformer", era:"19th to 20th century", alias:"No widely used alias",
+    distinguishingMark:"No reliable record",
+    associates:"Worked closely for decades with a fellow suffrage campaigner", lastSeen:"Died before the constitutional amendment she fought for was ratified"},
+  {id:'charlemagne', name:"Charlemagne", aliases:['charlemagne','charles the great'], tier:3,
+    location:"Frankish territory (modern Belgium/Germany border region)", sex:"M", height:"6'2\" (188 cm, unusually tall for his era)", hair:"Blonde/Grey", eyes:"Blue", dob:"c. 747", clue:"Crowned Emperor by a pope on Christmas Day, uniting much of Western Europe.",
+    occupation:"King and Emperor", era:"8th to 9th century", alias:"Charles the Great",
+    distinguishingMark:"Reportedly could not write fluently despite his intellectual patronage",
+    associates:"Crowned by the head of the Roman Catholic Church", lastSeen:"Died at his palace and was buried in a cathedral he had built"},
+];
+
+const EVENTS = [
+  // ---- tier 1 (easy) ----
+  {id:'moonlanding', name:"The Moon Landing", aliases:['moon landing','apollo 11','apollo 11 moon landing','the moon landing'], tier:1,
+    location:"Florida, USA", plate:"APLO-11", year:"1969", clue:"One small step, one giant leap."},
+  {id:'declaration', name:"Signing of the Declaration of Independence", aliases:['declaration of independence','signing of the declaration of independence','independence day'], tier:1,
+    location:"Pennsylvania, USA", plate:"4-JUL-76", year:"1776", clue:"Philadelphia, a room full of quills, and one bold signature from John Hancock."},
+  {id:'berlinwall', name:"Fall of the Berlin Wall", aliases:['fall of the berlin wall','berlin wall','fall of berlin wall'], tier:1,
+    location:"Berlin, Germany", plate:"9-NOV-89", year:"1989", clue:"A divided city became one again, hammer in hand."},
+  {id:'pearlharbor', name:"Attack on Pearl Harbor", aliases:['pearl harbor','attack on pearl harbor'], tier:1,
+    location:"Hawaii, USA", plate:"PEARL-41", year:"1941", clue:"A surprise naval attack pulled a reluctant nation into a world war."},
+  {id:'911', name:"September 11 Attacks", aliases:['september 11 attacks','september 11','9 11','9/11'], tier:1,
+    location:"New York, USA", plate:"911-2001", year:"2001", clue:"Hijacked planes brought down two towers in a single morning."},
+  {id:'jfk', name:"Assassination of John F. Kennedy", aliases:['assassination of john f kennedy','jfk assassination','kennedy assassination'], tier:1,
+    location:"Texas, USA", plate:"DALLAS-63", year:"1963", clue:"A motorcade turned tragic in a Texas city."},
+  {id:'wrightbros', name:"The Wright Brothers' First Flight", aliases:['wright brothers first flight','wright brothers','first flight'], tier:1,
+    location:"North Carolina, USA", plate:"KDH-1903", year:"1903", clue:"Twelve seconds airborne changed transportation forever."},
+  {id:'greatfire', name:"The Great Fire of London", aliases:['great fire of london','fire of london'], tier:1,
+    location:"London, England", plate:"PUDDING-66", year:"1666", clue:"Started in a bakery and consumed most of a medieval city."},
+  {id:'stockcrash', name:"The Stock Market Crash of 1929", aliases:['stock market crash of 1929','stock market crash','wall street crash'], tier:1,
+    location:"New York, USA", plate:"CRASH-29", year:"1929", clue:"A single October collapse triggered a decade-long economic depression."},
+  {id:'columbusevent', name:"Columbus Reaches the Americas", aliases:['columbus reaches the americas','columbus discovers america','columbus lands in america'], tier:1,
+    location:"Bahamas, Caribbean", plate:"NINA-1492", year:"1492", clue:"Three ships crossed an ocean expecting to find Asia."},
+  {id:'telephone', name:"The Invention of the Telephone", aliases:['invention of the telephone','first telephone call','telephone invented'], tier:1,
+    location:"Massachusetts, USA", plate:"BELL-1876", year:"1876", clue:"A famous first phone call summoned an assistant from another room."},
+  {id:'olympics1896', name:"The First Modern Olympic Games", aliases:['first modern olympic games','1896 olympics','modern olympics'], tier:1,
+    location:"Athens, Greece", plate:"OLYM-1896", year:"1896", clue:"An ancient Greek tradition was revived in its birthplace."},
+  {id:'fallrome', name:"Fall of the Western Roman Empire", aliases:['fall of the western roman empire','fall of rome'], tier:1,
+    location:"Ravenna, Italy", plate:"ROMA-476", year:"476 AD", clue:"The last emperor in the west was deposed by a Germanic chieftain."},
+  {id:'usconstitution', name:"Signing of the US Constitution", aliases:['signing of the us constitution','us constitution signed','constitutional convention'], tier:1,
+    location:"Pennsylvania, USA", plate:"WETHE-87", year:"1787", clue:"Delegates in Philadelphia hammered out a new framework of government."},
+  {id:'dday', name:"The Normandy Landings (D-Day)", aliases:['normandy landings','d day','dday'], tier:1,
+    location:"Normandy, France", plate:"DDAY-644", year:"1944", clue:"Allied troops stormed a heavily defended coastline at dawn."},
+  {id:'lincolnassass', name:"The Assassination of Abraham Lincoln", aliases:['assassination of abraham lincoln','lincoln assassination'], tier:1,
+    location:"Washington D.C., USA", plate:"FORDS-65", year:"1865", clue:"A president was shot at a theater just days after a war's end."},
+  {id:'goldrush', name:"The California Gold Rush", aliases:['california gold rush','gold rush'], tier:1,
+    location:"California, USA", plate:"EUREKA-48", year:"1848", clue:"A discovery at a sawmill sent hundreds of thousands west."},
+
+  // ---- tier 2 (medium) ----
+  {id:'bastille', name:"Storming of the Bastille", aliases:['storming of the bastille','bastille','bastille day'], tier:2,
+    location:"Paris, France", plate:"14-JUIL", year:"1789", clue:"The spark that lit the French Revolution."},
+  {id:'teaparty', name:"The Boston Tea Party", aliases:['boston tea party','tea party'], tier:2,
+    location:"Massachusetts, USA", plate:"TEA-1773", year:"1773", clue:"A harbor full of soggy leaves and no takers for the tax."},
+  {id:'titanic', name:"The Sinking of the Titanic", aliases:['sinking of the titanic','titanic','titanic sinking'], tier:2,
+    location:"North Atlantic (UK registry)", plate:"RMS-412", year:"1912", clue:"Unsinkable, they said, on her maiden voyage."},
+  {id:'mlk', name:"'I Have a Dream' Speech", aliases:['i have a dream speech','i have a dream','mlk speech','march on washington'], tier:2,
+    location:"Washington D.C., USA", plate:"DREAM-63", year:"1963", clue:"Delivered from the steps of the Lincoln Memorial."},
+  {id:'hastings', name:"The Battle of Hastings", aliases:['battle of hastings','hastings'], tier:2,
+    location:"Hastings, England", plate:"1066-WNC", year:"1066", clue:"A Norman duke defeated an English king with an arrow to the eye, legend says."},
+  {id:'constantinople', name:"The Fall of Constantinople", aliases:['fall of constantinople','constantinople falls'], tier:2,
+    location:"Constantinople (Istanbul), Ottoman Empire", plate:"1453-CON", year:"1453", clue:"Massive cannons finally breached walls that had held for a thousand years."},
+  {id:'charlemagnecrown', name:"The Coronation of Charlemagne", aliases:['coronation of charlemagne','charlemagne crowned emperor'], tier:2,
+    location:"Rome, Italy", plate:"XMAS-800", year:"800 AD", clue:"A pope crowned a Frankish king Emperor on a winter holiday."},
+  {id:'salem', name:"The Salem Witch Trials", aliases:['salem witch trials','witch trials'], tier:2,
+    location:"Massachusetts, USA", plate:"SALEM-92", year:"1692", clue:"Accusations of witchcraft led to a wave of trials and executions in a colonial town."},
+  {id:'louisiana', name:"The Louisiana Purchase", aliases:['louisiana purchase'], tier:2,
+    location:"Louisiana Territory, USA", plate:"LA-1803", year:"1803", clue:"A massive land deal roughly doubled the size of a young nation."},
+  {id:'chernobyl', name:"The Chernobyl Disaster", aliases:['chernobyl disaster','chernobyl'], tier:2,
+    location:"Pripyat, Ukraine (USSR)", plate:"RBMK-86", year:"1986", clue:"A reactor test went catastrophically wrong at a Soviet nuclear plant."},
+  {id:'franzferdinand', name:"Assassination of Archduke Franz Ferdinand", aliases:['assassination of archduke franz ferdinand','franz ferdinand assassination'], tier:2,
+    location:"Sarajevo, Bosnia", plate:"SARA-1914", year:"1914", clue:"A single gunshot in the Balkans triggered a continent-wide war."},
+  {id:'emancipation', name:"The Emancipation Proclamation", aliases:['emancipation proclamation'], tier:2,
+    location:"Washington D.C., USA", plate:"FREE-1863", year:"1863", clue:"A wartime executive order declared millions of enslaved people free."},
+  {id:'smallpoxvaccine', name:"The First Successful Smallpox Vaccination", aliases:['first smallpox vaccination','smallpox vaccine','first vaccination'], tier:2,
+    location:"Gloucestershire, England", plate:"COWPOX-96", year:"1796", clue:"A doctor tested a milkmaid's immunity theory on a young boy."},
+  {id:'greatpyramid', name:"Construction of the Great Pyramid of Giza", aliases:['great pyramid of giza','construction of the great pyramid'], tier:2,
+    location:"Giza, Egypt", plate:"GIZA-2560", year:"c. 2560 BC", clue:"Built as a tomb for a pharaoh, it stood as the tallest structure on Earth for millennia."},
+  {id:'versailles', name:"The Treaty of Versailles", aliases:['treaty of versailles'], tier:2,
+    location:"Versailles, France", plate:"VERS-1919", year:"1919", clue:"A peace treaty formally ended one world war while sowing seeds for another."},
+  {id:'sistine', name:"Completion of the Sistine Chapel Ceiling", aliases:['sistine chapel ceiling','sistine chapel'], tier:2,
+    location:"Vatican City, Rome", plate:"SISTINE-12", year:"1512", clue:"A reluctant painter spent years on his back to finish a ceiling masterpiece."},
+  {id:'bostonmassacre', name:"The Boston Massacre", aliases:['boston massacre'], tier:2,
+    location:"Massachusetts, USA", plate:"MASS-1770", year:"1770", clue:"British soldiers fired into a crowd of colonial protesters."},
+
+  // ---- tier 3 (hard) ----
+  {id:'vesuvius', name:"Eruption of Mount Vesuvius", aliases:['eruption of mount vesuvius','mount vesuvius','vesuvius','pompeii'], tier:3,
+    location:"Pompeii, Roman Empire (Italy)", plate:"VESUV-79", year:"79 AD", clue:"Buried a city in ash almost overnight."},
+  {id:'magnacarta', name:"Signing of the Magna Carta", aliases:['magna carta','signing of the magna carta'], tier:3,
+    location:"Runnymede, England", plate:"RUNI-1215", year:"1215", clue:"A king's power gets its first big set of limits, in Latin."},
+  {id:'hiroshima', name:"Atomic Bombing of Hiroshima", aliases:['atomic bombing of hiroshima','hiroshima','hiroshima bombing'], tier:3,
+    location:"Hiroshima, Japan", plate:"ENOLA-45", year:"1945", clue:"A single flight, a single bomb, an entire city changed."},
+  {id:'lutherstheses', name:"Martin Luther's 95 Theses", aliases:['95 theses','martin luther\'s 95 theses','ninety-five theses','luther\'s theses'], tier:3,
+    location:"Wittenberg, Holy Roman Empire (Germany)", plate:"THESES-95", year:"1517", clue:"Nailed to a church door, and the church was never quite the same."},
+  {id:'thermopylae', name:"The Battle of Thermopylae", aliases:['battle of thermopylae','thermopylae'], tier:3,
+    location:"Thermopylae, Greece", plate:"300-480BC", year:"480 BC", clue:"A small force of Greek soldiers held a narrow pass against a massive invading army."},
+  {id:'caesarassass', name:"Assassination of Julius Caesar", aliases:['assassination of julius caesar','caesar assassinated','ides of march'], tier:3,
+    location:"Rome, Roman Republic", plate:"IDES-44BC", year:"44 BC", clue:"Senators surrounded and stabbed a dictator on a day associated with warnings."},
+  {id:'blackdeath', name:"The Black Death Reaches Europe", aliases:['black death','black death reaches europe','the plague'], tier:3,
+    location:"Sicily, Italy (spreading across Europe)", plate:"PLAGUE-47", year:"1347", clue:"A pandemic arriving by trade ship killed a huge share of a continent's population."},
+  {id:'armada', name:"The Defeat of the Spanish Armada", aliases:['spanish armada','defeat of the spanish armada'], tier:3,
+    location:"English Channel", plate:"ARMADA-88", year:"1588", clue:"A massive invasion fleet was scattered by storms and a smaller island navy."},
+  {id:'meiji', name:"The Meiji Restoration", aliases:['meiji restoration'], tier:3,
+    location:"Japan", plate:"MEIJI-1868", year:"1868", clue:"A restored emperor's rule launched rapid modernization across an island nation."},
+  {id:'viennacongress', name:"The Congress of Vienna", aliases:['congress of vienna'], tier:3,
+    location:"Vienna, Austria", plate:"VIENNA-15", year:"1815", clue:"European powers redrew the map after a continent-spanning war ended."},
+  {id:'principia', name:"Publication of Newton's Principia Mathematica", aliases:['newtons principia','principia mathematica'], tier:3,
+    location:"London, England", plate:"PRIN-1687", year:"1687", clue:"A landmark work laid out the laws of motion and universal gravitation."},
+  {id:'galileotrial', name:"The Trial of Galileo", aliases:['trial of galileo'], tier:3,
+    location:"Rome, Italy", plate:"HERESY-33", year:"1633", clue:"A religious court forced a scientist to recant his support for a sun-centered universe."},
+  {id:'nuremberg', name:"The Nuremberg Trials", aliases:['nuremberg trials'], tier:3,
+    location:"Nuremberg, Germany", plate:"NURNBRG-45", year:"1945-46", clue:"Wartime leaders faced an international tribunal for crimes committed during the conflict."},
+  {id:'cubanmissile', name:"The Cuban Missile Crisis", aliases:['cuban missile crisis'], tier:3,
+    location:"Cuba", plate:"DEFCON-62", year:"1962", clue:"The world edged close to nuclear war over missiles ninety miles from Florida."},
+  {id:'indiapartition', name:"The Partition of India", aliases:['partition of india'], tier:3,
+    location:"India / Pakistan border region", plate:"PART-1947", year:"1947", clue:"The end of colonial rule split a subcontinent into two new nations amid mass upheaval."},
+  {id:'mongolfound', name:"The Founding of the Mongol Empire", aliases:['founding of the mongol empire','mongol empire founded'], tier:3,
+    location:"Mongolia", plate:"KHAN-1206", year:"1206", clue:"A unified tribal confederation crowned a single supreme ruler on the steppe."},
+];
+
+const TIER_LABEL = {1:'Easy',2:'Medium',3:'Hard'};
+
+/* ============================ STATE ============================ */
+
+let state = {
+  mode:null,
+  levelIndex:0,
+  lives:3,
+  hints:1,
+  levelPotential:100,
+  hiddenFields:[],
+  revealedByHint:[],
+  answered:false,
+};
+
+const SILHOUETTE_SVG = `<svg viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="36" r="26"/><path d="M10 118c0-30 18-46 40-46s40 16 40 46z"/></svg>`;
+const PAPERCLIP_SVG = `<svg viewBox="0 0 34 50" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#8a8a86" stroke-width="3"><path d="M9 14v22a7 7 0 0 0 14 0V10a4.5 4.5 0 0 0-9 0v22a2 2 0 0 0 4 0V14"/></svg>`;
+
+/* ============================ UTIL ============================ */
+
+function $(id){return document.getElementById(id);}
+function normalize(str){
+  return str.toLowerCase().trim().replace(/[^a-z0-9 ]/g,'').replace(/\s+/g,' ');
+}
+function levenshtein(a,b){
+  const m=a.length,n=b.length;
+  const dp=Array.from({length:m+1},()=>new Array(n+1).fill(0));
+  for(let i=0;i<=m;i++)dp[i][0]=i;
+  for(let j=0;j<=n;j++)dp[0][j]=j;
+  for(let i=1;i<=m;i++){
+    for(let j=1;j<=n;j++){
+      dp[i][j]=a[i-1]===b[j-1]?dp[i-1][j-1]:1+Math.min(dp[i-1][j-1],dp[i-1][j],dp[i][j-1]);
+    }
+  }
+  return dp[m][n];
+}
+function isMatch(guess, aliases){
+  const g = normalize(guess);
+  if(!g) return false;
+  for(const alias of aliases){
+    const a = normalize(alias);
+    if(g===a) return true;
+    if(a.includes(' ')){
+      const lastWord = a.split(' ').slice(-1)[0];
+      if(g===lastWord && lastWord.length>2) return true;
+    }
+    if(g.length>3 && levenshtein(g,a)<=Math.max(1,Math.floor(a.length*0.18))) return true;
+  }
+  return false;
+}
+
+/* ---------- persistence ---------- */
+function getDeck(mode){
+  if(mode==='plate') return EVENTS;
+  return FIGURES; // both 'driver' and 'detective' draw from the same historical figures
+}
+
+function loadUnlocked(mode){
+  try{ return Math.max(1, parseInt(localStorage.getItem('licenseGame_unlocked_'+mode)||'1',10)); }
+  catch(e){ return 1; }
+}
+function saveUnlocked(mode,n){
+  try{
+    const cur = loadUnlocked(mode);
+    if(n>cur) localStorage.setItem('licenseGame_unlocked_'+mode, String(n));
+  }catch(e){/* ignore */}
+}
+function loadCompleted(mode){
+  try{ return JSON.parse(localStorage.getItem('licenseGame_completed_'+mode)||'[]'); }
+  catch(e){ return []; }
+}
+function markCompleted(mode, idx){
+  try{
+    const arr = loadCompleted(mode);
+    if(!arr.includes(idx)){ arr.push(idx); localStorage.setItem('licenseGame_completed_'+mode, JSON.stringify(arr)); }
+  }catch(e){/* ignore */}
+}
+function loadTotalScore(mode){
+  try{ return parseInt(localStorage.getItem('licenseGame_total_'+mode)||'0',10); }
+  catch(e){ return 0; }
+}
+function addTotalScore(mode, pts){
+  try{
+    const cur = loadTotalScore(mode);
+    localStorage.setItem('licenseGame_total_'+mode, String(cur+pts));
+    return cur+pts;
+  }catch(e){ return loadTotalScore(mode); }
+}
+
+/* ============================ SCREEN CONTROL ============================ */
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.add('hidden'));
+  $(id).classList.remove('hidden');
+}
+
+function refreshTitleProgress(){
+  ['driver','plate','detective'].forEach(mode=>{
+    const deck = getDeck(mode);
+    const completed = loadCompleted(mode).length;
+    $('progress-'+mode).textContent = completed + ' / ' + deck.length + ' stops completed';
+  });
+}
+
+/* ============================ LEVEL SELECT ============================ */
+
+const MODE_TITLES = {
+  driver:"Choose Your License",
+  plate:"Choose Your Plate",
+  detective:"Choose Your Case"
+};
+
+function openLevelSelect(mode){
+  state.mode = mode;
+  const deck = getDeck(mode);
+  const unlocked = loadUnlocked(mode);
+  const completed = loadCompleted(mode);
+
+  $('level-title').textContent = MODE_TITLES[mode] || "Choose Your Stop";
+  $('level-total-score').textContent = loadTotalScore(mode) + ' PTS';
+
+  const grid = $('level-path');
+  grid.innerHTML = '';
+
+  deck.forEach((entry, i)=>{
+    const isCompleted = completed.includes(i);
+    const isPlayable = i < unlocked;
+
+    const node = document.createElement('button');
+    node.className = 'level-node ' + (isCompleted ? 'completed' : (isPlayable ? 'playable' : 'locked'));
+    node.disabled = !isPlayable;
+
+    const badge = document.createElement('div');
+    badge.className = 'badge';
+    badge.textContent = isCompleted ? '✓' : (isPlayable ? String(i+1) : '🔒');
+    node.appendChild(badge);
+
+    const lbl = document.createElement('div');
+    lbl.className = 'lbl';
+    lbl.textContent = isPlayable ? (String(i+1) + ' · ' + TIER_LABEL[entry.tier]) : String(i+1);
+    node.appendChild(lbl);
+
+    if(isPlayable){
+      node.addEventListener('click', ()=>startLevel(mode, i));
+    }
+    grid.appendChild(node);
+  });
+
+  showScreen('screen-levels');
+}
+
+/* ============================ GAME FLOW ============================ */
+
+function currentEntry(){
+  return getDeck(state.mode)[state.levelIndex];
+}
+
+function startLevel(mode, idx){
+  state.mode = mode;
+  state.levelIndex = idx;
+  state.lives = 3;
+  showScreen('screen-game');
+  loadLevel();
+}
+
+function getHideableKeys(mode){
+  if(mode==='plate') return ['year'];
+  if(mode==='detective') return ['location','height','hair','eyes','dob','occupation','era','alias','distinguishingMark','associates','lastSeen'];
+  return ['location','height','hair','eyes','dob']; // driver
+}
+
+function getHideCount(mode, tier){
+  if(mode==='plate') return tier===1?0:1;
+  if(mode==='detective') return tier===1?1:(tier===2?3:5);
+  return tier===1?0:(tier===2?1:2); // driver
+}
+
+function buildCardHTML(entry){
+  if(state.mode==='plate') return buildPlateCard(entry);
+  if(state.mode==='detective') return buildDetectiveCard(entry);
+  return buildLicenseCard(entry);
+}
+
+function loadLevel(){
+  state.answered = false;
+  const entry = currentEntry();
+  const deck = getDeck(state.mode);
+  state.hints = 1;
+  state.levelPotential = 100;
+  state.revealedByHint = [];
+  $('hint-count').textContent = state.hints;
+  $('answer-input').value = '';
+  $('answer-input').disabled = false;
+  $('btn-submit').disabled = false;
+  $('reveal-clue').textContent = '';
+  $('mile-marker').textContent = 'LEVEL ' + (state.levelIndex+1) + ' OF ' + deck.length;
+  $('score-val').textContent = loadTotalScore(state.mode);
+  renderLives();
+
+  const hideCount = getHideCount(state.mode, entry.tier);
+  const hideableKeys = getHideableKeys(state.mode);
+  state.hiddenFields = shuffleForHiding(hideableKeys).slice(0, Math.min(hideCount, hideableKeys.length));
+
+  $('card-slot').innerHTML = buildCardHTML(entry);
+  attachTilt();
+  $('answer-input').focus();
+}
+
+function shuffleForHiding(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+function fieldVal(entry,key){
+  const map = {
+    location:entry.location, height:entry.height, hair:entry.hair, eyes:entry.eyes, dob:entry.dob, year:entry.year,
+    occupation:entry.occupation, era:entry.era, alias:entry.alias, distinguishingMark:entry.distinguishingMark,
+    associates:entry.associates, lastSeen:entry.lastSeen
+  };
+  return map[key];
+}
+
+function buildLicenseCard(entry){
+  const hidden = k => state.hiddenFields.includes(k) && !state.revealedByHint.includes(k);
+  const fv = k => hidden(k) ? `<span class="fval redacted">${fieldVal(entry,k)}</span>` : `<span class="fval">${fieldVal(entry,k)}</span>`;
+  const serial = 'NO. HX-' + (1000+entry.name.length*37+entry.tier*91);
+  return `
+    <div class="license-card" id="the-card">
+      <div class="hologram"></div>
+      <div class="card-topline">
+        <div>
+          <div class="state-name">Historical Registry</div>
+          <div class="doc-type">Operator's License &middot; Class H</div>
+        </div>
+        <div class="serial">${serial}<br>ISSUED: LONG AGO</div>
+      </div>
+      <div class="card-body">
+        <div class="avatar-box">
+          <div class="avatar-silhouette">${SILHOUETTE_SVG}</div>
+          <div class="sig-line">signature on file</div>
+        </div>
+        <div class="fields">
+          <div class="field full"><span class="flabel">Location</span>${fv('location')}</div>
+          <div class="field"><span class="flabel">Sex</span><span class="fval">${entry.sex}</span></div>
+          <div class="field"><span class="flabel">Height</span>${fv('height')}</div>
+          <div class="field"><span class="flabel">Hair</span>${fv('hair')}</div>
+          <div class="field"><span class="flabel">Eyes</span>${fv('eyes')}</div>
+          <div class="field full"><span class="flabel">Date of Birth</span>${fv('dob')}</div>
+        </div>
+      </div>
+      <div class="barcode"></div>
+      <div class="stamp-overlay" id="stamp-overlay"></div>
+    </div>
+  `;
+}
+
+function buildPlateCard(entry){
+  const hidden = state.hiddenFields.includes('year') && !state.revealedByHint.includes('year');
+  return `
+    <div class="plate-frame" id="the-card">
+      <div class="plate-face">
+        <div class="plate-bolt tl"></div><div class="plate-bolt tr"></div>
+        <div class="plate-bolt bl"></div><div class="plate-bolt br"></div>
+        <div class="hologram"></div>
+        <div class="plate-state">${entry.location}</div>
+        <div class="plate-combo">${entry.plate}</div>
+        <div class="plate-tag">Historical Route Authority</div>
+        <div class="plate-year">Year: ${hidden ? '<span class="redacted">'+entry.year+'</span>' : entry.year}</div>
+      </div>
+      <div class="stamp-overlay" id="stamp-overlay"></div>
+    </div>
+  `;
+}
+
+function buildDetectiveCard(entry){
+  const hidden = k => state.hiddenFields.includes(k) && !state.revealedByHint.includes(k);
+  const fv = k => hidden(k) ? `<span class="fval redacted">${fieldVal(entry,k)}</span>` : `<span class="fval">${fieldVal(entry,k)}</span>`;
+  const caseNum = 'CF-' + (700+entry.name.length*19+entry.tier*53);
+  return `
+    <div class="case-file" id="the-card">
+      <div class="case-tab">Historical Bureau of Investigation</div>
+      <div class="case-stamp">Open Case</div>
+      <div class="case-topline">
+        <div>
+          <div class="case-name">Subject Dossier</div>
+        </div>
+        <div class="case-meta">CASE NO. ${caseNum}<br>STATUS: UNIDENTIFIED</div>
+      </div>
+      <div class="case-body">
+        <div class="case-photo-box">
+          <div class="paperclip">${PAPERCLIP_SVG}</div>
+          <div class="case-photo">${SILHOUETTE_SVG}</div>
+        </div>
+        <div class="case-fields">
+          <div class="field full"><span class="flabel">Alias</span>${fv('alias')}</div>
+          <div class="field"><span class="flabel">Occupation</span>${fv('occupation')}</div>
+          <div class="field"><span class="flabel">Era Active</span>${fv('era')}</div>
+          <div class="field"><span class="flabel">Origin</span>${fv('location')}</div>
+          <div class="field"><span class="flabel">Sex</span><span class="fval">${entry.sex}</span></div>
+          <div class="field"><span class="flabel">Height</span>${fv('height')}</div>
+          <div class="field"><span class="flabel">Hair</span>${fv('hair')}</div>
+          <div class="field"><span class="flabel">Eyes</span>${fv('eyes')}</div>
+          <div class="field full"><span class="flabel">Date of Birth</span>${fv('dob')}</div>
+          <div class="field full"><span class="flabel">Associates</span>${fv('associates')}</div>
+          <div class="field full"><span class="flabel">Distinguishing Marks</span>${fv('distinguishingMark')}</div>
+          <div class="field full"><span class="flabel">Last Known Whereabouts</span>${fv('lastSeen')}</div>
+        </div>
+      </div>
+      <div class="case-notes">
+        <span class="flabel">Investigator's Note</span>
+        <span class="fval">${entry.clue}</span>
+      </div>
+      <div class="stamp-overlay" id="stamp-overlay"></div>
+    </div>
+  `;
+}
+
+function attachTilt(){
+  const card = $('the-card');
+  if(!card) return;
+  card.addEventListener('mousemove', (e)=>{
+    const r = card.getBoundingClientRect();
+    const x = (e.clientX - r.left)/r.width - 0.5;
+    const y = (e.clientY - r.top)/r.height - 0.5;
+    card.style.transform = `rotateY(${x*8}deg) rotateX(${-y*8}deg)`;
+    const holo = card.querySelector('.hologram');
+    if(holo) holo.style.setProperty('--holo-angle', (x*180+180)+'deg');
+  });
+  card.addEventListener('mouseleave', ()=>{ card.style.transform = 'rotateY(0deg) rotateX(0deg)'; });
+}
+
+function renderLives(){
+  const wrap = $('lives-wrap');
+  wrap.innerHTML = '';
+  for(let i=0;i<3;i++){
+    const span = document.createElement('span');
+    span.textContent = i<state.lives ? '🚗' : '💨';
+    span.style.opacity = i<state.lives ? '1' : '0.35';
+    wrap.appendChild(span);
+  }
+}
+
+function useHint(){
+  if(state.hints<=0 || state.answered) return;
+  state.hints--;
+  $('hint-count').textContent = state.hints;
+  state.levelPotential = Math.max(40, state.levelPotential - 20);
+
+  const entry = currentEntry();
+  const stillHidden = state.hiddenFields.filter(k=>!state.revealedByHint.includes(k));
+  if(stillHidden.length>0){
+    state.revealedByHint.push(stillHidden[0]);
+    $('card-slot').innerHTML = buildCardHTML(entry);
+    attachTilt();
+  } else {
+    $('reveal-clue').textContent = '💡 ' + entry.clue;
+  }
+}
+
+function submitGuess(){
+  if(state.answered) return;
+  const val = $('answer-input').value;
+  if(!val.trim()) return;
+  const entry = currentEntry();
+  const correct = isMatch(val, entry.aliases);
+  state.answered = true;
+  $('answer-input').disabled = true;
+  $('btn-submit').disabled = true;
+
+  const overlay = $('stamp-overlay');
+  const deck = getDeck(state.mode);
+
+  if(correct){
+    overlay.innerHTML = `<div class="stamp correct show">Verified</div>`;
+    setTimeout(()=>{
+      const newTotal = addTotalScore(state.mode, state.levelPotential);
+      markCompleted(state.mode, state.levelIndex);
+      saveUnlocked(state.mode, state.levelIndex+2);
+
+      $('complete-title').textContent = state.mode==='plate' ? 'Case Closed!' : 'Identity Confirmed!';
+      $('complete-sub').textContent = state.mode==='plate' ? 'You correctly named the event:' : 'You correctly identified:';
+      $('complete-answer').textContent = entry.name;
+      $('complete-detail').textContent = entry.clue + ' (+' + state.levelPotential + ' pts, total ' + newTotal + ')';
+      const hasNext = state.levelIndex+1 < deck.length;
+      $('btn-next').classList.toggle('hidden', !hasNext);
+      $('btn-next').textContent = 'Next Level →';
+      showScreen('screen-complete');
+    }, 750);
+  } else {
+    overlay.innerHTML = `<div class="stamp wrong show">Denied</div>`;
+    state.lives--;
+    renderLives();
+    setTimeout(()=>{
+      if(state.lives<=0){
+        $('over-answer').textContent = entry.name;
+        showScreen('screen-over');
+      } else {
+        overlay.innerHTML = '';
+        state.answered = false;
+        $('answer-input').disabled = false;
+        $('btn-submit').disabled = false;
+        $('answer-input').value = '';
+        $('answer-input').focus();
+        $('reveal-clue').textContent = 'Not quite — try again, or use a hint.';
+      }
+    }, 750);
+  }
+}
+
+function giveUp(){
+  if(state.answered) return;
+  state.answered = true;
+  const entry = currentEntry();
+  $('gaveup-answer').textContent = entry.name;
+  $('gaveup-detail').textContent = entry.clue;
+  showScreen('screen-gaveup');
+}
+
+function goNextLevel(){
+  const deck = getDeck(state.mode);
+  if(state.levelIndex+1 < deck.length){
+    startLevel(state.mode, state.levelIndex+1);
+  } else {
+    $('win-score').textContent = loadTotalScore(state.mode);
+    showScreen('screen-win');
+  }
+}
+
+/* ============================ EVENTS ============================ */
+
+refreshTitleProgress();
+
+$('btn-mode-driver').addEventListener('click', ()=>openLevelSelect('driver'));
+$('btn-mode-plate').addEventListener('click', ()=>openLevelSelect('plate'));
+$('btn-mode-detective').addEventListener('click', ()=>openLevelSelect('detective'));
+$('btn-howto').addEventListener('click', ()=>$('glovebox').classList.remove('hidden'));
+$('btn-close-glovebox').addEventListener('click', ()=>$('glovebox').classList.add('hidden'));
+$('glovebox').addEventListener('click', (e)=>{ if(e.target.id==='glovebox') $('glovebox').classList.add('hidden'); });
+
+$('btn-levels-back').addEventListener('click', ()=>{ refreshTitleProgress(); showScreen('screen-title'); });
+
+$('btn-submit').addEventListener('click', submitGuess);
+$('answer-input').addEventListener('keydown', (e)=>{ if(e.key==='Enter') submitGuess(); });
+$('btn-hint').addEventListener('click', useHint);
+$('btn-skip').addEventListener('click', giveUp);
+$('btn-back').addEventListener('click', ()=>openLevelSelect(state.mode));
+
+$('btn-next').addEventListener('click', goNextLevel);
+$('btn-complete-menu').addEventListener('click', ()=>openLevelSelect(state.mode));
+
+$('btn-retry').addEventListener('click', ()=>startLevel(state.mode, state.levelIndex));
+$('btn-over-menu').addEventListener('click', ()=>openLevelSelect(state.mode));
+
+$('btn-gaveup-retry').addEventListener('click', ()=>startLevel(state.mode, state.levelIndex));
+$('btn-gaveup-menu').addEventListener('click', ()=>openLevelSelect(state.mode));
+
+$('btn-win-menu').addEventListener('click', ()=>{ refreshTitleProgress(); showScreen('screen-title'); });
+
+})();
+</script>
+</body>
+</html>
