@@ -208,6 +208,29 @@ html,body{
   letter-spacing:0.5px;
 }
 
+.btg-btn{
+  position:fixed;
+  top:16px;left:16px;
+  background:var(--asphalt-light);
+  color:var(--road-line);
+  border:2px solid var(--road-line);
+  font-family:var(--font-display);
+  font-weight:700;
+  letter-spacing:1px;
+  font-size:0.75rem;
+  padding:7px 13px;
+  border-radius:6px;
+  text-decoration:none;
+  text-transform:uppercase;
+  z-index:10;
+  transition:background 0.15s ease, color 0.15s ease;
+}
+.btg-btn:hover, .btg-btn:focus-visible{
+  background:var(--road-line);
+  color:var(--asphalt-dark);
+  outline:none;
+}
+
 .howto-link{
   display:inline-block;
   margin-top:28px;
@@ -869,6 +892,7 @@ html,body{
 
   <!-- TITLE SCREEN -->
   <div class="screen" id="screen-title">
+    <a class="btg-btn" href="/index.html" title="Burch Tree Games home">BTG</a>
     <div class="title-wrap">
       <div class="postcard-stamp">EST. SOMEWHERE ON ROUTE 1 &middot; HISTORY DIVISION</div>
       <h1 class="title-main">The<br>License<br>Game</h1>
